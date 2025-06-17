@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using PhyGen_SWD392.Models;
 
-namespace PhyGen_SWD392.Models;
+namespace PhyGen_SWD392.Data;
 
 public partial class PhyGenDbContext : DbContext
 {
@@ -46,13 +47,28 @@ public partial class PhyGenDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
+            .HasPostgresEnum("account_type_enum", new[] { "free", "premium" })
             .HasPostgresEnum("auth", "aal_level", new[] { "aal1", "aal2", "aal3" })
             .HasPostgresEnum("auth", "code_challenge_method", new[] { "s256", "plain" })
             .HasPostgresEnum("auth", "factor_status", new[] { "unverified", "verified" })
             .HasPostgresEnum("auth", "factor_type", new[] { "totp", "webauthn", "phone" })
             .HasPostgresEnum("auth", "one_time_token_type", new[] { "confirmation_token", "reauthentication_token", "recovery_token", "email_change_token_new", "email_change_token_current", "phone_change_token" })
+            .HasPostgresEnum("difficulty_enum", new[] { "easy", "medium", "hard" })
+            .HasPostgresEnum("exam_matrices_status_enum", new[] { "active", "archived", "deleted" })
+            .HasPostgresEnum("exam_status_enum", new[] { "active", "archived", "deleted" })
+            .HasPostgresEnum("exam_type_enum", new[] { "Giữa kỳ 1", "Cuối kỳ 1", "Giữa kỳ 2", "Cuối kỳ 2" })
+            .HasPostgresEnum("grade_enum", new[] { "10", "11", "12" })
+            .HasPostgresEnum("matrix_details_difficulty_enum", new[] { "easy", "medium", "hard" })
+            .HasPostgresEnum("matrix_details_type_enum", new[] { "essay", "multiple_choice" })
+            .HasPostgresEnum("question_type_enum", new[] { "essay", "multiple_choice" })
+            .HasPostgresEnum("questions_difficulty_enum", new[] { "easy", "medium", "hard" })
+            .HasPostgresEnum("questions_status_enum", new[] { "active", "inactive", "archived" })
             .HasPostgresEnum("realtime", "action", new[] { "INSERT", "UPDATE", "DELETE", "TRUNCATE", "ERROR" })
             .HasPostgresEnum("realtime", "equality_op", new[] { "eq", "neq", "lt", "lte", "gt", "gte", "in" })
+            .HasPostgresEnum("role_enum", new[] { "user", "admin" })
+            .HasPostgresEnum("role_type", new[] { "user", "admin" })
+            .HasPostgresEnum("status_enum", new[] { "active", "inactive", "banned" })
+            .HasPostgresEnum("subject_grade_enum", new[] { "10", "11", "12" })
             .HasPostgresExtension("extensions", "pg_stat_statements")
             .HasPostgresExtension("extensions", "pgcrypto")
             .HasPostgresExtension("extensions", "uuid-ossp")
@@ -70,9 +86,7 @@ public partial class PhyGenDbContext : DbContext
             entity.HasIndex(e => e.Username, "account_username_key").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.AccountType)
-                .HasDefaultValueSql("'free'::text")
-                .HasColumnName("account_type");
+            entity.Property(e => e.AccountType).HasColumnName("account_type");
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
                 .HasColumnName("email");
@@ -82,12 +96,8 @@ public partial class PhyGenDbContext : DbContext
             entity.Property(e => e.Password)
                 .HasMaxLength(255)
                 .HasColumnName("password");
-            entity.Property(e => e.Role)
-                .HasDefaultValueSql("'user'::text")
-                .HasColumnName("role");
-            entity.Property(e => e.Status)
-                .HasDefaultValueSql("'active'::text")
-                .HasColumnName("status");
+            entity.Property(e => e.Role).HasColumnName("role");
+            entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.Username)
                 .HasMaxLength(100)
                 .HasColumnName("username");
@@ -95,9 +105,9 @@ public partial class PhyGenDbContext : DbContext
 
         modelBuilder.Entity<Answer>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("answers_pkey");
+            entity.HasKey(e => e.Id).HasName("answer_pkey");
 
-            entity.ToTable("answers");
+            entity.ToTable("answer");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Content).HasColumnName("content");
@@ -111,7 +121,8 @@ public partial class PhyGenDbContext : DbContext
 
             entity.HasOne(d => d.Question).WithMany(p => p.Answers)
                 .HasForeignKey(d => d.QuestionId)
-                .HasConstraintName("answers_question_id_fkey");
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("answer_question_id_fkey");
         });
 
         modelBuilder.Entity<Exam>(entity =>
@@ -128,68 +139,66 @@ public partial class PhyGenDbContext : DbContext
             entity.Property(e => e.CreatedBy).HasColumnName("created_by");
             entity.Property(e => e.Examtype).HasColumnName("examtype");
             entity.Property(e => e.IsDraft).HasColumnName("is_draft");
-            entity.Property(e => e.Status)
-                .HasDefaultValueSql("'active'::text")
-                .HasColumnName("status");
+            entity.Property(e => e.Status).HasColumnName("status");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.Exams)
                 .HasForeignKey(d => d.CreatedBy)
+                .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("exam_created_by_fkey");
         });
 
         modelBuilder.Entity<ExamMatrix>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("exam_matrices_pkey");
+            entity.HasKey(e => e.Id).HasName("exam_matrix_pkey");
 
-            entity.ToTable("exam_matrices");
+            entity.ToTable("exam_matrix");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedBy).HasColumnName("created_by");
-            entity.Property(e => e.Examtype).HasColumnName("examtype");
-            entity.Property(e => e.Status)
-                .HasDefaultValueSql("'active'::text")
-                .HasColumnName("status");
+            entity.Property(e => e.Examtype)
+                .HasDefaultValueSql("''::text")
+                .HasColumnName("examtype");
+            entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.SubjectId).HasColumnName("subject_id");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ExamMatrices)
                 .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("exam_matrices_created_by_fkey");
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("exam_matrix_created_by_fkey");
 
             entity.HasOne(d => d.Subject).WithMany(p => p.ExamMatrices)
                 .HasForeignKey(d => d.SubjectId)
-                .HasConstraintName("exam_matrices_subject_id_fkey");
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("exam_matrix_subject_id_fkey");
         });
 
         modelBuilder.Entity<ExamQuestion>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("exam_questions_pkey");
+            entity.HasKey(e => e.Id).HasName("exam_question_pkey");
 
-            entity.ToTable("exam_questions");
+            entity.ToTable("exam_question");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.ExamId).HasColumnName("exam_id");
             entity.Property(e => e.OrderIndex).HasColumnName("order_index");
             entity.Property(e => e.QuestionId).HasColumnName("question_id");
             entity.Property(e => e.SectionId).HasColumnName("section_id");
 
-            entity.HasOne(d => d.Exam).WithMany(p => p.ExamQuestions)
-                .HasForeignKey(d => d.ExamId)
-                .HasConstraintName("exam_questions_exam_id_fkey");
-
             entity.HasOne(d => d.Question).WithMany(p => p.ExamQuestions)
                 .HasForeignKey(d => d.QuestionId)
-                .HasConstraintName("exam_questions_question_id_fkey");
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("exam_question_question_id_fkey");
 
             entity.HasOne(d => d.Section).WithMany(p => p.ExamQuestions)
                 .HasForeignKey(d => d.SectionId)
-                .HasConstraintName("exam_questions_section_id_fkey");
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("exam_question_section_id_fkey");
         });
 
         modelBuilder.Entity<ExamSection>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("exam_sections_pkey");
+            entity.HasKey(e => e.Id).HasName("exam_section_pkey");
 
-            entity.ToTable("exam_sections");
+            entity.ToTable("exam_section");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.DisplayOrder).HasColumnName("display_order");
@@ -203,14 +212,15 @@ public partial class PhyGenDbContext : DbContext
 
             entity.HasOne(d => d.Exam).WithMany(p => p.ExamSections)
                 .HasForeignKey(d => d.ExamId)
-                .HasConstraintName("exam_sections_exam_id_fkey");
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("exam_section_exam_id_fkey");
         });
 
         modelBuilder.Entity<ExamVersion>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("exam_versions_pkey");
+            entity.HasKey(e => e.Id).HasName("exam_version_pkey");
 
-            entity.ToTable("exam_versions");
+            entity.ToTable("exam_version");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.FinalExamId).HasColumnName("final_exam_id");
@@ -222,14 +232,15 @@ public partial class PhyGenDbContext : DbContext
 
             entity.HasOne(d => d.FinalExam).WithMany(p => p.ExamVersions)
                 .HasForeignKey(d => d.FinalExamId)
-                .HasConstraintName("exam_versions_final_exam_id_fkey");
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("exam_version_final_exam_id_fkey");
         });
 
         modelBuilder.Entity<MatrixDetail>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("matrix_details_pkey");
+            entity.HasKey(e => e.Id).HasName("matrix_detail_pkey");
 
-            entity.ToTable("matrix_details");
+            entity.ToTable("matrix_detail");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.DifficultyLevel).HasColumnName("difficulty_level");
@@ -240,18 +251,20 @@ public partial class PhyGenDbContext : DbContext
 
             entity.HasOne(d => d.MatrixSection).WithMany(p => p.MatrixDetails)
                 .HasForeignKey(d => d.MatrixSectionId)
-                .HasConstraintName("matrix_details_matrix_section_id_fkey");
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("matrix_detail_matrix_section_id_fkey");
 
             entity.HasOne(d => d.Topic).WithMany(p => p.MatrixDetails)
                 .HasForeignKey(d => d.TopicId)
-                .HasConstraintName("matrix_details_topic_id_fkey");
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("matrix_detail_topic_id_fkey");
         });
 
         modelBuilder.Entity<MatrixSection>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("matrix_sections_pkey");
+            entity.HasKey(e => e.Id).HasName("matrix_section_pkey");
 
-            entity.ToTable("matrix_sections");
+            entity.ToTable("matrix_section");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.DisplayOrder).HasColumnName("display_order");
@@ -265,29 +278,27 @@ public partial class PhyGenDbContext : DbContext
 
             entity.HasOne(d => d.Matrix).WithMany(p => p.MatrixSections)
                 .HasForeignKey(d => d.MatrixId)
-                .HasConstraintName("matrix_sections_matrix_id_fkey");
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("matrix_section_matrix_id_fkey");
         });
 
         modelBuilder.Entity<Question>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("questions_pkey");
+            entity.HasKey(e => e.Id).HasName("question_pkey");
 
-            entity.ToTable("questions");
+            entity.ToTable("question");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Content).HasColumnName("content");
-            entity.Property(e => e.DifficultyLevel)
-                .HasDefaultValueSql("'medium'::text")
-                .HasColumnName("difficulty_level");
-            entity.Property(e => e.Status)
-                .HasDefaultValueSql("'active'::text")
-                .HasColumnName("status");
+            entity.Property(e => e.DifficultyLevel).HasColumnName("difficulty_level");
+            entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.TopicId).HasColumnName("topic_id");
             entity.Property(e => e.Type).HasColumnName("type");
 
             entity.HasOne(d => d.Topic).WithMany(p => p.Questions)
                 .HasForeignKey(d => d.TopicId)
-                .HasConstraintName("questions_topic_id_fkey");
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("question_topic_id_fkey");
         });
 
         modelBuilder.Entity<Subject>(entity =>
@@ -311,9 +322,9 @@ public partial class PhyGenDbContext : DbContext
 
         modelBuilder.Entity<Topic>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("topics_pkey");
+            entity.HasKey(e => e.Id).HasName("topic_pkey");
 
-            entity.ToTable("topics");
+            entity.ToTable("topic");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.IsDeleted)
@@ -328,11 +339,13 @@ public partial class PhyGenDbContext : DbContext
 
             entity.HasOne(d => d.Parent).WithMany(p => p.InverseParent)
                 .HasForeignKey(d => d.ParentId)
-                .HasConstraintName("topics_parent_id_fkey");
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("topic_parent_id_fkey");
 
             entity.HasOne(d => d.Subject).WithMany(p => p.Topics)
                 .HasForeignKey(d => d.SubjectId)
-                .HasConstraintName("topics_subject_id_fkey");
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("topic_subject_id_fkey");
         });
 
         OnModelCreatingPartial(modelBuilder);

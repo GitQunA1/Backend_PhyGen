@@ -3,6 +3,7 @@ using PhyGen_SWD392.Models;
 using PhyGen_SWD392.Repositories.Interface;
 using PhyGen_SWD392.Repositories.Repo;
 using PhyGen_SWD392.Services;
+using PhyGen_SWD392.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,18 +22,18 @@ builder.Services.AddDbContext<PhyGenDbContext>(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
-app.UseSwagger();
-app.UseSwaggerUI(c =>
+//Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-    c.RoutePrefix = string.Empty;  
-});
+    app.UseSwagger();
+app.UseSwaggerUI();
+}
+//app.UseSwagger();
+//app.UseSwaggerUI(c =>
+//{
+//    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+//    c.RoutePrefix = string.Empty;  
+//});
 
 //app.UseHttpsRedirection();
 app.MapControllers();

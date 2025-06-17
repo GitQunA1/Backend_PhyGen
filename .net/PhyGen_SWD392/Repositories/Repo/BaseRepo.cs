@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PhyGen_SWD392.Data;
 using PhyGen_SWD392.Models;
 using PhyGen_SWD392.Repositories.Interface;
 

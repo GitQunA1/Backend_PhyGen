@@ -19,8 +19,6 @@ public partial class Exam
 
     public virtual Account? CreatedByNavigation { get; set; }
 
-    public virtual ICollection<ExamQuestion> ExamQuestions { get; set; } = new List<ExamQuestion>();
-
     public virtual ICollection<ExamSection> ExamSections { get; set; } = new List<ExamSection>();
 
     public virtual ICollection<ExamVersion> ExamVersions { get; set; } = new List<ExamVersion>();
