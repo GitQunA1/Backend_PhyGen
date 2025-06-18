@@ -48,7 +48,7 @@
 - **System Architecture Overview Diagram:** (Runtime view: API, DB, WebAdmin, Mobile, Firebase Storage, Background Job, Redis)
 - **ERD Diagrams:** Conceptual, Logical, and Physical
 - **Physical DB in Server with Data:** (Backend)
-- **Screen List + Screen Map:** (https://docs.google.com/spreadsheets/d/1eecFyFCY56jhuhFvF8JgiCbmiLwCbPZf8m15iWjUcOU/edit?usp=sharing)
+- [Screen List + Screen Map](https://docs.google.com/spreadsheets/d/1eecFyFCY56jhuhFvF8JgiCbmiLwCbPZf8m15iWjUcOU/edit?usp=sharing)
 - **Mockup Design Project in Figma:** [Figma Link](https://www.figma.com/design/9lRT7kGpW5CsBdRptl2U5Z/SWD?node-id=0-1&t=w0QFfP31WoRnXvQB-1)
 
 
