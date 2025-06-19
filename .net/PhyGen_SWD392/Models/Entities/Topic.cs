@@ -1,7 +1,9 @@
-﻿using System;
+﻿using PhyGen_SWD392.Models.Enums;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PhyGen_SWD392.Models;
+namespace PhyGen_SWD392.Models.Entities;
 
 public partial class Topic
 {
@@ -9,7 +11,15 @@ public partial class Topic
 
     public string Name { get; set; } = null!;
 
+    [Column("level")]
     public string? Level { get; set; }
+
+    [NotMapped]
+    public TopicLevelEnum? LevelEnum
+    {
+        get => Enum.TryParse<TopicLevelEnum>(Level, out var levelEnum) ? levelEnum : null;
+        set => Level = value?.ToString();
+    }
 
     public int? SubjectId { get; set; }
 

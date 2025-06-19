@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using PhyGen_SWD392.Models;
+using PhyGen_SWD392.Models.Entities;
 using PhyGen_SWD392.Services;
 
 namespace PhyGen_SWD392.Controllers

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PhyGen_SWD392.Models;
+namespace PhyGen_SWD392.Models.Entities;
 
 public partial class Subject
 {

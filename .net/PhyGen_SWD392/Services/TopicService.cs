@@ -1,5 +1,5 @@
 ﻿using PhyGen_SWD392.Data;
-using PhyGen_SWD392.Models;
+using PhyGen_SWD392.Models.Entities;
 using PhyGen_SWD392.Repositories.Interface;
 
 namespace PhyGen_SWD392.Services
@@ -17,11 +17,21 @@ namespace PhyGen_SWD392.Services
 
         public async Task<Topic> CreateTopicAsync(Topic topic)
         {
+            if (topic.LevelEnum.HasValue)
+            {
+                topic.Level = topic.LevelEnum.ToString();
+            }
+
             return await _topicRepo.CreateAsync(topic);
         }
 
         public async Task<bool> UpdateTopicAsync(int id, Topic topic)
         {
+            if (topic.LevelEnum.HasValue)
+            {
+                topic.Level = topic.LevelEnum.ToString();
+            }
+
             return await _topicRepo.UpdateAsync(id, topic);
         }
 
