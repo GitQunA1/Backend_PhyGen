@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using PhyGen_SWD392.Helpers;
 using PhyGen_SWD392.Models.Entities;
 using PhyGen_SWD392.Services;
 
@@ -16,9 +17,10 @@ namespace PhyGen_SWD392.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Topic>> GetAllTopicsAsync()
+        public async Task<IActionResult> GetAllTopicsAsync()
         {
-            return await _topicService.GetAllTopicsAsync();
+            var topics = await _topicService.GetAllTopicsAsync();
+            return Ok(ApiResponse<List<Topic>>.SuccessResponse(topics.ToList(), "Get All successfully"));
         }
 
         [HttpGet("{id}")]
@@ -26,21 +28,21 @@ namespace PhyGen_SWD392.Controllers
         {
             var topic = await _topicService.GetTopicByIdAsync(id);
             if (topic == null)
-                return NotFound();
+                return NotFound(ApiResponse<Topic>.ErrorResponse(new List<string> {"Topic not found."}, "No data found"));
 
-            return Ok(topic);
+            return Ok(ApiResponse<Topic>.SuccessResponse(topic, "Get By Id successfully"));
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTopicAsync(int id, [FromBody] Topic topic)
         {
             if (id != topic.Id)
-                return BadRequest("Topic ID mismatch.");
+                return BadRequest(ApiResponse<Topic>.ErrorResponse(new List<string> {"Not found Topic."}, "No data found"));
 
             var updated = await _topicService.UpdateTopicAsync(id, topic);
 
             if (!updated)
-                return NotFound();
+                return NotFound(ApiResponse<Topic>.ErrorResponse(new List<string> { "Not found Topic." }, "No data found"));
             return NoContent();
         }
 
@@ -49,7 +51,8 @@ namespace PhyGen_SWD392.Controllers
         {
             var deleted = await _topicService.DeleteTopicAsync(id);
             if (!deleted)
-                return NotFound();
+                return NotFound(ApiResponse<Topic>.ErrorResponse(new List<string> { "Not found Topic." }, "No data found"));
+
             return NoContent();
         }
     }
