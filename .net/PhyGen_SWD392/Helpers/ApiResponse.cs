@@ -2,17 +2,31 @@
 {
     public class ApiResponse<T>
     {
-        public string Message { get; set; }
+        public bool Success { get; set; }
+        public string? Message { get; set; }
+        public T? Data { get; set; }
+        public List<String>? Error { get; set; }
 
-        public T Body { get; set; }
-
-        public int Status { get; set; }
-
-        public ApiResponse(int status, string message, T body)
+        public static ApiResponse<T> SuccessResponse(T data, string message)
         {
-            Status = status;
-            Message = message;
-            Body = body;
+            return new ApiResponse<T>
+            {
+                Success = true,
+                Message = message,
+                Data = data,
+                Error = null
+            };
+        }
+
+        public static ApiResponse<T> ErrorResponse(List<string> errors, string errorMessage)
+        {
+            return new ApiResponse<T>
+            {
+                Success = false,
+                Message = errorMessage,
+                Data = default,
+                Error = errors
+            };
         }
     }
 }
