@@ -51,6 +51,9 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IAccountAdminRepo, AccountAdminRepo>();
 builder.Services.AddScoped<AccountAdminService>();
 
+builder.Services.AddScoped<IAccountUser, AccountUserRepo>();
+builder.Services.AddScoped<AccountUserService>();
+
 builder.Services.AddScoped<ITopicRepo, TopicRepo>();
 builder.Services.AddScoped<TopicService>();
 
