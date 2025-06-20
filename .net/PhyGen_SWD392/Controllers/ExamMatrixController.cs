@@ -7,7 +7,7 @@ using PhyGen_SWD392.Services;
 namespace PhyGen_SWD392.Controllers
 {
     [ApiController]
-    [Route("api/exammatrix")]
+    [Route("api/exam_matrix")]
     public class ExamMatrixController : ControllerBase
     {
         private readonly ExamMatrixService _service;
