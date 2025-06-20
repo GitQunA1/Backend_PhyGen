@@ -44,7 +44,17 @@
             //.ForMember(dest => dest.Id, opt => opt.Ignore());
 
             CreateMap<MatrixSectionRequest, MatrixSection>();
-                //.ForMember(dest => dest.Id, opt => opt.Ignore());
+            //.ForMember(dest => dest.Id, opt => opt.Ignore());
+
+            CreateMap<MatrixDetail, MatrixDetailDTO>()
+                .ForMember(dest => dest.DifficultyLevel, opt => opt.MapFrom(src => src.DifficultyLevel))
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type));
+
+            CreateMap<MatrixDetailDTO, MatrixDetail>();
+
+            CreateMap<MatrixDetailRequest, MatrixDetail>()
+                .ForMember(dest => dest.DifficultyLevel, opt => opt.MapFrom(src => src.LevelEnum.ToString()))
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.TypeEnum.ToString()));
         }
     }
 }

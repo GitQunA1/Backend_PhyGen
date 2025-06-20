@@ -23,6 +23,8 @@ builder.Services.AddScoped<IExamMatrixRepo, ExamMatrixRepo>();
 builder.Services.AddScoped<ExamMatrixService>();
 builder.Services.AddScoped<IMatrixSectionRepo, MatrixSectionRepo>();
 builder.Services.AddScoped<MatrixSectionService>();
+builder.Services.AddScoped<IMatrixDetailRepo, MatrixDetailRepo>();
+builder.Services.AddScoped<MatrixDetailService>();
 
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
