@@ -47,6 +47,10 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddControllers();
 builder.Services.AddScoped<IAuthRepo, AuthRepo>();
 builder.Services.AddScoped<AuthService>();
+
+builder.Services.AddScoped<IAccountAdminRepo, AccountAdminRepo>();
+builder.Services.AddScoped<AccountAdminService>();
+
 builder.Services.AddScoped<ITopicRepo, TopicRepo>();
 builder.Services.AddScoped<TopicService>();
 
