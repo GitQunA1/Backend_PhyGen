@@ -66,14 +66,5 @@ namespace PhyGen_SWD392.Controllers
 
             return Ok(ApiResponse<object>.SuccessResponse(response, "Login successful"));
         }
-
-
-
-        [Authorize]
-        [HttpGet("secure-endpoint")]
-        public IActionResult SecureEndpoint()
-        {
-            return Ok("You're authenticated!");
-        }
     }
 }

@@ -2,7 +2,7 @@
 {
     public class AccountLoginDto
     {
-        public string Email { get; set; } = null!;
+        public string Identifier { get; set; } = null!; // Email hoặc Username
         public string Password { get; set; } = null!;
     }
 }

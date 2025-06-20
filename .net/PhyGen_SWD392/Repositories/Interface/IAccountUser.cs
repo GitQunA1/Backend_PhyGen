@@ -6,7 +6,6 @@ namespace PhyGen_SWD392.Repositories.Interface
     public interface IAccountUser
     {
         Task<Account?> GetByIdAsync(int id);
-
         Task<bool> UpdateProfileAsync(int id, UserUpdateDto dto);
     }
 }

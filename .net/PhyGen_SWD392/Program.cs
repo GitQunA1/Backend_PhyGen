@@ -57,6 +57,15 @@ builder.Services.AddScoped<AccountUserService>();
 builder.Services.AddScoped<ITopicRepo, TopicRepo>();
 builder.Services.AddScoped<TopicService>();
 
+builder.Services.AddScoped<IEmailVerificationRepo, EmailVerificationRepo>();
+builder.Services.AddScoped<EmailVerificationService>();
+
+builder.Services.AddScoped<IForgetPasswordRepo, ForgetPasswordRepo>();
+builder.Services.AddScoped<ForgetPasswordService>();
+
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 builder.Services.AddDbContext<PhyGenDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 

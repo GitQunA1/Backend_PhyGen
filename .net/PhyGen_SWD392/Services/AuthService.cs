@@ -56,10 +56,23 @@ namespace PhyGen_SWD392.Services
 
         public async Task<Account?> LoginAsync(AccountLoginDto dto)
         {
-            var account = await _authRepo.GetAccountByEmailAsync(dto.Email);
-            if (account == null || account.StatusEnum != AccountStatusEnum.Active)
-                return null;
+            Account? account;
 
+            // Phân biệt email hay username
+            if (dto.Identifier.Contains("@"))
+            {
+                account = await _authRepo.GetAccountByEmailAsync(dto.Identifier);
+                if (account == null)
+                    return null;
+            }
+            else
+            {
+                account = await _authRepo.GetAccountByUsernameAsync(dto.Identifier);
+                if (account == null)
+                    return null;
+            }
+            if (account.StatusEnum != AccountStatusEnum.Active)
+                return null;
             var isValidPassword = BCrypt.Net.BCrypt.Verify(dto.Password, account.Password);
             return isValidPassword ? account : null;
         }
@@ -91,5 +104,6 @@ namespace PhyGen_SWD392.Services
         {
             return _jwtSettings.ExpirationMinutes * 60;
         }
+
     }
 }
