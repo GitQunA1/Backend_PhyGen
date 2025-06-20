@@ -1,6 +1,8 @@
-﻿namespace PhyGen_SWD392.Repositories.Interface
+﻿using PhyGen_SWD392.Models.Entities;
+
+namespace PhyGen_SWD392.Repositories.Interface
 {
-    public interface ISubject
+    public interface ISubject : IBaseRepo<Subject, int>
     {
     }
 }

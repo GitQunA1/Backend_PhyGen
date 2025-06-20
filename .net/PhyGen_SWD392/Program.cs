@@ -4,6 +4,7 @@ using PhyGen_SWD392.Repositories.Interface;
 using PhyGen_SWD392.Repositories.Repo;
 using PhyGen_SWD392.Services;
 using PhyGen_SWD392.Data;
+using PhyGen_SWD392.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddScoped<ITopicRepo, TopicRepo>();
 builder.Services.AddScoped<TopicService>();
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddDbContext<PhyGenDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

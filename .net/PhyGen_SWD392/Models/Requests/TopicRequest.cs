@@ -8,7 +8,6 @@ namespace PhyGen_SWD392.Models.Requests
         [Required]
         public string Name { get; set; } = null!;
 
-        [Required]
         [EnumDataType(typeof(TopicLevelEnum))]
         public TopicLevelEnum LevelEnum { get; set; }
 
