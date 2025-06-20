@@ -56,7 +56,6 @@ namespace PhyGen_SWD392.Controllers
             if (!updated)
                 return NotFound(ApiResponse<bool>.ErrorResponse(new List<string> { "Topic not found." }, "Update failed"));
 
-            var updatedTopic = await _topicService.GetTopicByIdAsync(id);
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Topic updated successfully"));
         }
 

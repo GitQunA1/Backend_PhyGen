@@ -17,6 +17,10 @@ builder.Services.AddControllers();
 
 builder.Services.AddScoped<ITopicRepo, TopicRepo>();
 builder.Services.AddScoped<TopicService>();
+builder.Services.AddScoped<ISubjectRepo, SubjectRepo>();
+builder.Services.AddScoped<SubjectService>();
+builder.Services.AddScoped<IExamMatrixRepo, ExamMatrixRepo>();
+builder.Services.AddScoped<ExamMatrixService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 

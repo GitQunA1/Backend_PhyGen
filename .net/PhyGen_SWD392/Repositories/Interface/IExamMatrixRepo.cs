@@ -2,7 +2,7 @@
 
 namespace PhyGen_SWD392.Repositories.Interface
 {
-    public interface ISubject : IBaseRepo<Subject, int>
+    public interface IExamMatrixRepo : IBaseRepo<ExamMatrix, int>
     {
     }
 }
