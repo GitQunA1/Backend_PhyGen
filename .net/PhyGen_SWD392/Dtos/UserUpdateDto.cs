@@ -1,0 +1,11 @@
+﻿using PhyGen_SWD392.Models.Enums;
+
+namespace PhyGen_SWD392.Dtos
+{
+    public class UserUpdateDto
+    {
+        public string Username { get; set; } = null!;
+        public string Password { get; set; } = null!;
+        public string Email { get; set; } = null!;
+    }
+}
