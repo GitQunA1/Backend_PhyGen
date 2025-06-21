@@ -1,5 +1,7 @@
-﻿using System;
+﻿using PhyGen_SWD392.Models.Enums;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhyGen_SWD392.Models.Entities;
 
@@ -12,6 +14,13 @@ public partial class Subject
     public string? Description { get; set; }
 
     public string? Grade { get; set; }
+
+    [NotMapped]
+    public SubjectGradeEnum? GradeEnum
+    {
+        get => Enum.TryParse(Grade, out SubjectGradeEnum grade) ? grade : (SubjectGradeEnum?)null;
+        set => Grade = value?.ToString();
+    }
 
     public bool? IsDeleted { get; set; }
 

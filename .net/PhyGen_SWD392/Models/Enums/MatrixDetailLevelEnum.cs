@@ -4,13 +4,13 @@ namespace PhyGen_SWD392.Models.Enums
 {
     public enum MatrixDetailLevelEnum
     {
-        [Description("Easy")]
-        Easy = 1,
+        [Description("easy")]
+        easy = 1,
 
-        [Description("Medium")]
-        Mediumn = 2,
+        [Description("medium")]
+        mediumn = 2,
 
-        [Description("Hard")]
-        Hard = 3
+        [Description("hard")]
+        hard = 3
     }
 }

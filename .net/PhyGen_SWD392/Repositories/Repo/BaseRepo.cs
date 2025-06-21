@@ -53,7 +53,7 @@ namespace PhyGen_SWD392.Repositories.Repo
             return await _context.Set<T>().FindAsync(id);
         }
 
-        public virtual async Task<IEnumerable<T>> GetAllAsync()
+        public virtual async Task<List<T>> GetAllAsync()
         {
             return await _context.Set<T>().ToListAsync();
         }

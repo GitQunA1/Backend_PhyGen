@@ -1,5 +1,8 @@
-﻿using PhyGen_SWD392.Data;
+﻿using AutoMapper;
+using PhyGen_SWD392.Data;
+using PhyGen_SWD392.Models.DTOs;
 using PhyGen_SWD392.Models.Entities;
+using PhyGen_SWD392.Models.Requests;
 using PhyGen_SWD392.Repositories.Interface;
 
 namespace PhyGen_SWD392.Services
@@ -8,45 +11,64 @@ namespace PhyGen_SWD392.Services
     {
         private readonly PhyGenDbContext _context;
         private readonly ITopicRepo _topicRepo;
+        private readonly IMapper _mapper;
 
-        public TopicService(PhyGenDbContext phyGenDbContext, ITopicRepo topicRepo)
+        public TopicService(PhyGenDbContext phyGenDbContext, ITopicRepo topicRepo, IMapper mapper)
         {
             _context = phyGenDbContext;
             _topicRepo = topicRepo;
+            _mapper = mapper;
         }
 
-        public async Task<Topic> CreateTopicAsync(Topic topic)
+        public async Task<TopicDTO> CreateTopicAsync(TopicRequest topicRequest)
         {
-            if (topic.LevelEnum.HasValue)
+            var topic = _mapper.Map<Topic>(topicRequest);
+
+            if(topicRequest.LevelEnum != null)
             {
-                topic.Level = topic.LevelEnum.ToString();
+                topic.Level = topicRequest.LevelEnum.ToString();
             }
 
-            return await _topicRepo.CreateAsync(topic);
+            var createdTopic = await _topicRepo.CreateAsync(topic);
+            var topicDto = _mapper.Map<TopicDTO>(createdTopic);
+
+            return topicDto;
         }
 
-        public async Task<bool> UpdateTopicAsync(int id, Topic topic)
+        public async Task<bool> UpdateTopicAsync(int id, TopicRequest topicRequest)
         {
-            if (topic.LevelEnum.HasValue)
+            var existingTopic = await _topicRepo.GetByIdAsync(id);
+            if (existingTopic == null)
+                return false;
+
+            _mapper.Map(topicRequest, existingTopic);
+
+            existingTopic.Id = id;
+
+            if (topicRequest.LevelEnum != null)
             {
-                topic.Level = topic.LevelEnum.ToString();
+                existingTopic.Level = topicRequest.LevelEnum.ToString();
             }
 
-            return await _topicRepo.UpdateAsync(id, topic);
+            return await _topicRepo.UpdateAsync(id, existingTopic);
         }
 
         public async Task<bool> DeleteTopicAsync(int id)
         {
             return await _topicRepo.Delete(id);
         }
-        public async Task<Topic?> GetTopicByIdAsync(int id)
+        public async Task<TopicDTO?> GetTopicByIdAsync(int id)
         {
-            return await _topicRepo.GetByIdAsync(id);
+            var topic = await _topicRepo.GetByIdAsync(id);
+            var topicDto = _mapper.Map<TopicDTO>(topic);
+            return topicDto;
         }
 
-        public async Task<IEnumerable<Topic>> GetAllTopicsAsync()
+        public async Task<List<TopicDTO>> GetAllTopicsAsync()
         {
-            return await _topicRepo.GetAllAsync();
+            var topics = await _topicRepo.GetAllAsync();
+            var topicDto = _mapper.Map<List<TopicDTO>>(topics);
+            return topicDto;
         }
     }
 }

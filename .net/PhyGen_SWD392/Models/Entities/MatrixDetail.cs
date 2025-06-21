@@ -13,19 +13,23 @@ public partial class MatrixDetail
 
     public int? TopicId { get; set; }
 
-    [Column("difficulty_level")]
     public string? DifficultyLevel { get; set; }
-
     [NotMapped]
-    public MatrixDetailLevelEnum? DifficultyLevelId
+    public MatrixDetailLevelEnum? LevelEnum
     {
-        get => Enum.TryParse<MatrixDetailLevelEnum>(DifficultyLevel, out var detailLevel) ? detailLevel : null;
+        get => Enum.TryParse<MatrixDetailLevelEnum>(DifficultyLevel, out var level) ? level : null;
         set => DifficultyLevel = value?.ToString();
     }
 
     public int? Quantity { get; set; }
 
     public string? Type { get; set; }
+    [NotMapped]
+    public MatrixDetailTypeEnum? TypeEnum
+    {
+        get => Enum.TryParse<MatrixDetailTypeEnum>(Type, out var type) ? type : null;
+        set => Type = value?.ToString();
+    }
 
     public virtual MatrixSection? MatrixSection { get; set; }
 
