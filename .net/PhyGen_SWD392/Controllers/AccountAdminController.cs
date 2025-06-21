@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PhyGen_SWD392.Dtos;
 using PhyGen_SWD392.Helpers;
+using PhyGen_SWD392.Models.DTOs;
 using PhyGen_SWD392.Models.Entities;
 using PhyGen_SWD392.Models.Enums;
 using PhyGen_SWD392.Services;

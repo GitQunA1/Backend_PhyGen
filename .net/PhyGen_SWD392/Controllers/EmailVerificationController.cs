@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PhyGen_SWD392.Dtos;
 using PhyGen_SWD392.Helpers;
+using PhyGen_SWD392.Models.DTOs;
 using PhyGen_SWD392.Services;
 
 namespace PhyGen_SWD392.Controllers

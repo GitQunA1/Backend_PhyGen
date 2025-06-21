@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using PhyGen_SWD392.Data;
-using PhyGen_SWD392.Dtos;
+using PhyGen_SWD392.Models.DTOs;
 using PhyGen_SWD392.Models.Entities;
 using PhyGen_SWD392.Models.Enums;
 using PhyGen_SWD392.Repositories.Interface;

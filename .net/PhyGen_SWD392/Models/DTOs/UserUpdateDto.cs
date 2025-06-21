@@ -1,6 +1,6 @@
 ﻿using PhyGen_SWD392.Models.Enums;
 
-namespace PhyGen_SWD392.Dtos
+namespace PhyGen_SWD392.Models.DTOs
 {
     public class UserUpdateDto
     {

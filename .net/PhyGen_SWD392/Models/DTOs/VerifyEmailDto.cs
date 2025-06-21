@@ -1,4 +1,4 @@
-﻿namespace PhyGen_SWD392.Dtos
+﻿namespace PhyGen_SWD392.Models.DTOs
 {
     public class VerifyEmailDto
     {

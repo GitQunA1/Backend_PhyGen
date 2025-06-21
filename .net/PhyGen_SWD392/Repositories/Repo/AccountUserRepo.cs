@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PhyGen_SWD392.Data;
-using PhyGen_SWD392.Dtos;
 using PhyGen_SWD392.Models.Entities;
 using PhyGen_SWD392.Repositories.Interface;
 using BCrypt.Net;
+using PhyGen_SWD392.Models.DTOs;
 
 namespace PhyGen_SWD392.Repositories.Repo
 {
