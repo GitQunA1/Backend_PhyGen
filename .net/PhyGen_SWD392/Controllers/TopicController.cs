@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using PhyGen_SWD392.Helpers;
 using PhyGen_SWD392.Models.DTOs;
@@ -10,6 +11,8 @@ namespace PhyGen_SWD392.Controllers
 {
     [ApiController]
     [Route("api/topic")]
+    [Authorize(Roles = "Admin")]
+
     public class TopicController : ControllerBase
     {
         private readonly TopicService _topicService;

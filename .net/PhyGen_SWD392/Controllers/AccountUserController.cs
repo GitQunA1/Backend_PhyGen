@@ -10,7 +10,7 @@ namespace PhyGen_SWD392.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = "User,Admin")]
 
     public class AccountUserController : ControllerBase
     {

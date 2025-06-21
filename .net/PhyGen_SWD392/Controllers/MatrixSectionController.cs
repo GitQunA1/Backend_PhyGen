@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PhyGen_SWD392.Helpers;
 using PhyGen_SWD392.Models.DTOs;
 using PhyGen_SWD392.Models.Requests;
@@ -8,6 +9,8 @@ namespace PhyGen_SWD392.Controllers
 {
     [ApiController]
     [Route("api/matrix_section")]
+    [Authorize(Roles = "Admin")]
+
     public class MatrixSectionController : ControllerBase
     {
         private readonly MatrixSectionService _service;
