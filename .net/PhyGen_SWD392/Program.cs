@@ -120,6 +120,7 @@ app.UseAuthorization();
 //To deploy
 var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
 app.Urls.Add($"http://*:{port}");
+Console.WriteLine($"Listening on port {port}");
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>
@@ -127,6 +128,8 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
     c.RoutePrefix = "swagger";  // Để swagger UI chạy ở /swagger thay vì /
 });
+
+app.MapGet("/", () => "OK");
 //
 
 app.MapControllers();
