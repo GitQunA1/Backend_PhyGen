@@ -2,7 +2,7 @@
 {
     public enum ExamMatrixStatusEnum
     {
-        Active = 1,
-        Inactive = 2
+        active = 1,
+        inactive = 2
     }
 }

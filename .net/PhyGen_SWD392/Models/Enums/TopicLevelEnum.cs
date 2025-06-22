@@ -4,13 +4,10 @@ namespace PhyGen_SWD392.Models.Enums
 {
     public enum TopicLevelEnum
     {
-        [Description("easy")]
         easy = 1,
 
-        [Description("medium")]
         mediumn = 2,
 
-        [Description("hard")]
         hard = 3
     }
 }
