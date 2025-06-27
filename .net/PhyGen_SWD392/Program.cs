@@ -12,6 +12,7 @@ using Microsoft.OpenApi.Models;
 using PhyGen_SWD392.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
+//var frontendUrls = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -43,6 +44,17 @@ builder.Services.AddSwaggerGen(c =>
     {
         { jwtScheme, Array.Empty<string>() }
     });
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
 });
 
 builder.Services.AddControllers();
@@ -113,6 +125,8 @@ var app = builder.Build();
 //    app.UseSwagger();
 //    app.UseSwaggerUI();
 //}
+
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
