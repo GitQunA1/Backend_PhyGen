@@ -26,24 +26,19 @@ builder.Services.AddSwaggerGen(c =>
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        Description = "This API uses JWT authentication.\n\n" +
-                      "To access these function paste your token below in this format:\n\n" +
-                      "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+        Description = "Paste your JWT token directly here.",
         Reference = new OpenApiReference
         {
             Type = ReferenceType.SecurityScheme,
-            Id = "Bearer"
+            Id = "JWT"
         }
     };
 
-    c.AddSecurityDefinition("Bearer", jwtScheme);
-
+    c.AddSecurityDefinition("JWT", jwtScheme);
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        { jwtScheme, Array.Empty<string>() }
-    });
+{
+    { jwtScheme, Array.Empty<string>() }
+    }); 
 });
 
 builder.Services.AddCors(options =>
@@ -127,6 +122,17 @@ var app = builder.Build();
 //}
 
 app.UseCors("AllowFrontend");
+
+app.Use(async (context, next) =>
+{
+    var token = context.Request.Headers["Authorization"].FirstOrDefault();
+    if (!string.IsNullOrEmpty(token) && !token.StartsWith("Bearer "))
+    {
+        context.Request.Headers["Authorization"] = $"Bearer {token}";
+    }
+    await next();
+});
+
 
 app.UseAuthentication();
 app.UseAuthorization();
