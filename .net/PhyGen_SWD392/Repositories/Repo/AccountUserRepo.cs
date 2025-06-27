@@ -40,5 +40,24 @@ namespace PhyGen_SWD392.Repositories.Repo
 
             return result > 0;
         }
+        public async Task<List<ExamListDto>> GetExamsByUserAsync(int userId)
+        {
+            var examList = await (from e in _context.Exams
+                                  join em in _context.ExamMatrices on e.Id equals em.Id
+                                  join s in _context.Subjects on em.SubjectId equals s.Id
+                                  where e.CreatedBy == userId
+                                  select new ExamListDto
+                                  {
+                                      Id = e.Id,
+                                      IsDraft = e.IsDraft,
+                                      ExamType = e.Examtype,
+                                      CreatedAt = e.CreatedAt,
+                                      QuestionCount = _context.ExamQuestions
+                                          .Count(eq => eq.Section != null && eq.Section.ExamId == e.Id),
+                                      SubjectName = s.Name
+                                  }).ToListAsync();
+
+            return examList;
+        }
     }
 }

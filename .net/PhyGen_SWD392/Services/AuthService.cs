@@ -82,6 +82,7 @@ namespace PhyGen_SWD392.Services
             var claims = new[]
             {
         new Claim(JwtRegisteredClaimNames.Sub, acc.Id.ToString()),
+        new Claim("id", acc.Id.ToString()),
         new Claim(JwtRegisteredClaimNames.Email, acc.Email),
         new Claim(ClaimTypes.Role, acc.Role ?? "User"),
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())

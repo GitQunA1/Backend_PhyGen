@@ -5,6 +5,7 @@ using PhyGen_SWD392.Helpers;
 using PhyGen_SWD392.Models.DTOs;
 using PhyGen_SWD392.Models.Entities;
 using PhyGen_SWD392.Services;
+using System.Security.Claims;
 
 namespace PhyGen_SWD392.Controllers
 {
@@ -21,10 +22,16 @@ namespace PhyGen_SWD392.Controllers
             _accountUserService = accountUserService;
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMyProfile()
         {
-            var account = await _accountUserService.GetByIdAsync(id);
+            var userIdClaim = User.FindFirst("id") ?? User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null) return Unauthorized();
+
+            if (!int.TryParse(userIdClaim.Value, out int userId))
+                return Unauthorized("Invalid user ID.");
+
+            var account = await _accountUserService.GetByIdAsync(userId);
             if (account == null)
             {
                 return NotFound(ApiResponse<string>.ErrorResponse(
@@ -35,10 +42,16 @@ namespace PhyGen_SWD392.Controllers
             return Ok(ApiResponse<Account>.SuccessResponse(account, "User retrieved successfully."));
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProfile(int id, [FromBody] UserUpdateDto dto)
+        [HttpPut("me")]
+        public async Task<IActionResult> UpdateMyProfile([FromBody] UserUpdateDto dto)
         {
-            var success = await _accountUserService.UpdateProfileAsync(id, dto);
+            var userIdClaim = User.FindFirst("id") ?? User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null) return Unauthorized();
+
+            if (!int.TryParse(userIdClaim.Value, out int userId))
+                return Unauthorized("Invalid user ID.");
+
+            var success = await _accountUserService.UpdateProfileAsync(userId, dto);
             if (!success)
             {
                 return NotFound(ApiResponse<string>.ErrorResponse(
@@ -48,5 +61,22 @@ namespace PhyGen_SWD392.Controllers
 
             return Ok(ApiResponse<string>.SuccessResponse(null, "User profile updated successfully."));
         }
+
+
+        [HttpGet("me/exams")]
+        public async Task<IActionResult> GetMyExams()
+        {
+            var userIdClaim = User.FindFirst("id") ?? User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null) return Unauthorized();
+
+            if (!int.TryParse(userIdClaim.Value, out int userId))
+                return Unauthorized("Invalid user ID.");
+
+            var exams = await _accountUserService.GetExamsByUserAsync(userId);
+
+            return Ok(ApiResponse<List<ExamListDto>>.SuccessResponse(exams, "Exam List retrieved successfully."));
+        }
+
+
     }
 }
