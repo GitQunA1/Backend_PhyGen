@@ -101,10 +101,9 @@ namespace PhyGen_SWD392.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        public int GetTokenExpirationSeconds()
+        public int GetTokenExpirationMinutes()
         {
-            return _jwtSettings.ExpirationMinutes * 60;
+            return _jwtSettings.ExpirationMinutes;
         }
-
     }
 }
