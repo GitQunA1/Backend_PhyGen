@@ -65,27 +65,40 @@ namespace PhyGen_SWD392.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] AccountUpdateDto dto)
         {
-            var account = new Account
+            var existingAccount = await _accountService.GetAccountByIdAsync(id);
+            if (existingAccount == null)
             {
-                Id = id,
-                Username = dto.Username,
-                Password = dto.Password,
-                Email = dto.Email,
-                EmailVerified = dto.EmailVerified ?? false,
-                Role = Enum.GetName(typeof(RoleEnum), dto.Role),
-                AccountType = Enum.GetName(typeof(AccountTypeEnum), dto.AccountType),
-                Status = Enum.GetName(typeof(AccountStatusEnum), dto.AccountStatus)
-            };
+                var error = ApiResponse<string>.ErrorResponse(
+                    new() { "Account not found." },
+                    "Update failed."
+                );
+                return NotFound(error);
+            }
 
-            var result = await _accountService.UpdateAccountAsync(account);
+
+            existingAccount.Username = !string.IsNullOrWhiteSpace(dto.Username) ? dto.Username : existingAccount.Username;
+            existingAccount.Password = !string.IsNullOrWhiteSpace(dto.Password) ? dto.Password : existingAccount.Password;
+            existingAccount.Email = !string.IsNullOrWhiteSpace(dto.Email) ? dto.Email : existingAccount.Email;
+            existingAccount.EmailVerified = dto.EmailVerified ?? existingAccount.EmailVerified;
+
+            if (Enum.IsDefined(typeof(RoleEnum), dto.Role))
+                existingAccount.Role = Enum.GetName(typeof(RoleEnum), dto.Role)!;
+
+            if (Enum.IsDefined(typeof(AccountTypeEnum), dto.AccountType))
+                existingAccount.AccountType = Enum.GetName(typeof(AccountTypeEnum), dto.AccountType)!;
+
+            if (Enum.IsDefined(typeof(AccountStatusEnum), dto.AccountStatus))
+                existingAccount.Status = Enum.GetName(typeof(AccountStatusEnum), dto.AccountStatus)!;
+
+            var result = await _accountService.UpdateAccountAsync(existingAccount);
 
             if (!result)
             {
                 var error = ApiResponse<string>.ErrorResponse(
-                    new() { "Account not found for update." },
+                    new() { "Failed to update account." },
                     "Update failed."
                 );
-                return NotFound(error);
+                return BadRequest(error);
             }
 
             var response = ApiResponse<string>.SuccessResponse(
