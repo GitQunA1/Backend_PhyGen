@@ -72,9 +72,9 @@ namespace PhyGen_SWD392.Controllers
                 Password = dto.Password,
                 Email = dto.Email,
                 EmailVerified = dto.EmailVerified ?? false,
-                Role = dto.Role.ToString(),
-                AccountType = dto.AccountType.ToString(),
-                Status = dto.AccountStatus.ToString()
+                Role = Enum.GetName(typeof(RoleEnum), dto.Role),
+                AccountType = Enum.GetName(typeof(AccountTypeEnum), dto.AccountType),
+                Status = Enum.GetName(typeof(AccountStatusEnum), dto.AccountStatus)
             };
 
             var result = await _accountService.UpdateAccountAsync(account);
