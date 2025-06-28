@@ -24,7 +24,7 @@ namespace PhyGen_SWD392.Services
             _subjectService = subjectService;
         }
 
-        public async Task<ExamMatrixDTO> CreateExamMatrixAsync(ExamMatrixRequest examMatrixRequest)
+        public async Task<ExamMatrixDTO> CreateExamMatrixAsync(ExamMatrixRequest examMatrixRequest, int userID)
         {
             var subject = await _subjectService.GetSubjectByIdAsync(examMatrixRequest.SubjectId);
             if (subject == null)
@@ -41,15 +41,14 @@ namespace PhyGen_SWD392.Services
                 examMatrix.Status = examMatrixRequest.StatusEnum.ToString();
             }
 
-            // Hard code CreatedBy = 1 (tạm thời, sau này sẽ lấy từ user đăng nhập)
-            examMatrix.CreatedBy = 1;
+            examMatrix.CreatedBy = userID;
 
             var createdExamMatrix = await _repo.CreateAsync(examMatrix);
             var examMatrixDto = _mapper.Map<ExamMatrixDTO>(createdExamMatrix);
             return examMatrixDto;
         }
 
-        public async Task<bool> UpdateExamMatrixAsync(int id, ExamMatrixRequest examMatrixRequest)
+        public async Task<bool> UpdateExamMatrixAsync(int id, ExamMatrixRequest examMatrixRequest, int userID)
         {
             var existingExamMatrix = await _repo.GetByIdAsync(id);
             if (existingExamMatrix == null || existingExamMatrix.Status == ExamMatrixStatusEnum.inactive.ToString())
@@ -58,7 +57,7 @@ namespace PhyGen_SWD392.Services
             _mapper.Map(examMatrixRequest, existingExamMatrix);
             existingExamMatrix.Id = id;
 
-            existingExamMatrix.CreatedBy = 1; // Hard code CreatedBy = 1 (tạm thời, sau này sẽ lấy từ user đăng nhập)
+            existingExamMatrix.CreatedBy = userID;
 
             if (examMatrixRequest.ExamTypeEnum != null)
             {

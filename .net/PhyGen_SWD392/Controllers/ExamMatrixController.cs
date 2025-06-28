@@ -52,7 +52,14 @@ namespace PhyGen_SWD392.Controllers
         {
             try
             {
-                var createdExamMatrix = await _service.CreateExamMatrixAsync(examMatrixRequest);
+                var userIdClaim = User.FindFirst("id") ?? User.FindFirst("sub");
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+                {
+                    return Unauthorized(ApiResponse<object>.ErrorResponse(
+                        new List<string> { "User ID not found in token." }, "Unauthorized"));
+                }
+
+                var createdExamMatrix = await _service.CreateExamMatrixAsync(examMatrixRequest, userId);
 
                 if (createdExamMatrix == null)
                     return NotFound(ApiResponse<ExamMatrixDTO>.ErrorResponse(new List<string> { "SubjectID not found" }, "Failed to create Exam Matrix"));
@@ -68,7 +75,14 @@ namespace PhyGen_SWD392.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateExamMatrixAsync(int id, [FromBody] ExamMatrixRequest examMatrixRequest)
         {
-            var updated = await _service.UpdateExamMatrixAsync(id, examMatrixRequest);
+            var userIdClaim = User.FindFirst("id") ?? User.FindFirst("sub");
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+            {
+                return Unauthorized(ApiResponse<object>.ErrorResponse(
+                    new List<string> { "User ID not found in token." }, "Unauthorized"));
+            }
+
+            var updated = await _service.UpdateExamMatrixAsync(id, examMatrixRequest, userId);
             if (!updated)
                 return NotFound(ApiResponse<bool>.ErrorResponse(new List<string> { "Exam Matrix not found." }, "Update failed"));
 
