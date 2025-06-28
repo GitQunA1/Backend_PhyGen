@@ -22,5 +22,9 @@ namespace PhyGen_SWD392.Services
         {
             return await _accountUserRepo.UpdateProfileAsync(id, dto);
         }
+        public async Task<List<ExamListDto>> GetExamsByUserAsync(int userId)
+        {
+            return await _accountUserRepo.GetExamsByUserAsync(userId);
+        }
     }
 }

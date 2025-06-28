@@ -48,7 +48,7 @@ namespace PhyGen_SWD392.Controllers
                 return Unauthorized(ApiResponse<string>.ErrorResponse(error, "Login failed"));
             }
             var token = _authService.GenerateJwtToken(account);
-            var expiresIn = _authService.GetTokenExpirationSeconds(); // gợi ý bên dưới
+            var expiresIn = _authService.GetTokenExpirationMinutes();
 
             var response = new
             {
