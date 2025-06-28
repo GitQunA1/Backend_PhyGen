@@ -36,7 +36,7 @@ namespace PhyGen_SWD392.Services
         public async Task<bool> UpdateSubjectAsync(int id, SubjectRequest subjectRequest)
         {
             var existingSubject = await _subjectRepo.GetByIdAsync(id);
-            if (existingSubject == null)
+            if (existingSubject == null || existingSubject.IsDeleted == true)
                 return false;
 
             _mapper.Map(subjectRequest, existingSubject);
@@ -50,23 +50,29 @@ namespace PhyGen_SWD392.Services
             return await _subjectRepo.UpdateAsync(id, existingSubject);
         }
 
-        public async Task<bool> DeleteSubjectAsync(int id)
+        public async Task<bool> SoftDeleteAsync(int id)
         {
-            return await _subjectRepo.Delete(id);
+            return await _subjectRepo.SoftDelete(id);
         }
 
         public async Task<SubjectDTO?> GetSubjectByIdAsync(int id)
         {
             var subject = await _subjectRepo.GetByIdAsync(id);
 
-            if (subject == null) return null;
+            if (subject == null || subject.IsDeleted == true) return null;
 
             return _mapper.Map<SubjectDTO>(subject);
         }
 
-        public async Task<List<SubjectDTO>> GetAllSubjectsAsync()
+        public async Task<List<SubjectDTO>> GetAllIncludeDeletedAsync()
         {
             var subjects = await _subjectRepo.GetAllAsync();
+            return _mapper.Map<List<SubjectDTO>>(subjects);
+        }
+
+        public async Task<List<SubjectDTO>> GetActiveSubjectsAsync()
+        {
+            var subjects = await _subjectRepo.GetActiveSubjectsAsync();
             return _mapper.Map<List<SubjectDTO>>(subjects);
         }
     }

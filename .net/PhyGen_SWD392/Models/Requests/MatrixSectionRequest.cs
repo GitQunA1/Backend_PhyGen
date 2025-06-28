@@ -2,7 +2,7 @@
 {
     public class MatrixSectionRequest
     {
-        public int? MatrixId { get; set; }
+        public int MatrixId { get; set; }
 
         public string? SectionName { get; set; }
 

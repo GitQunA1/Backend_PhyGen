@@ -8,7 +8,7 @@ using PhyGen_SWD392.Services;
 namespace PhyGen_SWD392.Controllers
 {
     [ApiController]
-    [Route("api/exam_matrix")]
+    [Route("api/exam_matrixs")]
     [Authorize(Roles = "Admin")]
 
     public class ExamMatrixController : ControllerBase
@@ -20,9 +20,17 @@ namespace PhyGen_SWD392.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllExamMatricesAsync()
+        public async Task<IActionResult> GetAllIncludeDeletedAsync()
         {
-            var examMatrices = await _service.GetAllExamMatrixsAsync();
+            var examMatrices = await _service.GetAllIncludeDeletedAsync();
+
+            return Ok(ApiResponse<List<ExamMatrixDTO>>.SuccessResponse(examMatrices, "Get All successfully"));
+        }
+
+        [HttpGet("active")]
+        public async Task<IActionResult> GetActiveExamMatrixAsync()
+        {
+            var examMatrices = await _service.GetActiveExamMatrixAsync();
 
             return Ok(ApiResponse<List<ExamMatrixDTO>>.SuccessResponse(examMatrices, "Get All successfully"));
         }
@@ -33,7 +41,7 @@ namespace PhyGen_SWD392.Controllers
             var examMatrix = await _service.GetExamMatrixByIdAsync(id);
             if (examMatrix == null)
             {
-                return NotFound(ApiResponse<ExamMatrixDTO>.ErrorResponse(new List<string> { "Exam Matrix not found." }, "No data found"));
+                return NotFound(ApiResponse<ExamMatrixDTO>.ErrorResponse(new List<string> { "Exam Matrix not found." }, "Failed to get by id"));
             }
 
             return Ok(ApiResponse<ExamMatrixDTO>.SuccessResponse(examMatrix, "Get By Id successfully"));
@@ -45,6 +53,9 @@ namespace PhyGen_SWD392.Controllers
             try
             {
                 var createdExamMatrix = await _service.CreateExamMatrixAsync(examMatrixRequest);
+
+                if (createdExamMatrix == null)
+                    return NotFound(ApiResponse<ExamMatrixDTO>.ErrorResponse(new List<string> { "SubjectID not found" }, "Failed to create Exam Matrix"));
 
                 return Ok(ApiResponse<ExamMatrixDTO>.SuccessResponse(createdExamMatrix, "Exam Matrix created successfully"));
             }
@@ -64,10 +75,10 @@ namespace PhyGen_SWD392.Controllers
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Exam Matrix updated successfully"));
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteExamMatrixAsync(int id)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> SoftDeleteAsync(int id)
         {
-            var deleted = await _service.DeleteExamMatrixAsync(id);
+            var deleted = await _service.SoftDeleteAsync(id);
             if (!deleted)
                 return NotFound(ApiResponse<bool>.ErrorResponse(new List<string> { "Exam Matrix not found." }, "Delete failed"));
 

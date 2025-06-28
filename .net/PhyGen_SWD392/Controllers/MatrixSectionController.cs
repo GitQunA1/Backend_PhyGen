@@ -8,7 +8,7 @@ using PhyGen_SWD392.Services;
 namespace PhyGen_SWD392.Controllers
 {
     [ApiController]
-    [Route("api/matrix_section")]
+    [Route("api/matrix_sections")]
     [Authorize(Roles = "Admin")]
 
     public class MatrixSectionController : ControllerBase
@@ -20,9 +20,17 @@ namespace PhyGen_SWD392.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllMatrixSectionsAsync()
+        public async Task<IActionResult> GetAllIncludeDeletedAsync()
         {
-            var sections = await _service.GetAllMatrixSectionsAsync();
+            var sections = await _service.GetAllIncludeDeletedAsync();
+
+            return Ok(ApiResponse<List<MatrixSectionDTO>>.SuccessResponse(sections, "Get All successfully"));
+        }
+
+        [HttpGet("active")]
+        public async Task<IActionResult> GetActiveMatrixSectionsAsync()
+        {
+            var sections = await _service.GetActiveMatrixSectionsAsync();
 
             return Ok(ApiResponse<List<MatrixSectionDTO>>.SuccessResponse(sections, "Get All successfully"));
         }
@@ -46,6 +54,11 @@ namespace PhyGen_SWD392.Controllers
             {
                 var createdSection = await _service.CreateMatrixSectionAsync(request);
 
+                if (createdSection == null)
+                {
+                    return NotFound(ApiResponse<MatrixSectionDTO>.ErrorResponse(new List<string> { "Invalid Matrix ID." }, "Creation failed"));
+                }
+
                 return Ok(ApiResponse<MatrixSectionDTO>.SuccessResponse(createdSection, "Matrix Section created successfully"));
             }
             catch (Exception ex)
@@ -64,10 +77,10 @@ namespace PhyGen_SWD392.Controllers
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Matrix Section updated successfully"));
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMatrixSectionAsync(int id)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> SoftDeleteAsync(int id)
         {
-            var deleted = await _service.DeleteMatrixSectionAsync(id);
+            var deleted = await _service.SoftDeleteAsync(id);
             if (!deleted)
                 return NotFound(ApiResponse<bool>.ErrorResponse(new List<string> { "Matrix Section not found." }, "Delete failed"));
 

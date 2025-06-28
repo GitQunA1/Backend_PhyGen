@@ -8,7 +8,7 @@ using PhyGen_SWD392.Services;
 namespace PhyGen_SWD392.Controllers
 {
     [ApiController]
-    [Route("api/subject")]
+    [Route("api/subjects")]
     [Authorize(Roles = "Admin")]
 
     public class SubjectController : ControllerBase
@@ -20,10 +20,17 @@ namespace PhyGen_SWD392.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllSubjectAsync()
+        public async Task<IActionResult> GetAllSubjectsIncludeDeletedAsync()
         {
-            var subjectDTOs = await _service.GetAllSubjectsAsync();
+            var subjectDTOs = await _service.GetAllIncludeDeletedAsync();
             return Ok(ApiResponse<List<SubjectDTO>>.SuccessResponse(subjectDTOs, "Get All successfully"));
+        }
+
+        [HttpGet("active")]
+        public async Task<IActionResult> GetActiveSubjectsAsync()
+        {
+            var subjects = await _service.GetActiveSubjectsAsync();
+            return Ok(ApiResponse<List<SubjectDTO>>.SuccessResponse(subjects.ToList(), "Get All successfully"));
         }
 
         [HttpGet("{id}")]
@@ -32,7 +39,7 @@ namespace PhyGen_SWD392.Controllers
             var subjectDTO = await _service.GetSubjectByIdAsync(id);
             if (subjectDTO == null)
             {
-                return NotFound(ApiResponse<SubjectDTO>.ErrorResponse(new List<string> { "Subject not found." }, "No data found"));
+                return NotFound(ApiResponse<SubjectDTO>.ErrorResponse(new List<string> { "Subject not found." }, "Failed to get subject by id"));
             }
 
             return Ok(ApiResponse<SubjectDTO>.SuccessResponse(subjectDTO, "Get By Id successfully"));
@@ -62,10 +69,10 @@ namespace PhyGen_SWD392.Controllers
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Subject updated successfully"));
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSubjectAsync(int id)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> SoftDeleteAsync(int id)
         {
-            var deleted = await _service.DeleteSubjectAsync(id);
+            var deleted = await _service.SoftDeleteAsync(id);
             if (!deleted)
                 return NotFound(ApiResponse<SubjectDTO>.ErrorResponse(new List<string> { "Subject not found." }, "Delete failed"));
 

@@ -4,5 +4,7 @@ namespace PhyGen_SWD392.Repositories.Interface
 {
     public interface IMatrixSectionRepo : IBaseRepo<MatrixSection, int>
     {
+        Task<bool> SoftDelete(int id);
+        Task<List<MatrixSection>> GetActiveMatrixSectionsAsync();
     }
 }

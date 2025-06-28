@@ -9,5 +9,7 @@
         public string? SectionName { get; set; }
 
         public int? DisplayOrder { get; set; }
+
+        public bool? IsDeleted { get; set; }
     }
 }

@@ -24,7 +24,7 @@ namespace PhyGen_SWD392.Services
         {
             var topic = _mapper.Map<Topic>(topicRequest);
 
-            if(topicRequest.LevelEnum != null)
+            if (topicRequest.LevelEnum != null)
             {
                 topic.Level = topicRequest.LevelEnum.ToString();
             }
@@ -41,6 +41,9 @@ namespace PhyGen_SWD392.Services
             if (existingTopic == null)
                 return false;
 
+            if (existingTopic.IsDeleted == true)
+                return false;
+
             _mapper.Map(topicRequest, existingTopic);
 
             existingTopic.Id = id;
@@ -53,22 +56,33 @@ namespace PhyGen_SWD392.Services
             return await _topicRepo.UpdateAsync(id, existingTopic);
         }
 
-        public async Task<bool> DeleteTopicAsync(int id)
-        {
-            return await _topicRepo.Delete(id);
-        }
         public async Task<TopicDTO?> GetTopicByIdAsync(int id)
         {
             var topic = await _topicRepo.GetByIdAsync(id);
+            if (topic == null || topic.IsDeleted == true)
+                return null;
+
             var topicDto = _mapper.Map<TopicDTO>(topic);
             return topicDto;
         }
 
-        public async Task<List<TopicDTO>> GetAllTopicsAsync()
+        public async Task<List<TopicDTO>> GetAllIncludeDeletedAsync()
         {
             var topics = await _topicRepo.GetAllAsync();
             var topicDto = _mapper.Map<List<TopicDTO>>(topics);
             return topicDto;
+        }
+
+        public async Task<List<TopicDTO>> GetActiveTopicsAsync()
+        {
+            var topics = await _topicRepo.GetActiveTopicsAsync();
+            var topicDto = _mapper.Map<List<TopicDTO>>(topics);
+            return topicDto;
+        }
+
+        public async Task<bool> SoftDeleteTopicAsync(int id)
+        {
+            return await _topicRepo.SoftDelete(id);
         }
     }
 }

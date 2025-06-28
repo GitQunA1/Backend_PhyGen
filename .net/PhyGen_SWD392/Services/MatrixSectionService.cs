@@ -12,16 +12,23 @@ namespace PhyGen_SWD392.Services
     {
         private readonly IMapper _mapper;
         private readonly IMatrixSectionRepo _repo;
+        private readonly ExamMatrixService _examMatrixService;
         private readonly PhyGenDbContext _context;
-        public MatrixSectionService(IMapper mapper, IMatrixSectionRepo repo, PhyGenDbContext context)
+        public MatrixSectionService(IMapper mapper, IMatrixSectionRepo repo, PhyGenDbContext context, ExamMatrixService examMatrixService)
         {
             _mapper = mapper;
             _repo = repo;
             _context = context;
+            _examMatrixService = examMatrixService;
         }
 
         public async Task<MatrixSectionDTO> CreateMatrixSectionAsync(MatrixSectionRequest matrixSectionRequest)
         {
+            var matrix = await _examMatrixService.GetExamMatrixByIdAsync(matrixSectionRequest.MatrixId);
+
+            if (matrix == null)
+                return null;
+
             var section = _mapper.Map<MatrixSection>(matrixSectionRequest);
 
             var createdSection = await _repo.CreateAsync(section);
@@ -32,7 +39,7 @@ namespace PhyGen_SWD392.Services
         public async Task<bool> UpdateMatrixSectionAsync(int id, MatrixSectionRequest matrixSectionRequest)
         {
             var existingSection = await _repo.GetByIdAsync(id);
-            if (existingSection == null)
+            if (existingSection == null || existingSection.IsDeleted == true)
                 return false;
 
             _mapper.Map(matrixSectionRequest, existingSection);
@@ -41,23 +48,30 @@ namespace PhyGen_SWD392.Services
             return await _repo.UpdateAsync(id, existingSection);
         }
 
-        public async Task<bool> DeleteMatrixSectionAsync(int id)
+        public async Task<bool> SoftDeleteAsync(int id)
         {
-            return await _repo.Delete(id);
+            return await _repo.SoftDelete(id);
         }
 
         public async Task<MatrixSectionDTO?> GetMatrixSectionByIdAsync(int id)
         {
             var section = await _repo.GetByIdAsync(id);
 
-            if (section == null) return null;
+            if (section == null || section.IsDeleted == true)
+                return null;
 
             return _mapper.Map<MatrixSectionDTO>(section);
         }
 
-        public async Task<List<MatrixSectionDTO>> GetAllMatrixSectionsAsync()
+        public async Task<List<MatrixSectionDTO>> GetAllIncludeDeletedAsync()
         {
             var sections = await _repo.GetAllAsync();
+            return _mapper.Map<List<MatrixSectionDTO>>(sections);
+        }
+
+        public async Task<List<MatrixSectionDTO>> GetActiveMatrixSectionsAsync()
+        {
+            var sections = await _repo.GetActiveMatrixSectionsAsync();
             return _mapper.Map<List<MatrixSectionDTO>>(sections);
         }
     }

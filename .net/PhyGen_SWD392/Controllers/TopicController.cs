@@ -10,7 +10,7 @@ using PhyGen_SWD392.Services;
 namespace PhyGen_SWD392.Controllers
 {
     [ApiController]
-    [Route("api/topic")]
+    [Route("api/topics")]
     [Authorize(Roles = "Admin")]
 
     public class TopicController : ControllerBase
@@ -22,9 +22,16 @@ namespace PhyGen_SWD392.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllTopicsAsync()
+        public async Task<IActionResult> GetAllTopicsIncludeDeletedAsync()
         {
-            var topics = await _topicService.GetAllTopicsAsync();
+            var topics = await _topicService.GetAllIncludeDeletedAsync();
+            return Ok(ApiResponse<List<TopicDTO>>.SuccessResponse(topics.ToList(), "Get All successfully"));
+        }
+
+        [HttpGet("active")]
+        public async Task<IActionResult> GetActiveTopicsAsync()
+        {
+            var topics = await _topicService.GetActiveTopicsAsync();
             return Ok(ApiResponse<List<TopicDTO>>.SuccessResponse(topics.ToList(), "Get All successfully"));
         }
 
@@ -33,7 +40,7 @@ namespace PhyGen_SWD392.Controllers
         {
             var topicDto = await _topicService.GetTopicByIdAsync(id);
             if (topicDto == null)
-                return NotFound(ApiResponse<TopicDTO>.ErrorResponse(new List<string> {"Topic not found."}, "No data found"));
+                return NotFound(ApiResponse<TopicDTO>.ErrorResponse(new List<string> {"Topic not found."}, "Failed to get by id"));
 
             return Ok(ApiResponse<TopicDTO>.SuccessResponse(topicDto, "Get By Id successfully"));
         }
@@ -62,17 +69,17 @@ namespace PhyGen_SWD392.Controllers
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Topic updated successfully"));
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTopicAsync(int id)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> SoftDeleteTopicAsync(int id)
         {
-            var deleted = await _topicService.DeleteTopicAsync(id);
+            var deleted = await _topicService.SoftDeleteTopicAsync(id);
             if (!deleted)
-                return NotFound(ApiResponse<TopicDTO>.ErrorResponse(
+                return NotFound(ApiResponse<bool>.ErrorResponse(
                     new List<string> { "Topic not found." },
-                    "Delete failed"
+                    "Soft delete failed"
                 ));
-
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Topic deleted successfully"));
         }
+
     }
 }

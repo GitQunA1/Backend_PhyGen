@@ -7,5 +7,6 @@
         public string? Level { get; set; }
         public int? SubjectId { get; set; }
         public int? ParentId { get; set; }
+        public bool? IsDeleted { get; set; }
     }
 }

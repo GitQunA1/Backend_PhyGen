@@ -2,6 +2,7 @@
 using PhyGen_SWD392.Data;
 using PhyGen_SWD392.Models.DTOs;
 using PhyGen_SWD392.Models.Entities;
+using PhyGen_SWD392.Models.Enums;
 using PhyGen_SWD392.Models.Requests;
 using PhyGen_SWD392.Repositories.Interface;
 using PhyGen_SWD392.Repositories.Repo;
@@ -11,18 +12,24 @@ namespace PhyGen_SWD392.Services
     public class ExamMatrixService 
     {
         private readonly IExamMatrixRepo _repo;
+        private readonly SubjectService _subjectService;
         private readonly IMapper _mapper;
         private readonly PhyGenDbContext _context;
 
-        public ExamMatrixService(IExamMatrixRepo repo, IMapper mapper, PhyGenDbContext context)
+        public ExamMatrixService(IExamMatrixRepo repo, IMapper mapper, PhyGenDbContext context, SubjectService subjectService)
         {
             _context = context;
             _repo = repo;
             _mapper = mapper;
+            _subjectService = subjectService;
         }
 
         public async Task<ExamMatrixDTO> CreateExamMatrixAsync(ExamMatrixRequest examMatrixRequest)
         {
+            var subject = await _subjectService.GetSubjectByIdAsync(examMatrixRequest.SubjectId);
+            if (subject == null)
+                return null;
+
             var examMatrix = _mapper.Map<ExamMatrix>(examMatrixRequest);
 
             if (examMatrixRequest.ExamTypeEnum != null)
@@ -45,7 +52,7 @@ namespace PhyGen_SWD392.Services
         public async Task<bool> UpdateExamMatrixAsync(int id, ExamMatrixRequest examMatrixRequest)
         {
             var existingExamMatrix = await _repo.GetByIdAsync(id);
-            if (existingExamMatrix == null)
+            if (existingExamMatrix == null || existingExamMatrix.Status == ExamMatrixStatusEnum.inactive.ToString())
                 return false;
 
             _mapper.Map(examMatrixRequest, existingExamMatrix);
@@ -65,23 +72,31 @@ namespace PhyGen_SWD392.Services
             return await _repo.UpdateAsync(id, existingExamMatrix);
         }
 
-        public async Task<bool> DeleteExamMatrixAsync(int id)
+        public async Task<bool> SoftDeleteAsync(int id)
         {
-            return await _repo.Delete(id);
+            return await _repo.SoftDelete(id);
         }
 
         public async Task<ExamMatrixDTO?> GetExamMatrixByIdAsync(int id)
         {
             var examMatrix = await _repo.GetByIdAsync(id);
 
-            if (examMatrix == null) return null;
+            if (examMatrix == null || examMatrix.Status == ExamMatrixStatusEnum.inactive.ToString()) 
+                return null;
 
             return _mapper.Map<ExamMatrixDTO>(examMatrix);
         }
 
-        public async Task<List<ExamMatrixDTO>> GetAllExamMatrixsAsync()
+        public async Task<List<ExamMatrixDTO>> GetAllIncludeDeletedAsync()
         {
             var examMatrixs = await _repo.GetAllAsync();
+
+            return _mapper.Map<List<ExamMatrixDTO>>(examMatrixs);
+        }
+
+        public async Task<List<ExamMatrixDTO>> GetActiveExamMatrixAsync()
+        {
+            var examMatrixs = await _repo.GetActiveExamMatricesAsync();
 
             return _mapper.Map<List<ExamMatrixDTO>>(examMatrixs);
         }
