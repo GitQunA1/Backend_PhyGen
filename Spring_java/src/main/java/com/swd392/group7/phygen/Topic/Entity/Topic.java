@@ -26,7 +26,7 @@ public class Topic {
     List<Question> questions;
 
     @ManyToOne
-    @JoinColumn(name = "topic_id")
+    @JoinColumn(name = "parent_id")
     Topic topic;
 
 }
