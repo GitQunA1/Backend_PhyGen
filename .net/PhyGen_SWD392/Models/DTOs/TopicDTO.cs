@@ -6,6 +6,7 @@
         public string Name { get; set; } = null!;
         public string? Level { get; set; }
         public int? SubjectId { get; set; }
+        public string? SubjectName { get; set; }
         public int? ParentId { get; set; }
         public bool? IsDeleted { get; set; }
     }

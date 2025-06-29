@@ -13,9 +13,24 @@ namespace PhyGen_SWD392.Repositories.Repo
             _context = phyGenDbContext;
         }
 
+        public override async Task<Topic?> GetByIdAsync(int id)
+        {
+            return await _context.Topics
+                .Include(t => t.Subject)
+                .FirstOrDefaultAsync(t => t.Id == id);
+        }
+
+        public override async Task<List<Topic>> GetAllAsync()
+        {
+            return await _context.Topics
+                .Include(t => t.Subject)
+                .ToListAsync();
+        }
+
         public async Task<List<Topic>> GetActiveTopicsAsync()
         {
             return await _context.Topics
+                .Include(t => t.Subject)
                 .Where(t => t.IsDeleted != true)
                 .ToListAsync();
         }

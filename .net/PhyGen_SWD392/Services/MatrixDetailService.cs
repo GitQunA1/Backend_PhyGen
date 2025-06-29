@@ -24,7 +24,10 @@ namespace PhyGen_SWD392.Services
             var detail = _mapper.Map<MatrixDetail>(request);
 
             var createdDetail = await _repo.CreateAsync(detail);
-            var detailDto = _mapper.Map<MatrixDetailDTO>(createdDetail);
+
+            var detailWithSectionAndTopic = await _repo.GetByIdAsync(createdDetail.Id);
+
+            var detailDto = _mapper.Map<MatrixDetailDTO>(detailWithSectionAndTopic);
             return detailDto;
         }
 

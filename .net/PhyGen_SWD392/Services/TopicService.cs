@@ -30,8 +30,10 @@ namespace PhyGen_SWD392.Services
             }
 
             var createdTopic = await _topicRepo.CreateAsync(topic);
-            var topicDto = _mapper.Map<TopicDTO>(createdTopic);
 
+            var topicWithSubject = await _topicRepo.GetByIdAsync(createdTopic.Id);
+
+            var topicDto = _mapper.Map<TopicDTO>(topicWithSubject);
             return topicDto;
         }
 

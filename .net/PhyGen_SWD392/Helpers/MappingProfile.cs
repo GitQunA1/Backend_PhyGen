@@ -12,6 +12,7 @@
         {
             CreateMap<Topic, TopicDTO>()
                 .ForMember(dest => dest.Level, opt => opt.MapFrom(src => src.LevelEnum))
+                .ForMember(dest => dest.SubjectName, opt => opt.MapFrom(src => src.Subject != null ? src.Subject.Name : null))
                 .ReverseMap()
                 .ForMember(dest => dest.Level, opt => opt.MapFrom(src => src.Level.ToString()));
 
@@ -43,7 +44,9 @@
 
             CreateMap<MatrixDetail, MatrixDetailDTO>()
                 .ForMember(dest => dest.DifficultyLevel, opt => opt.MapFrom(src => src.DifficultyLevel))
-                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type));
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type))
+                .ForMember(dest => dest.SectionName, opt => opt.MapFrom(src => src.MatrixSection != null ? src.MatrixSection.SectionName : null))
+                .ForMember(dest => dest.TopicName, opt => opt.MapFrom(src => src.Topic != null ? src.Topic.Name : null));
 
             CreateMap<MatrixDetailDTO, MatrixDetail>();
 
