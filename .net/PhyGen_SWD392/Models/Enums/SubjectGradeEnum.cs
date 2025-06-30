@@ -2,8 +2,8 @@
 {
     public enum SubjectGradeEnum
     {
-        Grade10 = 1,
-        Grade11 = 2,
-        Grade12 = 3,
+        grade10 = 1,
+        grade11 = 2,
+        grade12 = 3,
     }
 }

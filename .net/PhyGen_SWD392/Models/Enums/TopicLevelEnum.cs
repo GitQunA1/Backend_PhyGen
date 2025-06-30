@@ -6,7 +6,7 @@ namespace PhyGen_SWD392.Models.Enums
     {
         easy = 1,
 
-        mediumn = 2,
+        medium = 2,
 
         hard = 3
     }
