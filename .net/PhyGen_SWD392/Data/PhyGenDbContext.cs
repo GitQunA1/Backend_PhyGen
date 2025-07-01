@@ -97,6 +97,10 @@ public partial class PhyGenDbContext : DbContext
             entity.Property(e => e.Username)
                 .HasMaxLength(100)
                 .HasColumnName("username");
+
+            entity.Property(e => e.AvatarUrl).HasColumnName("avatar_url");
+            entity.Property(e => e.School).HasColumnName("school");
+            entity.Property(e => e.Address).HasColumnName("address");
         });
 
         modelBuilder.Entity<Answer>(entity =>

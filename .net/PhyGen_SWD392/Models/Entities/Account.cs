@@ -23,6 +23,12 @@ public partial class Account
 
     public string? Status { get; set; }
 
+    public string? AvatarUrl { get; set; } 
+
+    public string? School { get; set; }
+
+    public string? Address { get; set; }
+
     [NotMapped]
     public RoleEnum? RoleEnum
     {

@@ -29,6 +29,8 @@ namespace PhyGen_SWD392.Repositories.Repo
 
             account.Username = dto.Username;
             account.Email = dto.Email;
+            account.School = dto.School;
+            account.Address = dto.Address;   
 
             if (!string.IsNullOrEmpty(dto.Password))
             {

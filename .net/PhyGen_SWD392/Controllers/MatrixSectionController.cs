@@ -9,8 +9,6 @@ namespace PhyGen_SWD392.Controllers
 {
     [ApiController]
     [Route("api/matrix_sections")]
-    [Authorize(Roles = "admin")]
-
     public class MatrixSectionController : ControllerBase
     {
         private readonly MatrixSectionService _service;
@@ -18,7 +16,7 @@ namespace PhyGen_SWD392.Controllers
         {
             _service = service;
         }
-
+        [Authorize(Roles = "admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllIncludeDeletedAsync()
         {
@@ -27,6 +25,7 @@ namespace PhyGen_SWD392.Controllers
             return Ok(ApiResponse<List<MatrixSectionDTO>>.SuccessResponse(sections, "Get All successfully"));
         }
 
+        [Authorize(Roles = "admin,user")]
         [HttpGet("active")]
         public async Task<IActionResult> GetActiveMatrixSectionsAsync()
         {
@@ -34,7 +33,7 @@ namespace PhyGen_SWD392.Controllers
 
             return Ok(ApiResponse<List<MatrixSectionDTO>>.SuccessResponse(sections, "Get All successfully"));
         }
-
+        [Authorize(Roles = "admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMatrixSectionByIdAsync(int id)
         {
@@ -46,7 +45,7 @@ namespace PhyGen_SWD392.Controllers
 
             return Ok(ApiResponse<MatrixSectionDTO>.SuccessResponse(section, "Get By Id successfully"));
         }
-
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> CreateMatrixSectionAsync([FromBody] MatrixSectionRequest request)
         {
@@ -66,7 +65,7 @@ namespace PhyGen_SWD392.Controllers
                 return BadRequest(ApiResponse<MatrixSectionDTO>.ErrorResponse(new List<string> { ex.Message }, "Failed to create Matrix Section"));
             }
         }
-
+        [Authorize(Roles = "admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateMatrixSectionAsync(int id, [FromBody] MatrixSectionRequest request)
         {
@@ -76,7 +75,7 @@ namespace PhyGen_SWD392.Controllers
 
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Matrix Section updated successfully"));
         }
-
+        [Authorize(Roles = "admin")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> SoftDeleteAsync(int id)
         {

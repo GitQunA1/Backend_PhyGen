@@ -9,7 +9,6 @@ namespace PhyGen_SWD392.Controllers
 {
     [ApiController]
     [Route("api/exam_matrixs")]
-    [Authorize(Roles = "admin")]
 
     public class ExamMatrixController : ControllerBase
     {
@@ -18,7 +17,7 @@ namespace PhyGen_SWD392.Controllers
         {
             _service = service;
         }
-
+        [Authorize(Roles = "admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllIncludeDeletedAsync()
         {
@@ -26,7 +25,7 @@ namespace PhyGen_SWD392.Controllers
 
             return Ok(ApiResponse<List<ExamMatrixDTO>>.SuccessResponse(examMatrices, "Get All successfully"));
         }
-
+        [Authorize(Roles = "admin,user")]
         [HttpGet("active")]
         public async Task<IActionResult> GetActiveExamMatrixAsync()
         {
@@ -34,7 +33,7 @@ namespace PhyGen_SWD392.Controllers
 
             return Ok(ApiResponse<List<ExamMatrixDTO>>.SuccessResponse(examMatrices, "Get All successfully"));
         }
-
+        [Authorize(Roles = "admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetExamMatrixByIdAsync(int id)
         {
@@ -46,7 +45,7 @@ namespace PhyGen_SWD392.Controllers
 
             return Ok(ApiResponse<ExamMatrixDTO>.SuccessResponse(examMatrix, "Get By Id successfully"));
         }
-
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> CreateExamMatrixAsync([FromBody] ExamMatrixRequest examMatrixRequest)
         {
@@ -71,7 +70,7 @@ namespace PhyGen_SWD392.Controllers
                 return BadRequest(ApiResponse<ExamMatrixDTO>.ErrorResponse(new List<string> { ex.Message }, "Failed to create Exam Matrix"));
             }
         }
-
+        [Authorize(Roles = "admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateExamMatrixAsync(int id, [FromBody] ExamMatrixRequest examMatrixRequest)
         {
@@ -88,7 +87,7 @@ namespace PhyGen_SWD392.Controllers
 
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Exam Matrix updated successfully"));
         }
-
+        [Authorize(Roles = "admin")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> SoftDeleteAsync(int id)
         {

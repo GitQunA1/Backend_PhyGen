@@ -9,7 +9,6 @@ namespace PhyGen_SWD392.Controllers
 {
     [ApiController]
     [Route("api/matrix_details")]
-    [Authorize(Roles = "admin")]
 
     public class MatrixDetailController : ControllerBase
     {
@@ -18,7 +17,7 @@ namespace PhyGen_SWD392.Controllers
         {
             _service = service;
         }
-
+        [Authorize(Roles = "admin,user")]
         [HttpGet]
         public async Task<IActionResult> GetAllMatrixDetailsAsync()
         {
@@ -26,7 +25,7 @@ namespace PhyGen_SWD392.Controllers
 
             return Ok(ApiResponse<List<MatrixDetailDTO>>.SuccessResponse(details, "Get All successfully"));
         }
-
+        [Authorize(Roles = "admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMatrixDetailByIdAsync(int id)
         {
@@ -38,7 +37,7 @@ namespace PhyGen_SWD392.Controllers
 
             return Ok(ApiResponse<MatrixDetailDTO>.SuccessResponse(detail, "Get By Id successfully"));
         }
-
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> CreateMatrixDetailAsync([FromBody] MatrixDetailRequest request)
         {
@@ -53,7 +52,7 @@ namespace PhyGen_SWD392.Controllers
                 return BadRequest(ApiResponse<MatrixDetailDTO>.ErrorResponse(new List<string> { ex.Message }, "Failed to create Matrix Detail"));
             }
         }
-
+        [Authorize(Roles = "admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateMatrixDetailAsync(int id, [FromBody] MatrixDetailRequest request)
         {
@@ -63,7 +62,7 @@ namespace PhyGen_SWD392.Controllers
 
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Matrix Detail updated successfully"));
         }
-
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMatrixDetailAsync(int id)
         {

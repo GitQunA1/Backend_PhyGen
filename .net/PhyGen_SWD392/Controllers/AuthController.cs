@@ -75,5 +75,19 @@ namespace PhyGen_SWD392.Controllers
 
             return Ok(ApiResponse<object>.SuccessResponse(response, "Login successful"));
         }
+        [AllowAnonymous]
+        [HttpPost("verify")]
+        public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailDto dto)
+        {
+            var success = await _service.VerifyEmailAsync(dto.Email, dto.Code);
+
+            if (!success)
+            {
+                return BadRequest(ApiResponse<string>.ErrorResponse(
+                    new List<string> { "Invalid or expired code." }, "Email verification failed"));
+            }
+
+            return Ok(ApiResponse<string>.SuccessResponse(null, "Email verified successfully"));
+        }
     }
 }
