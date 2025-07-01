@@ -44,9 +44,9 @@ namespace PhyGen_SWD392.Services
                 Password = hashedPassword,
                 Username = dto.Email.Split('@')[0],
                 EmailVerified = false,
-                RoleEnum = RoleEnum.User,
-                AccountTypeEnum = AccountTypeEnum.Free,
-                StatusEnum = AccountStatusEnum.Active,
+                RoleEnum = RoleEnum.user,
+                AccountTypeEnum = AccountTypeEnum.free,
+                StatusEnum = AccountStatusEnum.active,
             };
 
             await _authRepo.AddAsync(newAccount);
@@ -71,8 +71,10 @@ namespace PhyGen_SWD392.Services
                 if (account == null)
                     return null;
             }
-            if (account.StatusEnum != AccountStatusEnum.Active)
+
+            if (account.StatusEnum != AccountStatusEnum.active || account.EmailVerified != true)
                 return null;
+
             var isValidPassword = BCrypt.Net.BCrypt.Verify(dto.Password, account.Password);
             return isValidPassword ? account : null;
         }
@@ -84,7 +86,7 @@ namespace PhyGen_SWD392.Services
         new Claim(JwtRegisteredClaimNames.Sub, acc.Id.ToString()),
         new Claim("id", acc.Id.ToString()),
         new Claim(JwtRegisteredClaimNames.Email, acc.Email),
-        new Claim(ClaimTypes.Role, acc.Role ?? "User"),
+        new Claim(ClaimTypes.Role, acc.Role ?? "user"),
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
          };
 

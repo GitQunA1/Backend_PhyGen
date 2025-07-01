@@ -9,7 +9,7 @@ namespace PhyGen_SWD392.Controllers
 {
     [ApiController]
     [Route("api/exam_matrixs")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
 
     public class ExamMatrixController : ControllerBase
     {

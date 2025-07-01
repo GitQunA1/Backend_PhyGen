@@ -11,7 +11,7 @@ namespace PhyGen_SWD392.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     public class AccountAdminController : ControllerBase
     {
         private readonly AccountAdminService _accountService;
@@ -30,9 +30,9 @@ namespace PhyGen_SWD392.Controllers
                 Password = dto.Password,
                 Email = dto.Email,
                 EmailVerified = dto.EmailVerified,
-                Role = dto.Role.ToString(),  // "Admin", "User"
-                AccountType = dto.AccountType.ToString(),  // "Free", "Premium"
-                StatusEnum = AccountStatusEnum.Active
+                Role = dto.Role.ToString(),
+                AccountType = dto.AccountType.ToString(),
+                StatusEnum = AccountStatusEnum.active
             };
 
             var created = await _accountService.CreateAccountAsync(account);

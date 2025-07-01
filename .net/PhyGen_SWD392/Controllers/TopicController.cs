@@ -11,7 +11,7 @@ namespace PhyGen_SWD392.Controllers
 {
     [ApiController]
     [Route("api/topics")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
 
     public class TopicController : ControllerBase
     {

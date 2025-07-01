@@ -17,7 +17,7 @@ namespace PhyGen_SWD392.Repositories.Repo
         public async Task<Account> CreateAccountAsync(Account account)
         {
             account.Password = BCrypt.Net.BCrypt.HashPassword(account.Password);
-            account.StatusEnum = AccountStatusEnum.Active;
+            account.StatusEnum = AccountStatusEnum.active;
             _context.Accounts.Add(account);
             await _context.SaveChangesAsync();
             return account;
@@ -26,7 +26,7 @@ namespace PhyGen_SWD392.Repositories.Repo
         public async Task<IEnumerable<Account>> GetAllUserAccountsAsync()
         {
             return await _context.Accounts
-                .Where(a => a.Role != RoleEnum.Admin.ToString())
+                .Where(a => a.Role != RoleEnum.admin.ToString())
                 .ToListAsync();
         }
 
@@ -63,7 +63,7 @@ namespace PhyGen_SWD392.Repositories.Repo
             var account = await _context.Accounts.FindAsync(id);
             if (account == null) return false;
 
-            account.StatusEnum = AccountStatusEnum.Inactive;
+            account.StatusEnum = AccountStatusEnum.inactive;
             await _context.SaveChangesAsync();
             return true;
         }

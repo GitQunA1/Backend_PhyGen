@@ -9,7 +9,7 @@ namespace PhyGen_SWD392.Controllers
 {
     [ApiController]
     [Route("api/matrix_details")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
 
     public class MatrixDetailController : ControllerBase
     {

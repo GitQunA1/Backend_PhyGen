@@ -13,10 +13,12 @@ namespace PhyGen_SWD392.Controllers
     public class AuthController : ControllerBase
     {
         private readonly AuthService _authService;
+        private readonly EmailVerificationService _service;
 
-        public AuthController(AuthService authService)
+        public AuthController(AuthService authService, EmailVerificationService service)
         {
             _authService = authService;
+            _service = service;
         }
 
 
@@ -31,8 +33,15 @@ namespace PhyGen_SWD392.Controllers
                 var error = new List<string> { "Email already exists or passwords do not match." };
                 return BadRequest(ApiResponse<string>.ErrorResponse(error, "Register failed"));
             }
+            var verifySent = await _service.RequestEmailVerificationAsync(dto.Email);
+            if (!verifySent)
+            {
+                return Ok(ApiResponse<string>.SuccessResponse(
+                    null, "Register successful, but failed to send verification code."));
+            }
 
-            return Ok(ApiResponse<string>.SuccessResponse(null, "Register successful"));
+            return Ok(ApiResponse<string>.SuccessResponse(
+                null, "Register successful. Verification code sent to email."));
         }
 
 
