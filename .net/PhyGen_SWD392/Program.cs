@@ -51,7 +51,7 @@ builder.Services.AddCors(options =>
                   .AllowAnyMethod();
         });
 });
-
+builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddScoped<IAuthRepo, AuthRepo>();
 builder.Services.AddScoped<AuthService>();
@@ -83,7 +83,9 @@ builder.Services.AddScoped<IForgetPasswordRepo, ForgetPasswordRepo>();
 builder.Services.AddScoped<ForgetPasswordService>();
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<SupabaseSettings>(builder.Configuration.GetSection("Supabase"));
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<SupabaseStorageService>();
 
 builder.Services.AddDbContext<PhyGenDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

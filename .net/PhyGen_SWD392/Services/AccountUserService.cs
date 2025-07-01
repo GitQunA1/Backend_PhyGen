@@ -1,5 +1,6 @@
 ﻿using PhyGen_SWD392.Models.DTOs;
 using PhyGen_SWD392.Models.Entities;
+using PhyGen_SWD392.Models.Requests;
 using PhyGen_SWD392.Repositories.Interface;
 
 namespace PhyGen_SWD392.Services
@@ -25,6 +26,10 @@ namespace PhyGen_SWD392.Services
         public async Task<List<ExamListDto>> GetExamsByUserAsync(int userId)
         {
             return await _accountUserRepo.GetExamsByUserAsync(userId);
+        }
+        public async Task<AvatarUploadResult> UploadAvatarAsyncSupabase(IFormFile file, string userId)
+        {
+            return await _accountUserRepo.UploadAvatarAsyncSupabase(file, userId);
         }
     }
 }
