@@ -55,7 +55,7 @@ public class QuestionService {
 
     public void deleted(Long id){
         Question question = findQuestionById(id);
-        question.setStatus(Status.INACTIVE);
+        question.setStatus(Status.inactive);
         questionRepo.save(question);
     }
 

@@ -1,6 +1,6 @@
 package com.swd392.group7.phygen.Question.Enum;
 
 public enum Status {
-    ACTIVE,
-    INACTIVE
+    active,
+    inactive
 }
