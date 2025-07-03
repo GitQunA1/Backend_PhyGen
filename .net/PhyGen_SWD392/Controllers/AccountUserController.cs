@@ -82,7 +82,7 @@ namespace PhyGen_SWD392.Controllers
             return Ok(ApiResponse<List<ExamListDto>>.SuccessResponse(exams, "Exam List retrieved successfully."));
         }
 
-        [HttpPost("upload-avatar")]
+        [HttpPut("update-avatar")]
         public async Task<IActionResult> UploadAvatar([FromForm] FileUploadDTO dto)
         {
             var userIdStr = User.FindFirst("id")?.Value;
