@@ -18,13 +18,13 @@ namespace PhyGen_SWD392.Controllers
     public class AccountUserController : ControllerBase
     {
         private readonly AccountUserService _accountUserService;
-        private readonly SupabaseStorageService _supabaseStorageService;
+        private readonly ImageService _imageService;
 
 
-        public AccountUserController(AccountUserService accountUserService, SupabaseStorageService supabaseStorageService)
+        public AccountUserController(AccountUserService accountUserService, ImageService imageService)
         {
             _accountUserService = accountUserService;
-            _supabaseStorageService = supabaseStorageService;
+            _imageService = imageService;
         }
 
         [HttpGet("me")]
@@ -82,50 +82,21 @@ namespace PhyGen_SWD392.Controllers
             return Ok(ApiResponse<List<ExamListDto>>.SuccessResponse(exams, "Exam List retrieved successfully."));
         }
 
-        [HttpGet("me/avatar")]
-        public async Task<IActionResult> GetAvatarUrl()
+        [HttpPost("upload-avatar")]
+        public async Task<IActionResult> UploadAvatar([FromForm] FileUploadDTO dto)
         {
-            var userId = User.FindFirst("id")?.Value;
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
+            var userIdStr = User.FindFirst("id")?.Value;
+            if (!int.TryParse(userIdStr, out int userId))
+                return Unauthorized("Invalid user");
 
-            var account = await _accountUserService.GetByIdAsync(int.Parse(userId));
-            if (account == null || string.IsNullOrEmpty(account.AvatarUrl))
-                return NotFound("No avatar");
+            if (dto.File == null || dto.File.Length == 0)
+                return BadRequest("No file uploaded");
 
-            var signedUrl = await _supabaseStorageService.GenerateSignedAvatarUrl(account.AvatarUrl);
+            var imageUrl = await _imageService.UploadImageAsync(dto.File);
 
-            return Ok(new { url = signedUrl });
-        }
+            await _accountUserService.UpdateAvatarUrlAsync(userId, imageUrl);
 
-
-        [HttpPost("me/avatar")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadUserImage([FromForm] AvatarUploadRequest request)
-        {
-            var userId = User.FindFirst("id")?.Value;
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized(new { error = "User ID not found in token." });
-
-            var file = request.File;
-
-            if (file == null || file.Length == 0)
-                return BadRequest(new { error = "No file provided." });
-
-            try
-            {
-                var result = await _accountUserService.UploadAvatarAsyncSupabase(file, userId);
-
-                return Ok(new
-                {
-                    path = result.Path,
-                    signedUrl = result.SignedUrl
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = ex.Message });
-            }
+            return Ok(new { avatarUrl = imageUrl });
         }
     }
 }

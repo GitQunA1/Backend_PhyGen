@@ -27,9 +27,9 @@ namespace PhyGen_SWD392.Services
         {
             return await _accountUserRepo.GetExamsByUserAsync(userId);
         }
-        public async Task<AvatarUploadResult> UploadAvatarAsyncSupabase(IFormFile file, string userId)
+        public async Task<bool> UpdateAvatarUrlAsync(int userId, string avatarUrl)
         {
-            return await _accountUserRepo.UploadAvatarAsyncSupabase(file, userId);
-        }
+            return await _accountUserRepo.UpdateAvatarUrlAsync(userId, avatarUrl);
+        }   
     }
 }

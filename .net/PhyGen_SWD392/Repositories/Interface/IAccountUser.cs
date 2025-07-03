@@ -9,6 +9,6 @@ namespace PhyGen_SWD392.Repositories.Interface
         Task<Account?> GetByIdAsync(int id);
         Task<bool> UpdateProfileAsync(int id, UserUpdateDto dto);
         Task<List<ExamListDto>> GetExamsByUserAsync(int userId);
-        Task<AvatarUploadResult> UploadAvatarAsyncSupabase(IFormFile file, string userId);
+        Task<bool> UpdateAvatarUrlAsync(int userId, string avatarUrl);
     }
 }

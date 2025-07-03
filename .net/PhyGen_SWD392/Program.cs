@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using PhyGen_SWD392.Helpers;
+using PhyGen_SWD392.Models.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 //var frontendUrls = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
@@ -83,9 +84,18 @@ builder.Services.AddScoped<IForgetPasswordRepo, ForgetPasswordRepo>();
 builder.Services.AddScoped<ForgetPasswordService>();
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
-builder.Services.Configure<SupabaseSettings>(builder.Configuration.GetSection("Supabase"));
 builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddScoped<SupabaseStorageService>();
+builder.Services.AddScoped<ImageService>();
+
+builder.Services.Configure<CloudinarySettings>(
+    builder.Configuration.GetSection("CloudinarySettings"));
+
+builder.Services.AddSingleton(cloudinary =>
+{
+    var config = builder.Configuration.GetSection("CloudinarySettings").Get<CloudinarySettings>();
+    var account = new CloudinaryDotNet.Account(config.CloudName, config.ApiKey, config.ApiSecret);
+    return new CloudinaryDotNet.Cloudinary(account);
+});
 
 builder.Services.AddDbContext<PhyGenDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
