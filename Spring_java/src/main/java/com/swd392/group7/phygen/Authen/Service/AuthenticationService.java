@@ -16,8 +16,8 @@ public class AuthenticationService implements UserDetailsService {
 
     private final AccountRepo accountRepo;
 
-    public Account findAccountByName(String userName){
-        return accountRepo.findByName(userName).orElseThrow(()-> new AccountException("Cant found account",HttpStatus.NOT_FOUND));
+    public Account findAccountByName(String username){
+        return accountRepo.findByUsername(username).orElseThrow(()-> new AccountException("Cant found account",HttpStatus.NOT_FOUND));
     }
 
     @Override

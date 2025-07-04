@@ -26,11 +26,17 @@ public class Account implements UserDetails {
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
 
-    String name;
+    String username;
 
     String password;
 
     String email;
+
+    String avatar_url;
+
+    String school;
+
+    String address;
 
     boolean emailVerified;
 
@@ -59,7 +65,7 @@ public class Account implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.name;
+        return this.username;
     }
 
     @Override
