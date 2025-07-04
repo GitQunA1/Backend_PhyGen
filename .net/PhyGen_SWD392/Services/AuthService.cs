@@ -43,7 +43,6 @@ namespace PhyGen_SWD392.Services
                 Email = dto.Email,
                 Password = hashedPassword,
                 Username = dto.Email.Split('@')[0],
-                AvatarUrl = "avatars/default-avatar.png",
                 EmailVerified = false,
                 RoleEnum = RoleEnum.user,
                 AccountTypeEnum = AccountTypeEnum.free,
