@@ -10,6 +10,12 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using PhyGen_SWD392.Helpers;
+<<<<<<< Updated upstream
+=======
+using PhyGen_SWD392.Models.Entities;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+>>>>>>> Stashed changes
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,6 +83,22 @@ builder.Services.AddScoped<ForgetPasswordService>();
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<IEmailService, EmailService>();
+<<<<<<< Updated upstream
+=======
+builder.Services.AddScoped<ImageService>();
+builder.Services.AddScoped<PaymentService>();
+builder.Services.AddSingleton<FirebaseNotificationService>();
+
+builder.Services.Configure<CloudinarySettings>(
+    builder.Configuration.GetSection("CloudinarySettings"));
+
+builder.Services.AddSingleton(cloudinary =>
+{
+    var config = builder.Configuration.GetSection("CloudinarySettings").Get<CloudinarySettings>();
+    var account = new CloudinaryDotNet.Account(config.CloudName, config.ApiKey, config.ApiSecret);
+    return new CloudinaryDotNet.Cloudinary(account);
+});
+>>>>>>> Stashed changes
 
 builder.Services.AddDbContext<PhyGenDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

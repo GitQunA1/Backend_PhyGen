@@ -8,6 +8,12 @@
 
 	<ItemGroup>
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+<<<<<<< Updated upstream
+=======
+		<PackageReference Include="CloudinaryDotNet" Version="1.27.6" />
+		<PackageReference Include="FirebaseAdmin" Version="3.2.0" />
+		<PackageReference Include="Google.Apis.Auth" Version="1.70.0" />
+>>>>>>> Stashed changes
 		<PackageReference Include="MailKit" Version="4.12.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.17" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />

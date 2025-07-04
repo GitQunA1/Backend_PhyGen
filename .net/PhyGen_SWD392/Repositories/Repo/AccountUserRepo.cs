@@ -40,5 +40,52 @@ namespace PhyGen_SWD392.Repositories.Repo
 
             return result > 0;
         }
+<<<<<<< Updated upstream
+=======
+        public async Task<List<ExamListDto>> GetExamsByUserAsync(int userId)
+        {
+            var examList = await (from e in _context.Exams
+                                  join em in _context.ExamMatrices on e.Id equals em.Id
+                                  join s in _context.Subjects on em.SubjectId equals s.Id
+                                  where e.CreatedBy == userId
+                                  select new ExamListDto
+                                  {
+                                      Id = e.Id,
+                                      IsDraft = e.IsDraft,
+                                      ExamType = e.Examtype,
+                                      CreatedAt = e.CreatedAt,
+                                      QuestionCount = _context.ExamQuestions
+                                          .Count(eq => eq.Section != null && eq.Section.ExamId == e.Id),
+                                      SubjectName = s.Name
+                                  }).ToListAsync();
+
+            return examList;
+        }
+        public async Task<bool> UpdateAvatarUrlAsync(int userId, string avatarUrl)
+        {
+            var user = await _context.Accounts.FindAsync(userId);
+
+            if (user == null)
+                return false;
+
+            user.AvatarUrl = avatarUrl;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateUserTypeAsync(int userId)
+        {
+            var account = await _context.Accounts.FindAsync(userId);
+            if (account == null)
+                return false;
+
+            account.AccountType = "premium";
+
+            _context.Accounts.Update(account);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+>>>>>>> Stashed changes
     }
 }
