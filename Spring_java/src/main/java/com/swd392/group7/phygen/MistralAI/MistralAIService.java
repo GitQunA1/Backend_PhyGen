@@ -1,7 +1,8 @@
 package com.swd392.group7.phygen.MistralAI;
 
-import com.google.api.client.util.Value;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -20,8 +21,14 @@ public class MistralAIService {
 
     private final RestTemplate restTemplate;
 
-    @Value("${mistral.api.key}")
+    @Value("${mistral_api_key}")
     private String apiKey;
+
+    @PostConstruct
+    public void init() {
+        System.out.println("mistral api key = " + apiKey);
+    }
+
 
     public String importFile(MultipartFile multipartFile){
         try{

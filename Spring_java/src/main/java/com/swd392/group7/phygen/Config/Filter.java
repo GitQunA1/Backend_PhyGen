@@ -39,8 +39,7 @@ public class Filter extends OncePerRequestFilter {
     private final List<String> AUTH_PERMISSION = List.of(
             "/swagger-ui/**",
             "/v3/api-docs/**",
-            "/swagger-resources/**",
-            "/api/**"
+            "/swagger-resources/**"
     );
 
 
@@ -74,6 +73,9 @@ public class Filter extends OncePerRequestFilter {
                 return;
             }catch(MalformedJwtException malformedJwtException){
                 handlerExceptionResolver.resolveException(request,response,null,new AuthException("Token invalid"));
+                return;
+            }catch(Exception e){
+                e.printStackTrace();
                 return;
             }
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(account,token,account.getAuthorities());
