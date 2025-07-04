@@ -17,9 +17,9 @@ public class MistralAIController {
     private final MistralAIService mistralAIService;
 
 
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
-        String result = mistralAIService.importFile(file);
+    @PostMapping(value = "/upload_url")
+    public ResponseEntity<?> uploadFile(@RequestParam("url") String url) {
+        String result = mistralAIService.importDocUrl(url);
         ApiResponse<?> response = new ApiResponse<>(true,"Read file",result,null);
         return ResponseEntity.ok(response);
     }
