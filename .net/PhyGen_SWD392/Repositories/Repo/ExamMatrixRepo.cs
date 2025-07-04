@@ -32,5 +32,14 @@ namespace PhyGen_SWD392.Repositories.Repo
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public override async Task<ExamMatrix?> GetByIdAsync(int id)
+        {
+            return await _context.ExamMatrices
+                .Include(e => e.Subject)
+                .Include(e => e.MatrixSections)
+                .ThenInclude(ms => ms.MatrixDetails)
+                .FirstOrDefaultAsync(e => e.Id == id && e.Status == ExamMatrixStatusEnum.active.ToString());
+        }
     }
 }

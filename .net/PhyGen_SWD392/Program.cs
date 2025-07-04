@@ -74,7 +74,8 @@ builder.Services.AddScoped<IMatrixSectionRepo, MatrixSectionRepo>();
 builder.Services.AddScoped<MatrixSectionService>();
 builder.Services.AddScoped<IMatrixDetailRepo, MatrixDetailRepo>();
 builder.Services.AddScoped<MatrixDetailService>();
-
+builder.Services.AddScoped<IQuestionRepo, QuestionRepo>();
+builder.Services.AddScoped<AIGenerationService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 

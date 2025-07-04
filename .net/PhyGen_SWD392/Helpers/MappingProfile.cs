@@ -53,6 +53,10 @@
             CreateMap<MatrixDetailRequest, MatrixDetail>()
                 .ForMember(dest => dest.DifficultyLevel, opt => opt.MapFrom(src => src.LevelEnum.ToString()))
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.TypeEnum.ToString()));
+
+            CreateMap<Question, QuestionDto>();
+
+
         }
     }
 }
