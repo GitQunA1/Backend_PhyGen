@@ -1,6 +1,8 @@
 package com.swd392.group7.phygen.Topic.Entity;
 
+import com.swd392.group7.phygen.MatrixDetail.MatrixDetail;
 import com.swd392.group7.phygen.Question.Entity.Question;
+import com.swd392.group7.phygen.Subject.Entity.Subject;
 import com.swd392.group7.phygen.Topic.Enum.Level;
 import jakarta.persistence.*;
 import lombok.*;
@@ -28,5 +30,12 @@ public class Topic {
     @ManyToOne
     @JoinColumn(name = "parent_id")
     Topic topic;
+
+    @ManyToOne
+    @JoinColumn(name = "subject_id")
+    Subject subject;
+
+    @OneToMany(mappedBy = "topic",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<MatrixDetail> matrixDetails;
 
 }

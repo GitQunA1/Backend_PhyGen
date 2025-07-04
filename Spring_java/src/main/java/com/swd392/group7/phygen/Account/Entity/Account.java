@@ -4,6 +4,7 @@ import com.swd392.group7.phygen.Exam.Entity.Exam;
 import com.swd392.group7.phygen.Account.Enum.AccountType;
 import com.swd392.group7.phygen.Account.Enum.Role;
 import com.swd392.group7.phygen.Account.Enum.Status;
+import com.swd392.group7.phygen.ExamMatrix.ExamMatrix;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -53,8 +54,8 @@ public class Account implements UserDetails {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     List<Exam> exams;
 
-//    @OneToMany(mappedBy = "account",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-//    List<ExamMatrix> examMatrices;
+    @OneToMany(mappedBy = "account",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    List<ExamMatrix> examMatrices;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

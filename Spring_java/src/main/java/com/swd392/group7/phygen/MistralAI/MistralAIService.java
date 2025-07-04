@@ -17,11 +17,11 @@ public class MistralAIService {
     private final RestTemplate restTemplate;
 
     @Value("${mistral_api_key}")
-    private String apiKey;
+    private String MISTRAL_KEY;
 
     @PostConstruct
     public void init() {
-        System.out.println("mistral api key = " + apiKey);
+        System.out.println("mistral api key = " + MISTRAL_KEY);
     }
 
 
@@ -39,7 +39,7 @@ public class MistralAIService {
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setBearerAuth(apiKey);
+            headers.setBearerAuth(MISTRAL_KEY);
 
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
             String endpoint = "https://api.mistral.ai/v1/ocr";
