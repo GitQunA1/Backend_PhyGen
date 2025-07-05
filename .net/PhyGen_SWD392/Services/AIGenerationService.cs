@@ -35,6 +35,16 @@ namespace PhyGen_SWD392.Services
 
             Console.WriteLine("👉 AI Raw Output:");
             Console.WriteLine(aiResponse);
+
+            if (aiResponse.StartsWith("```json"))
+            {
+                aiResponse = aiResponse.Replace("```json", "").Trim();
+            }
+            if (aiResponse.EndsWith("```"))
+            {
+                aiResponse = aiResponse.Replace("```", "").Trim();
+            }
+
             var selectedQuestions = JsonConvert.DeserializeObject<List<AIExamResponse>>(aiResponse);
 
             var exam = new Exam
@@ -83,25 +93,35 @@ namespace PhyGen_SWD392.Services
             var endpoint = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={apiKey}";
 
             var prompt = @"
-Bạn là một hệ thống tạo đề thi.
+Bạn là một hệ thống hỗ trợ tạo đề thi Vật Lý.
+Nhiệm vụ của bạn là chọn các câu hỏi từ danh sách 'questions' để phù hợp với từng phần trong 'matrixDetails' của đề thi.
 
-Dữ liệu: 
+Dữ liệu đầu vào (đã được serialize từ 'request'):
 " + JsonConvert.SerializeObject(request) + @"
 
-❗ Yêu cầu:
-- Chỉ trả về một mảng JSON hợp lệ.
-- Không được bao markdown, không có ```json, không có mô tả.
-- TRẢ VỀ DUY NHẤT:
+Quy tắc chọn câu hỏi:
+- Mỗi phần trong 'matrixDetails' có 'sectionName', 'topic', 'difficultyLevel' và 'quantity'.
+- Bạn phải chọn chính xác 'quantity' câu hỏi cho mỗi 'sectionName'.
+- Các câu hỏi được chọn phải khớp với 'topic' và 'difficultyLevel' của phần đó.
+- Danh sách câu hỏi để chọn là 'questions'.
 
+ĐỊNH DẠNG ĐẦU RA YÊU CẦU:
+Bạn CHỈ được trả về MỘT MẢNG JSON. Mỗi phần tử trong mảng là một đối tượng JSON có hai trường:
+- ""section"": TÊN CỦA PHẦN ĐỀ (từ 'sectionName' trong 'matrixDetails').
+- ""questionId"": ID CỦA CÂU HỎỎI ĐƯỢC CHỌN (từ 'id' trong 'questions').
+
+VÍ DỤ VỀ ĐỊNH DẠNG ĐẦU RA BẮT BUỘC:
 [
-  { ""section"": ""Berii"", ""questionId"": 2 }
+  { ""section"": ""Điện học"", ""questionId"": 2 },
+  { ""section"": ""Cơ học"", ""questionId"": 4 }
 ]
 
-⚠️ KHÔNG TRẢ VỀ:
-```json
-[
-  ...
-]
+NHẮC LẠI:
+- KHÔNG BAO GIỜ TRẢ VỀ BẤT KỲ VĂN BẢN GIẢI THÍCH NÀO.
+- KHÔNG BAO GIỜ TRẢ VỀ BẤT KỲ MÔ TẢ NÀO.
+- KHÔNG BAO GIỜ TRẢ VỀ BẤT KỲ DẤU HIỆU MARKDOWN NÀO (ví dụ: ```json).
+- CHỈ DUY NHẤT MẢNG JSON THEO ĐỊNH DẠNG TRÊN.
+- ĐẢM BẢO CHỌN ĐÚNG SỐ LƯỢNG VÀ ĐÚNG ĐIỀU KIỆN.
 ";
 
             var content = new
