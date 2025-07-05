@@ -1,46 +1,62 @@
-package com.swd392.group7.phygen.GeminiAI;
-
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
-import java.util.Map;
-
-@Service
-@RequiredArgsConstructor
-public class GeminiService {
-
-    private final RestTemplate restTemplate;
-
-    private String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/";
-
-    private String model = "gemini-2.5-flash";
-
-    @Value("${gemini_key}")
-    private String GEMINI_KEY;
-
-//    public String generateExam(List<Map<String,Object>> jsonFiles, String content){
+//package com.swd392.group7.phygen.GeminiAI;
 //
-//        String endpoint = apiUrl + model + "generateContent?key=" + GEMINI_KEY;
-//        StringBuilder promptBuilder = new StringBuilder();
-//        promptBuilder.append("Imagine you are a knowledgeable teacher across various subjects.\n");
-//        promptBuilder.append("Based on the given content and the JSON files representing responses of a list of entities,\n");
-//        promptBuilder.append("analyze the field names and data to identify relationships between them.\n");
-//        promptBuilder.append("Use this understanding to generate a comprehensive exam in Markdown format.\n");
-//        promptBuilder.append("The exam should include sections such as a title, multiple-choice questions, short answer questions, and extended response items.\n");
-//        promptBuilder.append("Each question should be clearly written, relevant to the topic, and—if applicable—include correct answers or answer markings.\n");
-//        promptBuilder.append("Ensure the questions reflect the concepts and relationships derived from the JSON data.\n");
-//        promptBuilder.append("Generate the Markdown exam naturally and academically, grounded in the structure and content provided.\n");
-//        promptBuilder.append("JSON data will be attached below (or provided through an API during implementation).\n");
-//        promptBuilder.append("Content:\n").append(content).append("\n\n");
-//        promptBuilder.append("JSON files:\n");
-//        int idx = 1;
-//        for (Map<String, Object> file : jsonFiles){
+//import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
+//import lombok.RequiredArgsConstructor;
+//import org.springframework.beans.factory.annotation.Value;
+//import org.springframework.jdbc.core.JdbcTemplate;
+//import org.springframework.stereotype.Service;
+//import org.springframework.web.client.RestTemplate;
 //
+//import javax.sql.DataSource;
+//import java.sql.Connection;
+//import java.sql.DatabaseMetaData;
+//import java.sql.ResultSet;
+//import java.sql.SQLException;
+//import java.util.ArrayList;
+//import java.util.List;
+//import java.util.Map;
+//
+//@Service
+//@RequiredArgsConstructor
+//public class GeminiService {
+//
+//    private final JdbcTemplate jdbcTemplate;
+//
+//    private final GoogleAiGeminiChatModel geminiChatModel;
+//
+//    private String schemaInfo() throws SQLException {
+//        StringBuilder schema = new StringBuilder();
+//        DataSource dataSource = jdbcTemplate.getDataSource();
+//        if (dataSource == null) {
+//            schema.append("DataSource is null. Check database configuration.");
+//            return schema.toString();
 //        }
+//        try (Connection connection = dataSource.getConnection()) {
+//            DatabaseMetaData metaData = connection.getMetaData();
+//            ResultSet tables = metaData.getTables(null, null, "%", new String[]{"TABLE"});
+//
+//            while (tables.next()) {
+//                String tableName = tables.getString("TABLE_NAME");
+//                schema.append("Table: ").append(tableName).append(" (");
+//
+//                ResultSet columns = metaData.getColumns(null, null, tableName, "%");
+//                List<String> columnNames = new ArrayList<>();
+//                while (columns.next()) {
+//                    columnNames.add(columns.getString("COLUMN_NAME"));
+//                }
+//                schema.append(String.join(", ", columnNames)).append(")\n");
+//                columns.close();
+//            }
+//            tables.close();
+//        }catch (Exception e) {
+//            schema.append("Error reading schema: ").append(e.getMessage());
+//        }
+//        return schema.toString();
+//    }
+//
+//    private String examQuery(){
 //
 //    }
-
-}
+//
+//
+//}
