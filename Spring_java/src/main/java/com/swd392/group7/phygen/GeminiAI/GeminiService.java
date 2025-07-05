@@ -2,10 +2,8 @@
 //
 //import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 //import lombok.RequiredArgsConstructor;
-//import org.springframework.beans.factory.annotation.Value;
 //import org.springframework.jdbc.core.JdbcTemplate;
 //import org.springframework.stereotype.Service;
-//import org.springframework.web.client.RestTemplate;
 //
 //import javax.sql.DataSource;
 //import java.sql.Connection;
@@ -14,7 +12,6 @@
 //import java.sql.SQLException;
 //import java.util.ArrayList;
 //import java.util.List;
-//import java.util.Map;
 //
 //@Service
 //@RequiredArgsConstructor
@@ -54,7 +51,8 @@
 //        return schema.toString();
 //    }
 //
-//    private String examQuery(){
+//    private String exampleQueries(){
+//        return ""
 //
 //    }
 //
