@@ -24,6 +24,7 @@ public class ExamMatrix {
     Long id;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "examtype")
     ExamType examType;
 
     @Enumerated(EnumType.STRING)

@@ -36,7 +36,7 @@ public class ExamService {
         Account account = accountService.getCurrentAccount();
         Exam exam = new Exam();
         exam.setExamType(examRq.getExamType());
-        exam.setCreateAt(exam.getCreateAt());
+        exam.setCreatedAt(exam.getCreatedAt());
         exam.setAccount(account);
         examRepo.save(exam);
         return modelMapper.map(exam, Response.class);
@@ -45,7 +45,7 @@ public class ExamService {
     public Response update(UpdateRequest examRq, Long id){
         Exam oldExam = findExamById(id);
         oldExam.setExamType(examRq.getExamType());
-        oldExam.setCreateAt((examRq.getCreateAt()));
+        oldExam.setCreatedAt((examRq.getCreateAt()));
         examRepo.save(oldExam);
         return modelMapper.map(oldExam,Response.class);
     }

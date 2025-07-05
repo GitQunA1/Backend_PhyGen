@@ -20,6 +20,7 @@ public class ExamVersion {
 
     String pdfUrl;
 
+    @Column(name = "questions_order")
     String questionOrder;
 
     @ManyToOne

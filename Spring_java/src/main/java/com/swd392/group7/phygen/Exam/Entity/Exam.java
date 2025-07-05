@@ -26,9 +26,11 @@ public class Exam {
     boolean isDraft = false;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "examtype")
     ExamType examType;
 
-    LocalDateTime createAt;
+
+    LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "created_by")
