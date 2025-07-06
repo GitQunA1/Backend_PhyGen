@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using PhyGen_SWD392.Helpers;
 using PhyGen_SWD392.Settings;
 using PhyGen_SWD392.ViewModels;

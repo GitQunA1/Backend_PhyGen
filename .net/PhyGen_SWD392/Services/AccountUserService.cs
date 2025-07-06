@@ -30,6 +30,10 @@ namespace PhyGen_SWD392.Services
         public async Task<bool> UpdateAvatarUrlAsync(int userId, string avatarUrl)
         {
             return await _accountUserRepo.UpdateAvatarUrlAsync(userId, avatarUrl);
-        }   
+        }
+        public async Task<bool> UpgradeToPremiumAsync(int userId)
+        {
+            return await _accountUserRepo.UpgradeToPremiumAsync(userId);
+        }
     }
 }
