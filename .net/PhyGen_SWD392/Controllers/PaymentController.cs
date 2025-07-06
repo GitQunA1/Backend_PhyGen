@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PhyGen_SWD392.Services;
 using PhyGen_SWD392.ViewModels;
+using System.Security.Claims;
 
 namespace PhyGen_SWD392.Controllers
 {
@@ -15,43 +17,49 @@ namespace PhyGen_SWD392.Controllers
         {
             _vnPayService = vnPayService;
         }
+
+        [Authorize]
         [HttpPost("create")]
         public IActionResult CreatePaymentUrl([FromBody] VnPaymentRequestModel model)
         {
             if (model == null || model.Amount <= 0)
-                return BadRequest("Thông tin không hợp lệ");
+                return BadRequest("Invalid payment information.");
 
+            string email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value ?? "unknown@example.com";
+
+
+            model.OrderId = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             model.CreatedDate = DateTime.Now;
+            model.FullName = email;
+            model.Amount = 599000;
+
             var paymentUrl = _vnPayService.CreatePaymentUrl(HttpContext, model);
             return Ok(new { paymentUrl });
         }
 
-        // Xử lý callback sau khi thanh toán
         [HttpGet("vnpay-return")]
         public IActionResult PaymentCallback()
         {
-            // Debug: Hiển thị toàn bộ query string từ VNPAY
             foreach (var key in Request.Query.Keys)
             {
                 var value = Request.Query[key];
                 Console.WriteLine($"{key}: {value}");
             }
 
-            // Thực hiện xử lý thanh toán
             var result = _vnPayService.PaymentExecute(Request.Query);
 
             if (!result.Success)
             {
                 return BadRequest(new
                 {
-                    message = "❌ Thanh toán thất bại hoặc sai chữ ký.",
+                    message = "Payment failed or invalid signature.",
                     responseCode = result.VnPayResponseCode
                 });
             }
 
             return Ok(new
             {
-                message = "✅ Thanh toán thành công!",
+                message = "✅ Payment successful!",
                 orderId = result.OrderId,
                 transactionId = result.TransactionId,
                 vnp_ResponseCode = result.VnPayResponseCode,
