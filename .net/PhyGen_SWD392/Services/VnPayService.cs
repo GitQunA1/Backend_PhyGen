@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
+using PhyGen_SWD392.Helpers;
 using PhyGen_SWD392.Settings;
+using PhyGen_SWD392.ViewModels;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
@@ -8,57 +10,88 @@ namespace PhyGen_SWD392.Services
 {
     public class VnPayService
     {
-        private readonly VnPaySettings _settings;
-
-        public VnPayService(IOptions<VnPaySettings> settings)
+        private readonly IConfiguration _config;
+        public VnPayService(IConfiguration config)
         {
-            _settings = settings.Value;
+            _config = config;
         }
-
-        public string CreatePaymentUrl(string orderId, decimal amount, string ipAddress)
+        public string CreatePaymentUrl(HttpContext context, VnPaymentRequestModel model)
         {
-            var time = DateTime.UtcNow.AddHours(7);
-            var tick = time.ToString("yyyyMMddHHmmss");
+            var tick = DateTime.Now.Ticks.ToString();
 
-            // Step 1: Khởi tạo các tham số vnp
-            var vnpParams = new SortedDictionary<string, string>
-            {
-                { "vnp_Version", "2.1.0" },
-                { "vnp_Command", "pay" },
-                { "vnp_TmnCode", _settings.TmnCode },
-                { "vnp_Amount", ((int)(amount * 100)).ToString() }, // nhân 100
-                { "vnp_CreateDate", tick },
-                { "vnp_CurrCode", "VND" },
-                { "vnp_IpAddr", ipAddress },
-                { "vnp_Locale", "vn" },
-                { "vnp_OrderInfo", $"Thanh toan don hang {orderId}" },
-                { "vnp_OrderType", "other" },
-                { "vnp_ReturnUrl", _settings.ReturnUrl },
-                { "vnp_TxnRef", orderId }
-            };
+            var vnpay = new VnPayLibrary();
+            vnpay.AddRequestData("vnp_Version", _config["VnPay:Version"]);
+            vnpay.AddRequestData("vnp_Command", _config["VnPay:Command"]);
+            vnpay.AddRequestData("vnp_TmnCode", _config["VnPay:TmnCode"]);
+            vnpay.AddRequestData("vnp_Amount", (model.Amount * 100).ToString());
 
-            // Step 2: Tạo chuỗi dữ liệu ký (KHÔNG encode, KHÔNG có vnp_SecureHash)
-            var signData = string.Join("&", vnpParams.Select(x => $"{x.Key}={x.Value}"));
-            var vnp_SecureHash = HmacSHA512(_settings.HashSecret, signData);
+            vnpay.AddRequestData("vnp_CreateDate", model.CreatedDate.ToString("yyyyMMddHHmmss"));
+            vnpay.AddRequestData("vnp_CurrCode", _config["VnPay:CurrCode"]);
+            vnpay.AddRequestData("vnp_IpAddr", Utils.GetIpAddress(context));
+            vnpay.AddRequestData("vnp_Locale", _config["VnPay:Locale"]);
 
-            // Step 3: Thêm chữ ký vào params
-            vnpParams.Add("vnp_SecureHash", vnp_SecureHash);
+            vnpay.AddRequestData("vnp_OrderInfo", "Thanh toán cho đơn hàng:" + model.OrderId);
+            vnpay.AddRequestData("vnp_OrderType", "other"); //default value: other
+            vnpay.AddRequestData("vnp_ReturnUrl", _config["VnPay:PaymentBackReturnUrl"]);
 
-            // Step 4: Tạo URL thanh toán (có encode giá trị)
-            var paymentUrl = _settings.Url + "?" +
-                string.Join("&", vnpParams.Select(x =>
-                    $"{x.Key}={HttpUtility.UrlEncode(x.Value)}"));
+            vnpay.AddRequestData("vnp_TxnRef", tick);
+
+            var paymentUrl = vnpay.CreateRequestUrl(_config["VnPay:BaseUrl"], _config["VnPay:HashSecret"]);
 
             return paymentUrl;
         }
 
-        private string HmacSHA512(string key, string inputData)
+        public VnPaymentResponseModel PaymentExecute(IQueryCollection collections)
         {
-            var keyBytes = Encoding.UTF8.GetBytes(key);
-            var inputBytes = Encoding.UTF8.GetBytes(inputData);
-            using var hmac = new HMACSHA512(keyBytes);
-            var hash = hmac.ComputeHash(inputBytes);
-            return BitConverter.ToString(hash).Replace("-", "").ToLower();
+            var vnpay = new VnPayLibrary();
+            foreach (var (key, value) in collections)
+            {
+                if (!string.IsNullOrEmpty(key) && key.StartsWith("vnp_"))
+                {
+                    vnpay.AddResponseData(key, value.ToString());
+                }
+            }
+
+            // Safe parsing vnp_TxnRef
+            var txnRefStr = vnpay.GetResponseData("vnp_TxnRef");
+            if (!long.TryParse(txnRefStr, out long vnp_orderId))
+            {
+                return new VnPaymentResponseModel
+                {
+                    Success = false,
+                    VnPayResponseCode = "INVALID_TxnRef"
+                };
+            }
+
+            // Safe parsing vnp_TransactionNo
+            var transNoStr = vnpay.GetResponseData("vnp_TransactionNo");
+            long.TryParse(transNoStr, out long vnp_TransactionId); // Không throw lỗi nếu null
+
+            var vnp_SecureHash = collections.FirstOrDefault(p => p.Key == "vnp_SecureHash").Value;
+            var vnp_ResponseCode = vnpay.GetResponseData("vnp_ResponseCode");
+            var vnp_OrderInfo = vnpay.GetResponseData("vnp_OrderInfo");
+
+            // Validate chữ ký
+            bool checkSignature = vnpay.ValidateSignature(vnp_SecureHash, _config["VnPay:HashSecret"]);
+            if (!checkSignature)
+            {
+                return new VnPaymentResponseModel
+                {
+                    Success = false,
+                    VnPayResponseCode = "INVALID_SIGNATURE"
+                };
+            }
+
+            return new VnPaymentResponseModel
+            {
+                Success = true,
+                PaymentMethod = "VnPay",
+                OrderDescription = vnp_OrderInfo,
+                OrderId = vnp_orderId.ToString(),
+                TransactionId = vnp_TransactionId.ToString(),
+                Token = vnp_SecureHash,
+                VnPayResponseCode = vnp_ResponseCode
+            };
         }
     }
 }

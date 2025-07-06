@@ -92,8 +92,7 @@ builder.Services.AddScoped<ImageService>();
 builder.Services.Configure<CloudinarySettings>(
     builder.Configuration.GetSection("CloudinarySettings"));
 
-builder.Services.Configure<VnPaySettings>(builder.Configuration.GetSection("VnPaySettings"));
-builder.Services.AddScoped<VnPayService>();
+builder.Services.AddSingleton<VnPayService>();
 
 builder.Services.AddSingleton(cloudinary =>
 {

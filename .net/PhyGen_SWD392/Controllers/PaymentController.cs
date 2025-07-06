@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PhyGen_SWD392.Services;
+using PhyGen_SWD392.ViewModels;
 
 namespace PhyGen_SWD392.Controllers
 {
@@ -14,28 +15,48 @@ namespace PhyGen_SWD392.Controllers
         {
             _vnPayService = vnPayService;
         }
-
-        [HttpGet("create")]
-        public IActionResult CreatePaymentUrl(string orderId, decimal amount)
+        [HttpPost("create")]
+        public IActionResult CreatePaymentUrl([FromBody] VnPaymentRequestModel model)
         {
-            var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
-            var url = _vnPayService.CreatePaymentUrl(orderId, amount, ip);
-            return Ok(new { paymentUrl = url });
+            if (model == null || model.Amount <= 0)
+                return BadRequest("Thông tin không hợp lệ");
+
+            model.CreatedDate = DateTime.Now;
+            var paymentUrl = _vnPayService.CreatePaymentUrl(HttpContext, model);
+            return Ok(new { paymentUrl });
         }
 
+        // Xử lý callback sau khi thanh toán
         [HttpGet("vnpay-return")]
         public IActionResult PaymentCallback()
         {
-            var query = Request.Query;
-            var vnp_ResponseCode = query["vnp_ResponseCode"];
-            var vnp_TxnRef = query["vnp_TxnRef"];
-
-            if (vnp_ResponseCode == "00")
+            // Debug: Hiển thị toàn bộ query string từ VNPAY
+            foreach (var key in Request.Query.Keys)
             {
-                return Ok("Thanh toán thành công! Mã đơn hàng: " + vnp_TxnRef);
+                var value = Request.Query[key];
+                Console.WriteLine($"{key}: {value}");
             }
 
-            return BadRequest("Thanh toán thất bại");
+            // Thực hiện xử lý thanh toán
+            var result = _vnPayService.PaymentExecute(Request.Query);
+
+            if (!result.Success)
+            {
+                return BadRequest(new
+                {
+                    message = "❌ Thanh toán thất bại hoặc sai chữ ký.",
+                    responseCode = result.VnPayResponseCode
+                });
+            }
+
+            return Ok(new
+            {
+                message = "✅ Thanh toán thành công!",
+                orderId = result.OrderId,
+                transactionId = result.TransactionId,
+                vnp_ResponseCode = result.VnPayResponseCode,
+                token = result.Token
+            });
         }
     }
 }
