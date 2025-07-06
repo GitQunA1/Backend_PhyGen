@@ -41,16 +41,10 @@ namespace PhyGen_SWD392.Controllers
             return Ok(new { paymentUrl });
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet("vnpay-return")]
         public async Task<IActionResult> PaymentCallback()
         {
-            foreach (var key in Request.Query.Keys)
-            {
-                var value = Request.Query[key];
-                Console.WriteLine($"{key}: {value}");
-            }
-
             var result = _vnPayService.PaymentExecute(Request.Query);
 
             if (!result.Success)
@@ -62,12 +56,17 @@ namespace PhyGen_SWD392.Controllers
                 });
             }
 
-            var userIdClaim = User.Claims.FirstOrDefault(c =>
-                c.Type == ClaimTypes.NameIdentifier || c.Type == "sub" || c.Type == "id");
+            var orderInfo = Request.Query["vnp_OrderInfo"].ToString();
+            int userId = 0;
 
-            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            if (!string.IsNullOrEmpty(orderInfo) && orderInfo.StartsWith("UpgradePremiumForUser:"))
             {
-                return Unauthorized("Unable to identify user from the token.");
+                int.TryParse(orderInfo.Replace("UpgradePremiumForUser:", ""), out userId);
+            }
+
+            if (userId <= 0)
+            {
+                return BadRequest("❌ Cannot identify user from vnp_OrderInfo.");
             }
 
             var success = await _accountUserService.UpgradeToPremiumAsync(userId);
@@ -85,6 +84,5 @@ namespace PhyGen_SWD392.Controllers
                 token = result.Token
             });
         }
-
     }
 }
