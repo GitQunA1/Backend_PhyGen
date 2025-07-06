@@ -35,7 +35,8 @@ namespace PhyGen_SWD392.Controllers
             model.FullName = "User #" + userId;
             model.Amount = 599000;
 
-            model.Description = $"UpgradePremiumForUser:{userId}";
+            // ✅ Gán vào OrderInfo
+            model.OrderInfo = $"UpgradePremiumForUser:{userId}";
 
             var paymentUrl = _vnPayService.CreatePaymentUrl(HttpContext, model);
             return Ok(new { paymentUrl });
@@ -72,7 +73,7 @@ namespace PhyGen_SWD392.Controllers
             var success = await _accountUserService.UpgradeToPremiumAsync(userId);
             if (!success)
             {
-                return StatusCode(500, "Payment succeeded, but failed to upgrade the user account.");
+                return StatusCode(500, "✅ Payment succeeded, but failed to upgrade the user account.");
             }
 
             return Ok(new
@@ -80,8 +81,7 @@ namespace PhyGen_SWD392.Controllers
                 message = "✅ Payment successful and account upgraded to Premium!",
                 orderId = result.OrderId,
                 transactionId = result.TransactionId,
-                vnp_ResponseCode = result.VnPayResponseCode,
-                token = result.Token
+                vnp_ResponseCode = result.VnPayResponseCode
             });
         }
     }

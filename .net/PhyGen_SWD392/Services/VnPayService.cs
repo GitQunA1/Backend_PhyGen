@@ -31,10 +31,9 @@ namespace PhyGen_SWD392.Services
             vnpay.AddRequestData("vnp_IpAddr", Utils.GetIpAddress(context));
             vnpay.AddRequestData("vnp_Locale", _config["VnPay:Locale"]);
 
-            vnpay.AddRequestData("vnp_OrderInfo", "Thanh toán cho đơn hàng:" + model.OrderId);
-            vnpay.AddRequestData("vnp_OrderType", "other"); //default value: other
+            vnpay.AddRequestData("vnp_OrderInfo", model.OrderInfo);
+            vnpay.AddRequestData("vnp_OrderType", "other");
             vnpay.AddRequestData("vnp_ReturnUrl", _config["VnPay:PaymentBackReturnUrl"]);
-
             vnpay.AddRequestData("vnp_TxnRef", tick);
 
             var paymentUrl = vnpay.CreateRequestUrl(_config["VnPay:BaseUrl"], _config["VnPay:HashSecret"]);
@@ -45,6 +44,7 @@ namespace PhyGen_SWD392.Services
         public VnPaymentResponseModel PaymentExecute(IQueryCollection collections)
         {
             var vnpay = new VnPayLibrary();
+
             foreach (var (key, value) in collections)
             {
                 if (!string.IsNullOrEmpty(key) && key.StartsWith("vnp_"))
@@ -53,7 +53,17 @@ namespace PhyGen_SWD392.Services
                 }
             }
 
-            // Safe parsing vnp_TxnRef
+            var vnp_SecureHash = collections["vnp_SecureHash"];
+
+            if (string.IsNullOrEmpty(vnp_SecureHash) || !vnpay.ValidateSignature(vnp_SecureHash, _config["VnPay:HashSecret"]))
+            {
+                return new VnPaymentResponseModel
+                {
+                    Success = false,
+                    VnPayResponseCode = "INVALID_SIGNATURE"
+                };
+            }
+
             var txnRefStr = vnpay.GetResponseData("vnp_TxnRef");
             if (!long.TryParse(txnRefStr, out long vnp_orderId))
             {
@@ -64,24 +74,11 @@ namespace PhyGen_SWD392.Services
                 };
             }
 
-            // Safe parsing vnp_TransactionNo
             var transNoStr = vnpay.GetResponseData("vnp_TransactionNo");
-            long.TryParse(transNoStr, out long vnp_TransactionId); // Không throw lỗi nếu null
+            long.TryParse(transNoStr, out long vnp_TransactionId);
 
-            var vnp_SecureHash = collections.FirstOrDefault(p => p.Key == "vnp_SecureHash").Value;
             var vnp_ResponseCode = vnpay.GetResponseData("vnp_ResponseCode");
             var vnp_OrderInfo = vnpay.GetResponseData("vnp_OrderInfo");
-
-            // Validate chữ ký
-            bool checkSignature = vnpay.ValidateSignature(vnp_SecureHash, _config["VnPay:HashSecret"]);
-            if (!checkSignature)
-            {
-                return new VnPaymentResponseModel
-                {
-                    Success = false,
-                    VnPayResponseCode = "INVALID_SIGNATURE"
-                };
-            }
 
             return new VnPaymentResponseModel
             {
