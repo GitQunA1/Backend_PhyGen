@@ -11,6 +11,8 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using PhyGen_SWD392.Helpers;
 using PhyGen_SWD392.Models.Entities;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 
 var builder = WebApplication.CreateBuilder(args);
 //var frontendUrls = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
@@ -100,6 +102,12 @@ builder.Services.AddSingleton(cloudinary =>
     var account = new CloudinaryDotNet.Account(config.CloudName, config.ApiKey, config.ApiSecret);
     return new CloudinaryDotNet.Cloudinary(account);
 });
+
+FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.FromFile(builder.Configuration["Firebase:CredentialPath"])
+});
+builder.Services.AddScoped<FirebaseNotificationService>();
 
 builder.Services.AddDbContext<PhyGenDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
