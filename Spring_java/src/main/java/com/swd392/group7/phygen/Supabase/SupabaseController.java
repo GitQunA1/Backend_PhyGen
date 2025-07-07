@@ -26,4 +26,13 @@ public class SupabaseController {
         ApiResponse<?> response = new ApiResponse<>(true,"Upload file to supabase success",result,null);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/getSignUrl")
+    public ResponseEntity<?> getUrlFile(@RequestParam("fileName") String fileName){
+        String url = supabaseStorageService.getSignedUrl(fileName);
+        ApiResponse<?> response = new ApiResponse<>(true,"Get signed Url successfully",url,null);
+        return ResponseEntity.ok(response);
+    }
+
+
 }

@@ -1,4 +1,4 @@
-package com.swd392.group7.phygen.MistralAI;
+package com.swd392.group7.phygen.AI.MistralAI;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

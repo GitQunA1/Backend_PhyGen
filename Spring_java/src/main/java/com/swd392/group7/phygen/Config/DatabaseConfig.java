@@ -1,27 +1,27 @@
 package com.swd392.group7.phygen.Config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.util.Objects;
 
 @Configuration
-public class DataBaseConfig {
+public class DatabaseConfig {
+    
     @Bean
     public JdbcTemplate jdbcTemplate(DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }
 
     @Bean
-    public CommandLineRunner checkSupabaseConnection(JdbcTemplate jdbcTemplate) {
+    public CommandLineRunner checkCurrentConnection(JdbcTemplate jdbcTemplate) {
         return args -> {
-            try (Connection conn = jdbcTemplate.getDataSource().getConnection()) {
+            try (Connection conn = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection()) {
                 DatabaseMetaData metaData = conn.getMetaData();
                 String dbProduct = metaData.getDatabaseProductName();
                 String dbVersion = jdbcTemplate.queryForObject("SELECT version()", String.class);
