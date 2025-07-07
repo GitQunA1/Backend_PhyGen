@@ -54,7 +54,6 @@ namespace PhyGen_SWD392.Services
             }
 
             var vnp_SecureHash = collections["vnp_SecureHash"];
-
             if (string.IsNullOrEmpty(vnp_SecureHash) || !vnpay.ValidateSignature(vnp_SecureHash, _config["VnPay:HashSecret"]))
             {
                 return new VnPaymentResponseModel
@@ -78,17 +77,22 @@ namespace PhyGen_SWD392.Services
             long.TryParse(transNoStr, out long vnp_TransactionId);
 
             var vnp_ResponseCode = vnpay.GetResponseData("vnp_ResponseCode");
+            var vnp_TransactionStatus = vnpay.GetResponseData("vnp_TransactionStatus");
             var vnp_OrderInfo = vnpay.GetResponseData("vnp_OrderInfo");
+
+            // ✅ Chỉ thành công nếu cả ResponseCode và TransactionStatus đều == "00"
+            var isPaymentSuccess = vnp_ResponseCode == "00" && vnp_TransactionStatus == "00";
 
             return new VnPaymentResponseModel
             {
-                Success = true,
+                Success = isPaymentSuccess,
                 PaymentMethod = "VnPay",
                 OrderDescription = vnp_OrderInfo,
                 OrderId = vnp_orderId.ToString(),
                 TransactionId = vnp_TransactionId.ToString(),
                 Token = vnp_SecureHash,
-                VnPayResponseCode = vnp_ResponseCode
+                VnPayResponseCode = vnp_ResponseCode,
+                VnPayTransactionStatus = vnp_TransactionStatus // Thêm để debug/hiển thị chi tiết
             };
         }
     }

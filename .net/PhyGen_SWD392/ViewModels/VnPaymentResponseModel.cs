@@ -10,6 +10,8 @@
         public string TransactionId { get; set; }
         public string Token { get; set; }
         public string VnPayResponseCode { get; set; }
+        public string VnPayTransactionStatus { get; set; }
+
     }
 
     public class VnPaymentRequestModel

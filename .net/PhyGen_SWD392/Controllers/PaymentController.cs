@@ -35,8 +35,7 @@ namespace PhyGen_SWD392.Controllers
             model.FullName = "User #" + userId;
             model.Amount = 599000;
 
-            // ✅ Gán vào OrderInfo
-            model.OrderInfo = $"UpgradePremiumForUser:{userId}";
+            model.OrderInfo = $"UpgradPremiumForUser:{userId}";
 
             var paymentUrl = _vnPayService.CreatePaymentUrl(HttpContext, model);
             return Ok(new { paymentUrl });
@@ -48,12 +47,22 @@ namespace PhyGen_SWD392.Controllers
         {
             var result = _vnPayService.PaymentExecute(Request.Query);
 
-            if (!result.Success)
+            var responseCode = Request.Query["vnp_ResponseCode"].ToString();
+            var transactionStatus = Request.Query["vnp_TransactionStatus"].ToString();
+
+            var isPaidSuccessfully =
+                result.Success &&
+                responseCode == "00" &&
+                transactionStatus == "00";
+
+            if (!isPaidSuccessfully)
             {
                 return BadRequest(new
                 {
-                    message = "❌ Payment failed or the signature is invalid.",
-                    responseCode = result.VnPayResponseCode
+                    status = false,
+                    message = "Payment failed, cancelled, or not completed.",
+                    responseCode,
+                    transactionStatus
                 });
             }
 
@@ -67,21 +76,30 @@ namespace PhyGen_SWD392.Controllers
 
             if (userId <= 0)
             {
-                return BadRequest("❌ Cannot identify user from vnp_OrderInfo.");
+                return BadRequest(new
+                {
+                    status = false,
+                    message = "Cannot identify user from vnp_OrderInfo."
+                });
             }
 
             var success = await _accountUserService.UpgradeToPremiumAsync(userId);
             if (!success)
             {
-                return StatusCode(500, "✅ Payment succeeded, but failed to upgrade the user account.");
+                return StatusCode(500, new
+                {
+                    status = false,
+                    message = "Payment succeeded, but failed to upgrade the user account."
+                });
             }
 
             return Ok(new
             {
-                message = "✅ Payment successful and account upgraded to Premium!",
+                status = true,
+                message = "Payment successful and account upgraded to Premium!",
                 orderId = result.OrderId,
                 transactionId = result.TransactionId,
-                vnp_ResponseCode = result.VnPayResponseCode
+                vnp_ResponseCode = responseCode
             });
         }
     }
