@@ -23,7 +23,8 @@ public class GeminiService {
     private final Client client;
 
 
-    public String GenerateTextFromTextInput(String prompt){
+    public String generateExam(GenerateExamRequest request){
+        String prompt = PromptBuilder.buildExamPrompt(request);
         GenerateContentResponse response = client.models.generateContent(
                 "gemini-2.5-flash",
                 prompt,
