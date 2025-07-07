@@ -15,7 +15,7 @@ Lưu ý: cần kết hợp 4 thông tin **Khối lớp**, **Môn học**, **Mứ
 đúng với mức độ tạo đề.
 --------------------------------------------------------------------------
 Yêu cầu cấu trúc đề thi:
--**Tựa đề đè thi** căn giữa
+-**Tựa đề đề thi** căn giữa
 -**Khối lớp** căn phải
 -**Môn học** căn phải
 -Thời gian làm bài (mặc định 45 phút) căn phải
