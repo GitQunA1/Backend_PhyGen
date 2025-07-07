@@ -35,7 +35,7 @@ namespace PhyGen_SWD392.Controllers
             model.FullName = "User #" + userId;
             model.Amount = 599000;
 
-            model.OrderInfo = $"UpgradPremiumForUser:{userId}";
+            model.OrderInfo = $"UpgradePremiumForUser:{userId}";
 
             var paymentUrl = _vnPayService.CreatePaymentUrl(HttpContext, model);
             return Ok(new { paymentUrl });

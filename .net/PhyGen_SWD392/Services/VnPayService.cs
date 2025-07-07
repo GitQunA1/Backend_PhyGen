@@ -80,7 +80,6 @@ namespace PhyGen_SWD392.Services
             var vnp_TransactionStatus = vnpay.GetResponseData("vnp_TransactionStatus");
             var vnp_OrderInfo = vnpay.GetResponseData("vnp_OrderInfo");
 
-            // ✅ Chỉ thành công nếu cả ResponseCode và TransactionStatus đều == "00"
             var isPaymentSuccess = vnp_ResponseCode == "00" && vnp_TransactionStatus == "00";
 
             return new VnPaymentResponseModel
@@ -92,7 +91,7 @@ namespace PhyGen_SWD392.Services
                 TransactionId = vnp_TransactionId.ToString(),
                 Token = vnp_SecureHash,
                 VnPayResponseCode = vnp_ResponseCode,
-                VnPayTransactionStatus = vnp_TransactionStatus // Thêm để debug/hiển thị chi tiết
+                VnPayTransactionStatus = vnp_TransactionStatus 
             };
         }
     }
