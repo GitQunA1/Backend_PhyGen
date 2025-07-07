@@ -66,7 +66,7 @@ namespace PhyGen_SWD392.Controllers
                 });
             }
 
-            var orderInfo = Request.Query["vnp_OrderInfo"].ToString();
+            var orderInfo = result.OrderDescription;
             int userId = 0;
 
             if (!string.IsNullOrEmpty(orderInfo) && orderInfo.StartsWith("UpgradePremiumForUser:"))
