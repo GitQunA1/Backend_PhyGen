@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using PhyGen_SWD392.Helpers;
+using PhyGen_SWD392.Models.DTOs;
+using PhyGen_SWD392.Models.Entities;
 using PhyGen_SWD392.Repositories.Interface;
 using PhyGen_SWD392.Services;
 
@@ -29,7 +31,7 @@ namespace PhyGen_SWD392.Controllers
             }
 
             var aiResponses = await _aIGenerationService.GenerateExamFromMatrix(matrixId, userId);
-            return Ok(aiResponses);
+            return Ok(ApiResponse<List<AIExamResponse>>.SuccessResponse(aiResponses, "Exam generated successfully"));
         }
     }
 }

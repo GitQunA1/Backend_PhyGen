@@ -30,7 +30,6 @@ namespace PhyGen_SWD392.Services
         public async Task<List<AIExamResponse>> GenerateExamFromMatrix(int matrixId, int userId)
         {
             var aiRequest = await BuildAIExamRequest(matrixId);
-
             var aiResponse = await CallGeminiApi(aiRequest);
 
             Console.WriteLine("👉 AI Raw Output:");
@@ -45,46 +44,67 @@ namespace PhyGen_SWD392.Services
                 aiResponse = aiResponse.Replace("```", "").Trim();
             }
 
-            var selectedQuestions = JsonConvert.DeserializeObject<List<AIExamResponse>>(aiResponse);
+            var tempItems = JsonConvert.DeserializeObject<List<TempAIExamItem>>(aiResponse);
+
+            var matrix = await _examMatrixRepo.GetByIdAsync(matrixId);
 
             var exam = new Exam
             {
                 CreatedAt = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified),
                 CreatedBy = userId,
                 IsDraft = true,
-                Status = "active"
+                Status = "active",
+                Examtype = matrix.Examtype
             };
             _context.Exams.Add(exam);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); 
 
-            var grouped = selectedQuestions.GroupBy(x => x.Section);
-            int sectionIndex = 0;
+            var grouped = tempItems.GroupBy(x => x.section);
+            var aiExamResponses = new List<AIExamResponse>();
 
             foreach (var group in grouped)
             {
+                var matrixSection = matrix.MatrixSections.FirstOrDefault(x => x.SectionName == group.Key);
+
                 var section = new ExamSection
                 {
                     ExamId = exam.Id,
                     SectionName = group.Key,
-                    DisplayOrder = sectionIndex++
+                    DisplayOrder = matrixSection?.DisplayOrder ?? 0
                 };
                 _context.ExamSections.Add(section);
                 await _context.SaveChangesAsync();
 
-                int qIndex = 0;
+                var questionInfos = new List<QuestionInfo>();
+                int qIndex = 1;
                 foreach (var item in group)
                 {
+                    var question = await _questionRepo.GetByIdAsync(item.questionId);
+
                     _context.ExamQuestions.Add(new ExamQuestion
                     {
                         SectionId = section.Id,
-                        QuestionId = item.QuestionId,
-                        OrderIndex = qIndex++
+                        QuestionId = item.questionId,
+                        OrderIndex = qIndex
                     });
+
+                    questionInfos.Add(new QuestionInfo
+                    {
+                        QuestionName = question.Content,
+                        OrderIndex = qIndex
+                    });
+
+                    qIndex++;
                 }
+                aiExamResponses.Add(new AIExamResponse
+                {
+                    SectionName = group.Key,
+                    Questions = questionInfos
+                });
             }
 
             await _context.SaveChangesAsync();
-            return selectedQuestions;
+            return aiExamResponses;
         }
 
         private async Task<string> CallGeminiApi(AIExamRequest request)

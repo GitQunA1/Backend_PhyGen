@@ -2,7 +2,17 @@
 {
     public class AIExamResponse
     {
-        public string Section { get; set; }
-        public int QuestionId { get; set; }
+        public string SectionName { get; set; }
+        public List<QuestionInfo> Questions { get; set; }
+    }
+    public class QuestionInfo
+    {
+        public string QuestionName { get; set; }
+        public int OrderIndex { get; set; }
+    }
+    public class TempAIExamItem
+    {
+        public string section { get; set; }
+        public int questionId { get; set; }
     }
 }
