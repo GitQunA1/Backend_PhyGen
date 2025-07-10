@@ -80,5 +80,15 @@ namespace PhyGen_SWD392.Repositories.Repo
             await _context.SaveChangesAsync();
             return true;
         }
+        public async Task<bool> UpgradeToPremiumAsync(int userId)
+        {
+            var user = await _context.Accounts.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                return false;
+
+            user.AccountType = "premium"; // hoặc enum: AccountTypeEnum.Premium
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

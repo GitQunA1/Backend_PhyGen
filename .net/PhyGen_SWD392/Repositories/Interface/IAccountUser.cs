@@ -10,6 +10,6 @@ namespace PhyGen_SWD392.Repositories.Interface
         Task<bool> UpdateProfileAsync(int id, UserUpdateDto dto);
         Task<List<ExamListDto>> GetExamsByUserAsync(int userId);
         Task<bool> UpdateAvatarUrlAsync(int userId, string avatarUrl);
-
+        Task<bool> UpgradeToPremiumAsync(int userId);
     }
 }
