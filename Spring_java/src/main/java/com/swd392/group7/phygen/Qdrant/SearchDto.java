@@ -1,4 +1,5 @@
-package com.swd392.group7.phygen.AI.MistralAI;
+package com.swd392.group7.phygen.Qdrant;
+
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -9,13 +10,12 @@ import lombok.experimental.FieldDefaults;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MistralAPIResponse<T> {
-    boolean success;
-    String message;
-    String downloadLink;
-    T data;
-    List<String> errors;
+public class SearchDto {
+    List<Double> vector;
+    Integer limit;
+    boolean with_payload;
+
 }

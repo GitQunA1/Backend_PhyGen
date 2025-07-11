@@ -23,6 +23,7 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
 
+    @Column(length = 4000)
     String content;
 
     @Enumerated(EnumType.STRING)

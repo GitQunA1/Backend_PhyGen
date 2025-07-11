@@ -1,5 +1,6 @@
 package com.swd392.group7.phygen.Question.Controller;
 
+import com.swd392.group7.phygen.AI.Structure.Dto.SubjectDto;
 import com.swd392.group7.phygen.Common.ApiResponse;
 import com.swd392.group7.phygen.Common.PagedResponse;
 import com.swd392.group7.phygen.Question.Dto.CreateRequest;
@@ -11,6 +12,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,6 +54,13 @@ public class QuestionController {
     ){
         PagedResponse<Response> pagedResponse = questionService.getAllQuestionFromTopicId(topicId, page, size, sortBy, sortDir);
         ApiResponse<PagedResponse<Response>> response = new ApiResponse<>(true,"get Question from topicId"+topicId+"successfully",pagedResponse,null);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/insert")
+    public ResponseEntity<?> insertDataFromGeminiJsonFormat(@RequestParam String fileUrl) throws IOException {
+        SubjectDto subjectDto = questionService.insertDataFromGeminiJsonFormat(fileUrl);
+        ApiResponse<SubjectDto> response = new ApiResponse<>(true,"Insert successfully",subjectDto,null);
         return ResponseEntity.ok(response);
     }
 

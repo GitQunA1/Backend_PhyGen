@@ -1,4 +1,4 @@
-package com.swd392.group7.phygen.AI.GeminiAI;
+package com.swd392.group7.phygen.AI.Structure.Dto;
 
 public record GenerateExamRequest (
     String title,

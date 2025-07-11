@@ -1,5 +1,9 @@
 package com.swd392.group7.phygen.Question.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.swd392.group7.phygen.AI.GeminiAI.GeminiService;
+import com.swd392.group7.phygen.AI.Structure.Dto.SubjectDto;
+import com.swd392.group7.phygen.Answer.Entity.Answer;
 import com.swd392.group7.phygen.Common.PagedResponse;
 import com.swd392.group7.phygen.Question.Dto.Response;
 import com.swd392.group7.phygen.Question.Dto.CreateRequest;
@@ -8,6 +12,8 @@ import com.swd392.group7.phygen.Question.Entity.Question;
 import com.swd392.group7.phygen.Question.Enum.Status;
 import com.swd392.group7.phygen.Question.Exception.QuestionException;
 import com.swd392.group7.phygen.Question.Repository.QuestionRepo;
+import com.swd392.group7.phygen.Subject.Entity.Subject;
+import com.swd392.group7.phygen.Subject.SubjectRepo;
 import com.swd392.group7.phygen.Topic.Entity.Topic;
 import com.swd392.group7.phygen.Topic.Service.TopicService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +24,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -25,7 +32,10 @@ import java.util.List;
 public class QuestionService {
     private final TopicService topicService;
     private final QuestionRepo questionRepo;
+    private final SubjectRepo subjectRepo;
     private final ModelMapper modelMapper;
+    private final ObjectMapper objectMapper;
+    private final GeminiService geminiService;
 
     public Question findQuestionById(Long id){
         return questionRepo.findById(id).orElseThrow(()-> new QuestionException("Cant found Question", HttpStatus.NOT_FOUND));
@@ -86,6 +96,46 @@ public class QuestionService {
                 questionPage.isLast()
         );
 
+    }
+
+    public SubjectDto insertDataFromGeminiJsonFormat(String fileUrl) throws IOException {
+            String geminiJsonFormat = geminiService.formatJson(fileUrl);
+            SubjectDto subjectDto = objectMapper.readValue(geminiJsonFormat, SubjectDto.class);
+            System.out.println("DTO sau khi parse JSON:\n" + subjectDto);
+            Subject subject = modelMapper.map(subjectDto,Subject.class);
+            if(subject.getTopics() != null){
+                for(Topic topic : subject.getTopics()){
+                    topic.setSubject(subject);
+                    if(topic.getSubTopics()!=null){
+                        for(Topic subtopic : topic.getSubTopics()){
+                            subtopic.setParent(topic);
+                            if(subtopic.getQuestions()!=null){
+                                for(Question question :subtopic.getQuestions()){
+                                    question.setTopic(subtopic);
+                                    if(question.getAnswers()!=null){
+                                        for(Answer answer : question.getAnswers()){
+                                            answer.setQuestion(question);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if(topic.getQuestions()!=null){
+                        for(Question question : topic.getQuestions()){
+                            question.setTopic(topic);
+                            if(question.getAnswers() != null){
+                                for(Answer answer : question.getAnswers()){
+                                    answer.setQuestion(question);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            System.out.println("Entity sau khi ánh xạ và thiết lập quan hệ:\n" + subject);
+            subjectRepo.save(subject);
+            return modelMapper.map(subject, SubjectDto.class);
     }
 
 }

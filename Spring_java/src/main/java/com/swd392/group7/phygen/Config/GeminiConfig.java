@@ -11,4 +11,5 @@ public class GeminiConfig {
     public Client client(){
         return new Client();
     }
+
 }

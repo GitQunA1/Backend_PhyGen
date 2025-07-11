@@ -1,5 +1,7 @@
 package com.swd392.group7.phygen.AI.MistralAI;
 
+import com.swd392.group7.phygen.AI.Cohere.CohereService;
+import com.swd392.group7.phygen.Qdrant.QdrantService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -15,6 +18,10 @@ import java.util.Map;
 public class MistralAIService {
 
     private final RestTemplate restTemplate;
+
+    private final CohereService cohereService;
+
+    private final QdrantService qdrantService;
 
     @Value("${mistral_api_key}")
     private String MISTRAL_KEY;
@@ -52,4 +59,11 @@ public class MistralAIService {
             throw new MistralAIException("Unexpected error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public List<List<Double>> checkCohereEmbedding(String text){
+        return cohereService.embedDocument(text);
+    }
+
+
+
 }

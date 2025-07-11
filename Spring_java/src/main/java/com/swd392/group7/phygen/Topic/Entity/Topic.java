@@ -29,7 +29,10 @@ public class Topic {
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
-    Topic topic;
+    private Topic parent;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Topic> subTopics;
 
     @ManyToOne
     @JoinColumn(name = "subject_id")

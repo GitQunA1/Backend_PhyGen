@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class CohereConfig {
-    @Value("${cohere_api_key)")
+    @Value("${cohere_api_key}")
     private String COHERE_API_KEY;
 
     @Bean
