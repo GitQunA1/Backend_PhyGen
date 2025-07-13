@@ -13,7 +13,7 @@ import com.swd392.group7.phygen.Question.Enum.Status;
 import com.swd392.group7.phygen.Question.Exception.QuestionException;
 import com.swd392.group7.phygen.Question.Repository.QuestionRepo;
 import com.swd392.group7.phygen.Subject.Entity.Subject;
-import com.swd392.group7.phygen.Subject.SubjectRepo;
+import com.swd392.group7.phygen.Subject.Repository.SubjectRepo;
 import com.swd392.group7.phygen.Topic.Entity.Topic;
 import com.swd392.group7.phygen.Topic.Service.TopicService;
 import lombok.RequiredArgsConstructor;

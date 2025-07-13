@@ -2,9 +2,7 @@ package com.swd392.group7.phygen.Exam.Controller;
 
 import com.swd392.group7.phygen.Common.ApiResponse;
 import com.swd392.group7.phygen.Common.PagedResponse;
-import com.swd392.group7.phygen.Exam.Dto.CreateRequest;
-import com.swd392.group7.phygen.Exam.Dto.Response;
-import com.swd392.group7.phygen.Exam.Dto.UpdateRequest;
+import com.swd392.group7.phygen.Exam.Dto.*;
 import com.swd392.group7.phygen.Exam.Service.ExamService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -47,6 +45,13 @@ public class ExamController {
     ){
         PagedResponse<Response> pagedResponse = examService.getAllExamFromAccountId(page,size,sortBy,sortDir);
         ApiResponse<PagedResponse<Response>> response = new ApiResponse<>(true,"get Exam from account successfully",pagedResponse,null );
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/getExamStructure")
+    public ResponseEntity<?> getExamStructure(@RequestBody ExamStructureRequest request){
+        ExamStructureResponse examStructureResponse = examService.getExamStructure(request);
+        ApiResponse<ExamStructureResponse> response = new ApiResponse<>(true,"Get Exam Structure successfully",examStructureResponse,null);
         return ResponseEntity.ok(response);
     }
 }

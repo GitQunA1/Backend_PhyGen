@@ -13,4 +13,5 @@ import java.util.Optional;
 public interface AnswerRepo extends JpaRepository<Answer, Long> {
 
     Page<Answer> findAllByQuestionId (Long questionId, Pageable pageable);
+    Optional<List<Answer>> findAllByQuestionId(Long questionId);
 }

@@ -1,4 +1,4 @@
-package com.swd392.group7.phygen.Subject;
+package com.swd392.group7.phygen.Subject.Repository;
 
 import com.swd392.group7.phygen.Subject.Entity.Subject;
 import org.springframework.data.jpa.repository.JpaRepository;
