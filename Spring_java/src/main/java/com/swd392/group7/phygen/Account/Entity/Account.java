@@ -4,7 +4,7 @@ import com.swd392.group7.phygen.Exam.Entity.Exam;
 import com.swd392.group7.phygen.Account.Enum.AccountType;
 import com.swd392.group7.phygen.Account.Enum.Role;
 import com.swd392.group7.phygen.Account.Enum.Status;
-import com.swd392.group7.phygen.ExamMatrix.ExamMatrix;
+import com.swd392.group7.phygen.ExamMatrix.Entity.ExamMatrix;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

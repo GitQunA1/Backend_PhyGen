@@ -1,6 +1,6 @@
 package com.swd392.group7.phygen.MatrixSection;
 
-import com.swd392.group7.phygen.ExamMatrix.ExamMatrix;
+import com.swd392.group7.phygen.ExamMatrix.Entity.ExamMatrix;
 import com.swd392.group7.phygen.MatrixDetail.MatrixDetail;
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,4 +1,4 @@
-package com.swd392.group7.phygen.ExamMatrix;
+package com.swd392.group7.phygen.ExamMatrix.Entity;
 
 import com.swd392.group7.phygen.Account.Entity.Account;
 import com.swd392.group7.phygen.ExamMatrix.Enum.ExamType;

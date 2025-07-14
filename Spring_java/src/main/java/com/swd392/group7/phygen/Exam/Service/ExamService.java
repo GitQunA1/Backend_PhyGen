@@ -18,7 +18,7 @@ import com.swd392.group7.phygen.Exam.Enum.Status;
 import com.swd392.group7.phygen.Exam.Exception.ExamException;
 import com.swd392.group7.phygen.Exam.Repository.ExamRepo;
 import com.swd392.group7.phygen.ExamMatrix.Dto.ExamMatrixStructureResponse;
-import com.swd392.group7.phygen.ExamMatrix.ExamMatrix;
+import com.swd392.group7.phygen.ExamMatrix.Entity.ExamMatrix;
 import com.swd392.group7.phygen.ExamMatrix.Exception.ExamMatrixException;
 import com.swd392.group7.phygen.ExamMatrix.Repository.ExamMatrixRepo;
 import com.swd392.group7.phygen.ExamQuestion.Dto.ExamQuestionResponse;

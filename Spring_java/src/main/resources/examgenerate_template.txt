@@ -70,6 +70,8 @@ Thời gian làm bài: Mặc định 45 phút, căn phải.
 
 Các mục lớn (ví dụ: "PHẦN I. TRẮC NGHIỆM"): Căn phải.
 
+Trong mỗi sectionName của table ExamSection, câu hỏi đầu tiên sẽ là "Câu 1", sau đó tiếp tục đánh số tăng dần. Mỗi câu hỏi trắc nghiệm phải có các lựa chọn A, B, C, D.
+
 Các câu hỏi: Căn phải.
 
 Cuối đề: Chữ "HẾT" được căn giữa.
@@ -78,22 +80,21 @@ Cuối đề: Chữ "HẾT" được căn giữa.
 Không hiện thêm các mục khác nếu chưa có sự cho phép trong prompt
 
 ---------------------------------------------------------------------------
-**Đầu ra mong muốn (định dạng JSON):**
-Gemini sẽ trả về một đối tượng JSON duy nhất, chứa thông tin về phiên bản đề thi được tạo và danh sách các đề thi Markdown. Cấu trúc JSON như sau:
+**Đầu ra mong muốn (định dạng JSON): Gemini sẽ trả về một đối tượng JSON duy nhất, chứa thông tin về phiên bản đề thi được tạo và danh sách các đề thi Markdown.:**
+Cấu trúc JSON:
 
 ```json
 {
   "examId": {{EXAM_ID_PLACEHOLDER}}, 
   "generatedExams": [
-    {
-      "examCode": "Mã đề: [Mã ngẫu nhiên 3 chữ số]",
-      "examContentMarkdown": ""
-    },
-    {
-      "examCode": "Mã đề: [Mã ngẫu nhiên 3 chữ số]",
-      "examContentMarkdown": ""
-    }
-    // ... các đối tượng đề thi khác ...
-  ]
+      {
+        "examCode": "Mã đề: [Mã ngẫu nhiên 3 chữ số, duy nhất cho mỗi đề thi trong danh sách này]",
+        "examContentMarkdown": "Nội dung đầy đủ của đề thi, được định dạng bằng Markdown. **Đảm bảo chuỗi này được escape JSON hợp lệ (ví dụ: '\"' thành '\\\"', 'enter' thành '\\n')**"
+      },
+      {
+        "examCode": "Mã đề: [Mã ngẫu nhiên 3 chữ số, duy nhất cho mỗi đề thi trong danh sách này]",
+        "examContentMarkdown": "Nội dung đầy đủ của đề thi, được định dạng bằng Markdown. **Đảm bảo chuỗi này được escape JSON hợp lệ**"
+      }
+    ]
 }
 

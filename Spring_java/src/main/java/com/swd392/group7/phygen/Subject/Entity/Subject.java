@@ -1,6 +1,6 @@
 package com.swd392.group7.phygen.Subject.Entity;
 
-import com.swd392.group7.phygen.ExamMatrix.ExamMatrix;
+import com.swd392.group7.phygen.ExamMatrix.Entity.ExamMatrix;
 //import com.swd392.group7.phygen.Subject.Converter.GradeConverter;
 import com.swd392.group7.phygen.Subject.Enum.Grade;
 import com.swd392.group7.phygen.Topic.Entity.Topic;
