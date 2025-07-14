@@ -14,6 +14,7 @@ Mỗi đề thi phải có mã đề thi riêng, ngẫu nhiên, ví dụ: "Mã �
 Các đề thi được tạo ra phải không trùng khớp nhau về thứ tự câu hỏi hoặc cách sắp xếp các lựa chọn đáp án 
 (đối với trắc nghiệm), dựa trên các câu hỏi đã cho và các câu hỏi được tạo thêm. Hãy xáo trộn thứ tự các câu hỏi 
 trong mỗi phần hoặc thứ tự các đáp án trong câu trắc nghiệm để tạo sự khác biệt.
+Nếu {{NUMBER_OF_EXAMS_TO_GENERATE}} = 1, tạo 1 đề, nếu lớn hơn 2, hãy tạo từ 2 đề trở lên.
 
 --Đầu vào thông tin đề thi bắt đầu--
 **Thông tin cấu trúc đề thi**
