@@ -15,7 +15,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpdateRequest {
+public class QuestionCreateRequest {
+
     String content;
 
     @Enumerated(EnumType.STRING)
@@ -26,4 +27,5 @@ public class UpdateRequest {
 
     @Enumerated(EnumType.STRING)
     Status status;
+
 }

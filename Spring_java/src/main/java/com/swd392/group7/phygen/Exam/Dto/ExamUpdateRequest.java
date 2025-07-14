@@ -1,11 +1,9 @@
 package com.swd392.group7.phygen.Exam.Dto;
 
-import com.swd392.group7.phygen.Account.Entity.Account;
+
 import com.swd392.group7.phygen.Exam.Enum.ExamType;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,11 +16,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreateRequest {
+public class ExamUpdateRequest {
 
     @Enumerated(EnumType.STRING)
     ExamType examType;
 
     LocalDateTime createAt;
-
 }

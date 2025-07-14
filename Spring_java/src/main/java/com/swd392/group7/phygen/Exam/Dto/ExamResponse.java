@@ -1,9 +1,7 @@
 package com.swd392.group7.phygen.Exam.Dto;
 
-import com.swd392.group7.phygen.Account.Entity.Account;
 import com.swd392.group7.phygen.Exam.Enum.ExamType;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import com.swd392.group7.phygen.Exam.Enum.Status;
 import lombok.AccessLevel;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -14,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Response {
+public class ExamResponse {
 
     Long id;
 
@@ -24,5 +22,6 @@ public class Response {
 
     LocalDateTime createAt;
 
+    Status status;
 
 }

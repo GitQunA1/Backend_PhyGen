@@ -1,6 +1,5 @@
-package com.swd392.group7.phygen.ExamVersion.Dto;
+package com.swd392.group7.phygen.ExamQuestion.Dto;
 
-import com.swd392.group7.phygen.Exam.Entity.Exam;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,10 +10,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreateRequest {
-    String versionCode;
+public class ExamQuestionCreateRequest {
 
-    String pdfUrl;
+    int orderIndex;
 
-    String questionOrder;
 }

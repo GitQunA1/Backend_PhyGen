@@ -3,9 +3,9 @@ package com.swd392.group7.phygen.ExamQuestion.Controller;
 
 import com.swd392.group7.phygen.Common.ApiResponse;
 import com.swd392.group7.phygen.Common.PagedResponse;
-import com.swd392.group7.phygen.ExamQuestion.Dto.CreateRequest;
-import com.swd392.group7.phygen.ExamQuestion.Dto.Response;
-import com.swd392.group7.phygen.ExamQuestion.Dto.UpdateRequest;
+import com.swd392.group7.phygen.ExamQuestion.Dto.ExamQuestionCreateRequest;
+import com.swd392.group7.phygen.ExamQuestion.Dto.ExamQuestionResponse;
+import com.swd392.group7.phygen.ExamQuestion.Dto.ExamQuestionUpdateRequest;
 import com.swd392.group7.phygen.ExamQuestion.Service.ExamQuestionService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -23,16 +23,16 @@ public class ExamQuestionController {
     private final ExamQuestionService examQuestionService;
 
     @PostMapping("/exam-section/{examSectionId}/questions/{questionId}")
-    public ResponseEntity<?> create(@Valid @RequestBody CreateRequest examQuestionRq,@PathVariable Long questionId,@PathVariable Long examSectionId){
-        Response examQuestionRp = examQuestionService.create(examQuestionRq, questionId,examSectionId);
-        ApiResponse<Response> response = new ApiResponse<>(true,"Create Exam Question successfully",examQuestionRp,null);
+    public ResponseEntity<?> create(@Valid @RequestBody ExamQuestionCreateRequest examQuestionRq, @PathVariable Long questionId, @PathVariable Long examSectionId){
+        ExamQuestionResponse examQuestionRp = examQuestionService.create(examQuestionRq, questionId,examSectionId);
+        ApiResponse<ExamQuestionResponse> response = new ApiResponse<>(true,"Create Exam Question successfully",examQuestionRp,null);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> update(@Valid @RequestBody UpdateRequest examQuestionRq,@PathVariable Long id){
-        Response examQuestionRp = examQuestionService.update(examQuestionRq, id);
-        ApiResponse<Response> response = new ApiResponse<>(true, "Update Exam Question successfully", examQuestionRp, null);
+    public ResponseEntity<?> update(@Valid @RequestBody ExamQuestionUpdateRequest examQuestionRq, @PathVariable Long id){
+        ExamQuestionResponse examQuestionRp = examQuestionService.update(examQuestionRq, id);
+        ApiResponse<ExamQuestionResponse> response = new ApiResponse<>(true, "Update Exam Question successfully", examQuestionRp, null);
         return ResponseEntity.ok(response);
     }
 
@@ -44,8 +44,8 @@ public class ExamQuestionController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir
     ){
-        PagedResponse<Response> pagedResponse = examQuestionService.getAllExamQuestionFromQuestionId(questionId, page, size, sortBy, sortDir);
-        ApiResponse<PagedResponse<Response>> response = new ApiResponse<>(true,"get Question from questionId"+questionId+"successfully",pagedResponse,null);
+        PagedResponse<ExamQuestionResponse> pagedResponse = examQuestionService.getAllExamQuestionFromQuestionId(questionId, page, size, sortBy, sortDir);
+        ApiResponse<PagedResponse<ExamQuestionResponse>> response = new ApiResponse<>(true,"get Question from questionId"+questionId+"successfully",pagedResponse,null);
         return ResponseEntity.ok(response);
     }
 
@@ -57,8 +57,8 @@ public class ExamQuestionController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir
     ){
-        PagedResponse<Response> pagedResponse = examQuestionService.getAllExamQuestionFromExamSectionId(examSectionId, page, size, sortBy, sortDir);
-        ApiResponse<PagedResponse<Response>> response = new ApiResponse<>(true,"get Question from examSectionId"+examSectionId+"successfully",pagedResponse,null);
+        PagedResponse<ExamQuestionResponse> pagedResponse = examQuestionService.getAllExamQuestionFromExamSectionId(examSectionId, page, size, sortBy, sortDir);
+        ApiResponse<PagedResponse<ExamQuestionResponse>> response = new ApiResponse<>(true,"get Question from examSectionId"+examSectionId+"successfully",pagedResponse,null);
         return ResponseEntity.ok(response);
     }
 }

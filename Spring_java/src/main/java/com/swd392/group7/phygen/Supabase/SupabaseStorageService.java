@@ -26,15 +26,12 @@ public class SupabaseStorageService {
 
     private final S3Presigner s3Presigner;
 
-    @Value("${supabase_s3_bucket}")
-    private String bucket;
-
     public String detectContentType(MultipartFile file) throws IOException {
         Tika tika = new Tika();
         return tika.detect(file.getInputStream());
     }
 
-    public String uploadFile(MultipartFile multipartFile, String key) throws IOException{
+    public String uploadFile(MultipartFile multipartFile, String key,String bucket) throws IOException{
         String contentType = detectContentType(multipartFile);
         s3Client.putObject(
                 PutObjectRequest.builder()
@@ -47,7 +44,7 @@ public class SupabaseStorageService {
         return key;
     }
 
-    public String getSignedUrl(String key){
+    public String getSignedUrl(String key, String bucket){
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)

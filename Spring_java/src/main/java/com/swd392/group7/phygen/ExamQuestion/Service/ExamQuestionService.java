@@ -1,9 +1,9 @@
 package com.swd392.group7.phygen.ExamQuestion.Service;
 
 import com.swd392.group7.phygen.Common.PagedResponse;
-import com.swd392.group7.phygen.ExamQuestion.Dto.CreateRequest;
-import com.swd392.group7.phygen.ExamQuestion.Dto.Response;
-import com.swd392.group7.phygen.ExamQuestion.Dto.UpdateRequest;
+import com.swd392.group7.phygen.ExamQuestion.Dto.ExamQuestionCreateRequest;
+import com.swd392.group7.phygen.ExamQuestion.Dto.ExamQuestionResponse;
+import com.swd392.group7.phygen.ExamQuestion.Dto.ExamQuestionUpdateRequest;
 import com.swd392.group7.phygen.ExamQuestion.Entity.ExamQuestion;
 import com.swd392.group7.phygen.ExamQuestion.Exception.ExamQuestionException;
 import com.swd392.group7.phygen.ExamQuestion.Repository.ExamQuestionRepo;
@@ -29,13 +29,14 @@ public class ExamQuestionService {
     private final QuestionService questionService;
     private final ModelMapper modelMapper;
     private final ExamQuestionRepo examQuestionRepo;
+
     private final ExamSectionService examSectionService;
 
     public ExamQuestion findExamQuestionById(Long id){
         return examQuestionRepo.findById(id).orElseThrow(()->new ExamQuestionException("Cant found exam question", HttpStatus.NOT_FOUND));
     }
 
-    public Response create(CreateRequest examQuestionRq, Long questionId,Long examSectionId) {
+    public ExamQuestionResponse create(ExamQuestionCreateRequest examQuestionRq, Long questionId, Long examSectionId) {
         Question question = questionService.findQuestionById(questionId);
         ExamSection examSection = examSectionService.findExamSectionById(examSectionId);
         ExamQuestion examQuestion = new ExamQuestion();
@@ -43,17 +44,17 @@ public class ExamQuestionService {
         examQuestion.setQuestion(question);
         examQuestion.setExamSection(examSection);
         examQuestionRepo.save(examQuestion);
-        return modelMapper.map(examQuestion, Response.class);
+        return modelMapper.map(examQuestion, ExamQuestionResponse.class);
     }
 
-    public Response update(UpdateRequest examQuestionRq, Long id){
+    public ExamQuestionResponse update(ExamQuestionUpdateRequest examQuestionRq, Long id){
         ExamQuestion oldExamQuestion = findExamQuestionById(id);
         oldExamQuestion.setOrderIndex(examQuestionRq.getOrderIndex());
         examQuestionRepo.save(oldExamQuestion);
-        return modelMapper.map(oldExamQuestion, Response.class);
+        return modelMapper.map(oldExamQuestion, ExamQuestionResponse.class);
     }
 
-    public PagedResponse<Response> getAllExamQuestionFromQuestionId(
+    public PagedResponse<ExamQuestionResponse> getAllExamQuestionFromQuestionId(
             Long questionId
             , int page
             , int size
@@ -66,12 +67,12 @@ public class ExamQuestionService {
         if(examQuestionPage.isEmpty()){
             throw new ExamSectionException("Cant found list examQuestion from QuestionId:"+ questionId,HttpStatus.NOT_FOUND);
         }
-        List<Response> responses = examQuestionPage
+        List<ExamQuestionResponse> respons = examQuestionPage
                 .stream()
-                .map(examQuestion -> modelMapper.map(examQuestion,Response.class))
+                .map(examQuestion -> modelMapper.map(examQuestion, ExamQuestionResponse.class))
                 .toList();
         return new PagedResponse<>(
-                responses,
+                respons,
                 page,
                 size,
                 examQuestionPage.getTotalElements(),
@@ -79,7 +80,7 @@ public class ExamQuestionService {
                 examQuestionPage.isLast());
     }
 
-    public PagedResponse<Response> getAllExamQuestionFromExamSectionId(
+    public PagedResponse<ExamQuestionResponse> getAllExamQuestionFromExamSectionId(
             Long examSectionId
             , int page
             , int size
@@ -92,12 +93,12 @@ public class ExamQuestionService {
         if(examSectionPage.isEmpty()){
             throw new ExamSectionException("Cant found list examQuestion from ExamSectionId: "+ examSectionId,HttpStatus.NOT_FOUND);
         }
-        List<Response> responses = examSectionPage
+        List<ExamQuestionResponse> respons = examSectionPage
                 .stream()
-                .map(examSection -> modelMapper.map(examSection,Response.class))
+                .map(examSection -> modelMapper.map(examSection, ExamQuestionResponse.class))
                 .toList();
         return new PagedResponse<>(
-                responses,
+                respons,
                 page,
                 size,
                 examSectionPage.getTotalElements(),

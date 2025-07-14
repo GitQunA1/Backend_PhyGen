@@ -1,8 +1,8 @@
 package com.swd392.group7.phygen.Answer.Service;
 
-import com.swd392.group7.phygen.Answer.Dto.CreateRequest;
-import com.swd392.group7.phygen.Answer.Dto.Response;
-import com.swd392.group7.phygen.Answer.Dto.UpdateRequest;
+import com.swd392.group7.phygen.Answer.Dto.AnswerCreateRequest;
+import com.swd392.group7.phygen.Answer.Dto.AnswerResponse;
+import com.swd392.group7.phygen.Answer.Dto.AnswerUpdateRequest;
 import com.swd392.group7.phygen.Answer.Entity.Answer;
 import com.swd392.group7.phygen.Answer.Exception.AnswerException;
 import com.swd392.group7.phygen.Answer.Repository.AnswerRepo;
@@ -30,22 +30,22 @@ public class AnswerService {
         return answerRepo.findById(id).orElseThrow(()-> new AnswerException("Cant found answer",HttpStatus.NOT_FOUND));
     }
 
-    public Response createAnswer(CreateRequest createRequest, Long questionId){
+    public AnswerResponse createAnswer(AnswerCreateRequest answerCreateRequest, Long questionId){
         Question question = questionService.findQuestionById(questionId);
         Answer answer =new Answer();
-        answer.setContent(createRequest.getContent());
-        answer.setCorrect(createRequest.isCorrect());
+        answer.setContent(answerCreateRequest.getContent());
+        answer.setCorrect(answerCreateRequest.isCorrect());
         answer.setQuestion(question);
         answerRepo.save(answer);
-        return modelMapper.map(answer, Response.class);
+        return modelMapper.map(answer, AnswerResponse.class);
     }
 
-    public Response updateAnswer(UpdateRequest updateRequest, Long id){
+    public AnswerResponse updateAnswer(AnswerUpdateRequest answerUpdateRequest, Long id){
         Answer oldAnswer = findAnswerById(id);
-        oldAnswer.setContent(updateRequest.getContent());
-        oldAnswer.setCorrect(updateRequest.isCorrect());
+        oldAnswer.setContent(answerUpdateRequest.getContent());
+        oldAnswer.setCorrect(answerUpdateRequest.isCorrect());
         answerRepo.save(oldAnswer);
-        return modelMapper.map(oldAnswer, Response.class);
+        return modelMapper.map(oldAnswer, AnswerResponse.class);
     }
 
     public void deleted (Long examId){
@@ -54,7 +54,7 @@ public class AnswerService {
         answerRepo.save(answerDeleted);
     }
 
-    public PagedResponse<Response> getAllAnswerFromQuestionId(Long questionId
+    public PagedResponse<AnswerResponse> getAllAnswerFromQuestionId(Long questionId
             , int page
             , int size
             , String sortBy
@@ -67,12 +67,12 @@ public class AnswerService {
             throw new AnswerException("Empty list answer for questionID: "+ questionId,HttpStatus.NOT_FOUND);
         }
 
-        List<Response> responses =answerPage.stream()
-                .map(answer -> modelMapper.map(answer, Response.class))
+        List<AnswerResponse> respons =answerPage.stream()
+                .map(answer -> modelMapper.map(answer, AnswerResponse.class))
                 .toList();
 
         return new PagedResponse<>(
-                responses,
+                respons,
                 page,
                 size,
                 answerPage.getTotalElements(),

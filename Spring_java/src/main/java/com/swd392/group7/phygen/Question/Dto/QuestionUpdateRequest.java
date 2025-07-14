@@ -3,7 +3,6 @@ package com.swd392.group7.phygen.Question.Dto;
 import com.swd392.group7.phygen.Question.Enum.DifficultyLevel;
 import com.swd392.group7.phygen.Question.Enum.Status;
 import com.swd392.group7.phygen.Question.Enum.Type;
-import com.swd392.group7.phygen.Topic.Entity.Topic;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.AccessLevel;
@@ -16,9 +15,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Response {
-    Long id;
-
+public class QuestionUpdateRequest {
     String content;
 
     @Enumerated(EnumType.STRING)
@@ -29,5 +26,4 @@ public class Response {
 
     @Enumerated(EnumType.STRING)
     Status status;
-
 }

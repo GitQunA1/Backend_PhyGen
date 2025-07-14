@@ -1,4 +1,4 @@
-package com.swd392.group7.phygen.Answer.Dto;
+package com.swd392.group7.phygen.Exam.Dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -10,9 +10,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpdateRequest {
+public class GeneratedExam {
+    String examCode;
+    String examContentMarkdown;
 
-    String content;
-
-    boolean isCorrect;
 }

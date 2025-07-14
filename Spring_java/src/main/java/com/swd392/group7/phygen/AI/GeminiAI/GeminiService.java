@@ -39,14 +39,15 @@ public class GeminiService {
     private final ObjectMapper objectMapper;
 
 
-    public String generateExam(GenerateExamRequest request){
-        String prompt = promptBuilder.buildGenerateExamPrompt(request);
+    public String generateExam(String prompt){
         GenerateContentResponse response = client.models.generateContent(
                 "gemini-2.5-flash",
                 prompt,
                 null
         );
-        return response.text();
+        String extractJson = extractJsonFromMarkdown(response.text());
+        System.out.println("✅ JSON từ Gemini:\n" + extractJson);
+        return extractJson;
     }
 
     public String formatJson(String fileUrl) {

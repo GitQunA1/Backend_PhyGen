@@ -20,12 +20,12 @@ public class GeminiController {
 
     private final GeminiService geminiService;
 
-    @PostMapping("/generateExam")
-    public ResponseEntity<?> chatWithGemini(@RequestBody GenerateExamRequest request){
-        String answer = geminiService.generateExam(request);
-        ApiResponse<?> response = new ApiResponse<>(true,"Here the response from chat gemini",answer,null);
-        return ResponseEntity.ok(response);
-    }
+//    @PostMapping("/generateExam")
+//    public ResponseEntity<?> chatWithGemini(@RequestBody GenerateExamRequest request){
+//        String answer = geminiService.generateExam(request);
+//        ApiResponse<?> response = new ApiResponse<>(true,"Here the response from chat gemini",answer,null);
+//        return ResponseEntity.ok(response);
+//    }
 
     @GetMapping("/printSchemaInfo")
     public ResponseEntity<?> printSchemaInfo()throws SQLException{

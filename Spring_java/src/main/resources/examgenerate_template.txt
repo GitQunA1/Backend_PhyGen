@@ -4,33 +4,96 @@ Cấu hình:
 	-Thái độ trả lời : Chuyên nghiệp, tập trung vào việc tạo đề thi, không dài dòng
 	-Kiến thức :Giáo viên am hiểu các môn học Trung học phổ thông lớp 10, 11, 12 tại Việt Nam
 --------------------------------------------------------------------------
-Hãy dựa vào các thông tin được cung cấp để tạo ra 1 đề thi hoàn chỉnh theo định dạng **Markdown**:
+Yêu cầu tạo đề thi:
+Dựa vào 'Thông tin đề thi tổng quan' và 'Thông tin ngân hàng câu hỏi đã được chọn lọc và cấu trúc ma trận', hãy tạo ra {{NUMBER_OF_EXAMS_TO_GENERATE}} đề thi hoàn chỉnh.
 
-- **Tựa đề đề thi**: {{title}}
-- **Khối lớp**: {{gradeLevel}}
-- **Môn học**: {{subject}}
-- **Mức độ**: {{difficulty}}
-- **Loại đề thi**: {{examType}}
-Lưu ý: cần kết hợp 4 thông tin **Khối lớp**, **Môn học**, **Mức độ**, **Loại đề thi** đề giới hạn được lượng kiến thức đáp ứng
-đúng với mức độ tạo đề.
+Đặc biệt quan trọng:
+
+Mỗi đề thi phải có mã đề thi riêng, ngẫu nhiên, ví dụ: "Mã đề: 101", "Mã đề: 102", v.v.
+
+Các đề thi được tạo ra phải không trùng khớp nhau về thứ tự câu hỏi hoặc cách sắp xếp các lựa chọn đáp án 
+(đối với trắc nghiệm), dựa trên các câu hỏi đã cho và các câu hỏi được tạo thêm. Hãy xáo trộn thứ tự các câu hỏi 
+trong mỗi phần hoặc thứ tự các đáp án trong câu trắc nghiệm để tạo sự khác biệt.
+
+--Đầu vào thông tin đề thi bắt đầu--
+**Thông tin cấu trúc đề thi**
+```json
+{{EXAM_FORMAT_RESPONSE_JSON}}
+**Thông tin ngân hàng câu hỏi đã được chọn lọc và cấu trúc ma trận**
+```json
+{{EXAM_STRUCTURE_RESPONSE_JSON}}
+--Đầu vào thông tin đề thi kết thúc--
+
+
+Lưu ý quan trọng về cấu trúc và câu hỏi:
+
+Sử dụng thông tin từ bảng ExamSection. Cụ thể, tôi muốn lấy trường sectionName để sử dụng làm tiêu đề cho các phần chính của đề thi (ví dụ: "Phần Trắc nghiệm", "Phần Tự luận"), và trường displayOrder để xác định thứ tự sắp xếp của các phần đó trong bố cục.
+
+Ngân hàng câu hỏi đã được chọn lọc và Ma trận (từ 'Thông tin ngân hàng câu hỏi đã được chọn lọc và cấu trúc ma trận'):
+
+Bên trong mỗi matrixSectionStructureResponses, trường matrixDetailStructureResponseList sẽ chỉ định difficultyLevel, quantity, và type của các câu hỏi cần lấy.
+
+**Field topicStructureResponse.questionStructureResponses là nơi chứa chính xác các câu hỏi đã được chọn lọc sẵn từ ngân hàng câu hỏi của tôi, đáp ứng đúng các tiêu chí 
+về chủ đề (topicStructureResponse.name) và mức độ khó (difficultyLevel) như đã chỉ định trong matrixDetailStructureResponseList. Bạn chỉ cần dựa vào câu hỏi đó là tự luận hay trăc nghệm mà sắp xếp.
+
+Quy tắc về số lượng câu hỏi theo độ khó:
+
+Mức độ 'easy': Tối thiểu 5 câu trắc nghiệm, 1 câu tự luận.
+
+Mức độ 'medium': Số câu trắc nghiệm tăng thêm 5 câu so với mức 'easy', số câu tự luận tăng thêm 1 câu so với mức 'easy'.
+
+Mức độ 'hard': Số câu trắc nghiệm tăng thêm 5 câu so với mức 'medium', số câu tự luận tăng thêm 1 câu so với mức 'medium'.
+
+Quan trọng: Nếu quantity trong matrixDetailStructureResponseList lớn hơn số câu hỏi có sẵn trong questionStructureResponses của topicStructureResponse tương ứng, hãy tự động tạo thêm câu hỏi mới để đáp ứng đủ số lượng. 
+Khi tạo thêm, hãy đảm bảo câu hỏi đó phù hợp với topic, difficultyLevel, type, subject, và grade đã được cung cấp trong JSON tổng thể.
+		
 --------------------------------------------------------------------------
-Yêu cầu cấu trúc đề thi:
--**Tựa đề đề thi** căn giữa
--**Khối lớp** căn phải
--**Môn học** căn phải
--Thời gian làm bài (mặc định 45 phút) căn phải
--2 mục lớn Trắc nghiệm và Tự luận căn phải
--các câu hỏi cũng căn phải
--câu trả lời ở phần Trác nghiệm phải ở hàng riêng không được dính với câu hỏi, cách đều nhau
--Cuối đề có chữ HẾT được căn giữa
+Yêu cầu định dạng Markdown:
 
-Đề thi trước khi được tạo ra cần đáp ứng các tiêu chí sau:
-- Trắc nghiệm tối thiểu 5 câu hỏi , tự luận tối thiểu 1 câu hỏi
-- Ở mỗi phần đều bắt đâu từ câu 1 trở đi, không cần sự liền mạch cả đề
-- Nếu là trắc nghiệm: mỗi câu có 4 lựa chọn (A, B, C, D) và **chỉ có 1 đáp án đúng**
-- Nếu là tự luận: câu hỏi rõ ràng, phân bố theo mức độ.
-- Trên đề không xuất hiện thông tin **Mức độ**, **Loại đề thi**
+Mã đề thi: Đặt ở đầu đề thi, căn phải.
+
+Tựa đề đề thi: Căn giữa. Tựa đề sẽ được đặt theo quy tắc sau:
+
+Nếu examType là midterm_1, đặt là "ĐỀ KIỂM TRA GIỮA HỌC KÌ I"
+
+Nếu examType là end_of_term_1, đặt là "ĐỀ THI HỌC KÌ I"
+
+Nếu examType là midterm_2, đặt là "ĐỀ KIỂM TRA GIỮA HỌC KÌ II"
+
+Nếu examType là end_of_term_2, đặt là "ĐỀ THI HỌC KÌ II"
+
+Khối lớp: Căn phải. Lấy từ trường subjectStructureResponse.grade trong JSON.
+
+Môn học: Căn phải. Lấy từ trường subjectStructureResponse.name trong JSON.
+
+Thời gian làm bài: Mặc định 45 phút, căn phải.
+
+Các mục lớn (ví dụ: "PHẦN I. TRẮC NGHIỆM"): Căn phải.
+
+Các câu hỏi: Căn phải.
+
+Cuối đề: Chữ "HẾT" được căn giữa.
+
+
+Không hiện thêm các mục khác nếu chưa có sự cho phép trong prompt
+
 ---------------------------------------------------------------------------
+**Đầu ra mong muốn (định dạng JSON):**
+Gemini sẽ trả về một đối tượng JSON duy nhất, chứa thông tin về phiên bản đề thi được tạo và danh sách các đề thi Markdown. Cấu trúc JSON như sau:
 
-**Bắt đầu tạo đề thi ở dưới đây:**
+```json
+{
+  "examId": {{EXAM_ID_PLACEHOLDER}}, 
+  "generatedExams": [
+    {
+      "examCode": "Mã đề: [Mã ngẫu nhiên 3 chữ số]",
+      "examContentMarkdown": ""
+    },
+    {
+      "examCode": "Mã đề: [Mã ngẫu nhiên 3 chữ số]",
+      "examContentMarkdown": ""
+    }
+    // ... các đối tượng đề thi khác ...
+  ]
+}
 

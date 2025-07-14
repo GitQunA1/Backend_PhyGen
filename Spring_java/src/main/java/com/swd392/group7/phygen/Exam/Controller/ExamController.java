@@ -1,9 +1,11 @@
 package com.swd392.group7.phygen.Exam.Controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.swd392.group7.phygen.Common.ApiResponse;
 import com.swd392.group7.phygen.Common.PagedResponse;
 import com.swd392.group7.phygen.Exam.Dto.*;
 import com.swd392.group7.phygen.Exam.Service.ExamService;
+import com.swd392.group7.phygen.ExamVersion.Dto.ExamVersionGenerateResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,21 +21,21 @@ public class ExamController {
     private final ExamService examService;
 
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody CreateRequest examRq){
-        Response examRp = examService.create(examRq);
-        ApiResponse<Response> response = new ApiResponse<>(true,"Create Exam successfully",examRp,null);
+    public ResponseEntity<?> create(@Valid @RequestBody ExamCreateRequest examRq)throws JsonProcessingException {
+        ExamVersionGenerateResponse examVersionGenerateResponse = examService.create(examRq);
+        ApiResponse<ExamVersionGenerateResponse> response = new ApiResponse<>(true,"Generate exam successfully", examVersionGenerateResponse,null);
         return ResponseEntity.ok(response);
     }
     @PutMapping("{id}")
-    public ResponseEntity<?> update(@Valid @RequestBody UpdateRequest examRq,@PathVariable Long id){
-        Response examRp = examService.update(examRq,id);
-        ApiResponse<Response> response = new ApiResponse<>(true,"Update Exam successfully",examRp,null);
+    public ResponseEntity<?> update(@Valid @RequestBody ExamUpdateRequest examRq, @PathVariable Long id){
+        ExamResponse examRp = examService.update(examRq,id);
+        ApiResponse<ExamResponse> response = new ApiResponse<>(true,"Update Exam successfully",examRp,null);
         return ResponseEntity.ok(response);
     }
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleted(@PathVariable Long id){
         examService.deleted(id);
-        ApiResponse<Response> response = new ApiResponse<>(true, "Deleted Exam successfully",null,null);
+        ApiResponse<ExamResponse> response = new ApiResponse<>(true, "Deleted Exam successfully",null,null);
         return ResponseEntity.ok(response);
     }
     @GetMapping("/getAllExamFromCurrentAccount")
@@ -43,8 +45,8 @@ public class ExamController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir
     ){
-        PagedResponse<Response> pagedResponse = examService.getAllExamFromAccountId(page,size,sortBy,sortDir);
-        ApiResponse<PagedResponse<Response>> response = new ApiResponse<>(true,"get Exam from account successfully",pagedResponse,null );
+        PagedResponse<ExamResponse> pagedResponse = examService.getAllExamFromAccountId(page,size,sortBy,sortDir);
+        ApiResponse<PagedResponse<ExamResponse>> response = new ApiResponse<>(true,"get Exam from account successfully",pagedResponse,null );
         return ResponseEntity.ok(response);
     }
 

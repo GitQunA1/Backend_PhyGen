@@ -2,15 +2,17 @@ package com.swd392.group7.phygen.ExamSection.Controller;
 
 import com.swd392.group7.phygen.Common.ApiResponse;
 import com.swd392.group7.phygen.Common.PagedResponse;
-import com.swd392.group7.phygen.ExamSection.Dto.CreateRequest;
-import com.swd392.group7.phygen.ExamSection.Dto.Response;
-import com.swd392.group7.phygen.ExamSection.Dto.UpdateRequest;
+import com.swd392.group7.phygen.ExamSection.Dto.ExamSectionCreateRequest;
+import com.swd392.group7.phygen.ExamSection.Dto.ExamSectionResponse;
+import com.swd392.group7.phygen.ExamSection.Dto.ExamSectionUpdateRequest;
 import com.swd392.group7.phygen.ExamSection.Service.ExamSectionService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,23 +25,23 @@ public class ExamSectionController {
 
 
     @PostMapping("/exam/{examId}")
-    public ResponseEntity<?> create(@Valid @RequestBody CreateRequest examSectionRq,@PathVariable Long examId){
-        Response examSectionRp = examSectionService.create(examSectionRq, examId);
-        ApiResponse<Response> response = new ApiResponse<>(true,"Create exam section successfully",examSectionRp,null);
+    public ResponseEntity<?> create(@Valid @RequestBody ExamSectionCreateRequest examSectionRq, @PathVariable Long examId){
+        List<ExamSectionResponse> examSectionRp = examSectionService.create(examSectionRq, examId);
+        ApiResponse<List<ExamSectionResponse>> response = new ApiResponse<>(true,"Create exam section successfully",examSectionRp,null);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> update(@Valid @RequestBody UpdateRequest examSectionRq,@PathVariable Long id){
-        Response examSectionRp  = examSectionService.update(examSectionRq, id);
-        ApiResponse<Response> response = new ApiResponse<>(true, "Create exam Section successfully",examSectionRp,null);
+    public ResponseEntity<?> update(@Valid @RequestBody ExamSectionUpdateRequest examSectionRq, @PathVariable Long id){
+        ExamSectionResponse examSectionRp  = examSectionService.update(examSectionRq, id);
+        ApiResponse<ExamSectionResponse> response = new ApiResponse<>(true, "Create exam Section successfully",examSectionRp,null);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleted(@PathVariable Long id){
         examSectionService.deleted(id);
-        ApiResponse<Response> response = new ApiResponse<>(true,"Delete examSection successfully",null,null);
+        ApiResponse<ExamSectionResponse> response = new ApiResponse<>(true,"Delete examSection successfully",null,null);
         return ResponseEntity.ok(response);
     }
 
@@ -51,8 +53,8 @@ public class ExamSectionController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir
     ){
-        PagedResponse<Response> pagedResponse = examSectionService.getAllExamSectionFromExamId(examId,page,size,sortBy,sortDir);
-        ApiResponse<PagedResponse<Response>> response = new ApiResponse<>(true,"Get list form examId:"+examId,pagedResponse,null);
+        PagedResponse<ExamSectionResponse> pagedResponse = examSectionService.getAllExamSectionFromExamId(examId,page,size,sortBy,sortDir);
+        ApiResponse<PagedResponse<ExamSectionResponse>> response = new ApiResponse<>(true,"Get list form examId:"+examId,pagedResponse,null);
         return ResponseEntity.ok(response);
     }
 

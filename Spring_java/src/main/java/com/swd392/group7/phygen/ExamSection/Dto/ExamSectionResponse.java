@@ -1,4 +1,4 @@
-package com.swd392.group7.phygen.ExamQuestion.Dto;
+package com.swd392.group7.phygen.ExamSection.Dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -10,8 +10,14 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreateRequest {
+public class ExamSectionResponse {
 
-    int orderIndex;
+    Long id;
+
+    String sectionName;
+
+    int displayOrder;
+
+    boolean isDeleted;
 
 }

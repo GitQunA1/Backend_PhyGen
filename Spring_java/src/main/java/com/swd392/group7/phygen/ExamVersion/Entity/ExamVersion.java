@@ -13,15 +13,12 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ExamVersion {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     String versionCode;
 
     String pdfUrl;
-
-    @Column(name = "questions_order")
-    String questionOrder;
 
     @ManyToOne
     @JoinColumn(name="final_exam_id")

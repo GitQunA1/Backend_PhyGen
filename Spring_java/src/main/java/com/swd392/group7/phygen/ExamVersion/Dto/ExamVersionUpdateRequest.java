@@ -7,10 +7,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpdateRequest {
+public class ExamVersionUpdateRequest {
     String versionCode;
 
     String pdfUrl;
-
-    String questionOrder;
 }

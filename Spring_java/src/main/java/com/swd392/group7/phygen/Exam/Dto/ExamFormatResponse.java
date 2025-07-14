@@ -1,25 +1,23 @@
 package com.swd392.group7.phygen.Exam.Dto;
 
-
-import com.swd392.group7.phygen.Exam.Enum.ExamType;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import com.swd392.group7.phygen.ExamSection.Dto.ExamSectionFormatResponse;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDateTime;
+import java.util.List;
+
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpdateRequest {
+public class ExamFormatResponse {
 
-    @Enumerated(EnumType.STRING)
-    ExamType examType;
+    ExamResponse examResponse;
 
-    LocalDateTime createAt;
+    List<ExamSectionFormatResponse> examSectionFormatResponses;
+
 }

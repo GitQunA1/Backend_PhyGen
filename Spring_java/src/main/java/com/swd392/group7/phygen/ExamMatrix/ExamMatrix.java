@@ -20,7 +20,7 @@ import java.util.List;
 @Table(name = "exam_matrix")
 public class ExamMatrix {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @Enumerated(EnumType.STRING)

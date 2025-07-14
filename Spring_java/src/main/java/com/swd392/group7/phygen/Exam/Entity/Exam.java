@@ -1,6 +1,7 @@
 package com.swd392.group7.phygen.Exam.Entity;
 
 import com.swd392.group7.phygen.Account.Entity.Account;
+import com.swd392.group7.phygen.Exam.Enum.Status;
 import com.swd392.group7.phygen.ExamSection.Entity.ExamSection;
 import com.swd392.group7.phygen.ExamVersion.Entity.ExamVersion;
 import com.swd392.group7.phygen.Exam.Enum.ExamType;
@@ -20,10 +21,13 @@ import java.util.List;
 public class Exam {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    boolean isDraft = false;
+    boolean isDraft = true;
+
+    @Enumerated(EnumType.STRING)
+    Status status;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "examtype")

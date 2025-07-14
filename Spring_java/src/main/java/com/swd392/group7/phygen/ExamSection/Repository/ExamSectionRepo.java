@@ -12,4 +12,6 @@ import java.util.Optional;
 @Repository
 public interface ExamSectionRepo extends JpaRepository<ExamSection, Long> {
     Page<ExamSection> findAllByExamId(Long examId, Pageable pageable);
+
+    Optional<List<ExamSection>> findAllByExamId(Long examId);
 }

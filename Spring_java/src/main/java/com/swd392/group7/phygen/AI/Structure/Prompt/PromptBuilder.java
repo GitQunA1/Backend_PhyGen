@@ -1,6 +1,8 @@
 package com.swd392.group7.phygen.AI.Structure.Prompt;
 
 import com.swd392.group7.phygen.AI.Structure.Dto.GenerateExamRequest;
+import com.swd392.group7.phygen.Exam.Dto.ExamFormatResponse;
+import com.swd392.group7.phygen.Exam.Dto.ExamStructureResponse;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
@@ -22,16 +24,9 @@ public class PromptBuilder {
         }
     }
 
-
-    public String buildGenerateExamPrompt(GenerateExamRequest request ){
+    public String buildGenerateExamPrompt(){
         try{
-            String template = readTemplate(generateExamTemplatePath);
-            return template
-                    .replace("{{title}}", request.title())
-                    .replace("{{gradeLevel}}", request.gradeLevel())
-                    .replace("{{subject}}", request.subject())
-                    .replace("{{difficulty}}", request.difficulty())
-                    .replace("{{examType}}", request.examType());
+            return readTemplate(generateExamTemplatePath);
         }catch (IOException e){
             throw new RuntimeException("Khong the doc template nay", e);
         }
