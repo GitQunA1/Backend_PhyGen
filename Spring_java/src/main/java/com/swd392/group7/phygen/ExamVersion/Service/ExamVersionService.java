@@ -37,7 +37,7 @@ public class ExamVersionService {
     public ExamVersion findExamVersionById(Long id){
         return examVersionRepo.findById(id).orElseThrow(()-> new ExamVersionException("Cant found that ExamVersion", HttpStatus.NOT_FOUND));
     }
-    public ExamVersionResponse upload(ExamVersionCreateRequest examVersionRq, Long examId, MultipartFile multipartFile ) throws IOException {
+    public ExamVersionResponse upload(ExamVersionCreateRequest examVersionRq,Long examId, MultipartFile multipartFile ) throws IOException {
         Account account = accountService.getCurrentAccount();
         Exam exam = examService.findExamById(examId);
         ExamVersion examVersion = new ExamVersion();

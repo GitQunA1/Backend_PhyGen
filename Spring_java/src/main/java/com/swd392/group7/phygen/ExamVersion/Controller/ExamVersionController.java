@@ -9,6 +9,7 @@ import com.swd392.group7.phygen.ExamVersion.Service.ExamVersionService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,14 +24,12 @@ import java.io.IOException;
 public class ExamVersionController {
     private final ExamVersionService examVersionService;
 
-    @PostMapping("/exam/{examId}")
+    @PostMapping(path = "/exam/{examId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@RequestParam("file") MultipartFile multipartFile,
-                                    @RequestParam("versionCode") String versionCode,
-                                    @PathVariable Long examId ) throws IOException {
-        ExamVersionCreateRequest examVersionRq = new ExamVersionCreateRequest();
-        examVersionRq.setVersionCode(versionCode);
+                                    @RequestBody ExamVersionCreateRequest examVersionRq,
+                                    @PathVariable Long examId) throws IOException {
         examVersionRq.setNameBucket("swd392phygen.exam");
-        ExamVersionResponse examVersionRp = examVersionService.upload(examVersionRq, examId,multipartFile);
+        ExamVersionResponse examVersionRp = examVersionService.upload(examVersionRq,examId,multipartFile);
         ApiResponse<ExamVersionResponse> response = new ApiResponse<>(true,"Create ExamVersion successfully",examVersionRp,null);
         return ResponseEntity.ok(response);
     }
