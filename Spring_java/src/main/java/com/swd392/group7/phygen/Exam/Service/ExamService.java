@@ -241,4 +241,8 @@ public class ExamService {
             subjectStructureResponse.setExamMatrixStructureResponse(examMatrixStructureResponse);
         return new ExamStructureResponse(subjectStructureResponse);
     }
+
+    public void convertMarkdownToPdf(String markdown){
+
+    }
 }
