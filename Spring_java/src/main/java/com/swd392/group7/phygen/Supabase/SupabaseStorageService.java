@@ -7,8 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
@@ -16,6 +15,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -56,6 +56,28 @@ public class SupabaseStorageService {
                 .build();
         URL signedUrl = s3Presigner.presignGetObject(getObjectPresignRequest).url();
         return signedUrl.toString();
+    }
+
+    public List<String> listFileKeysInBucket(){
+        String bucketName = "swd392phygen.docs";
+        ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
+                .bucket(bucketName)
+                .build();
+        ListObjectsV2Response listObjectsV2Response = s3Client.listObjectsV2(listObjectsV2Request);
+        return listObjectsV2Response.contents().stream()
+                .map(S3Object::key)
+                .filter(key -> !key.endsWith(".emptyFolderPlaceholder") && !key.endsWith("/"))
+                .collect(Collectors.toList());
+    }
+
+    public List<S3Object> listFilesInBucket(String bucketName) {
+        ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
+                .bucket(bucketName)
+                .build();
+
+        ListObjectsV2Response listObjectsV2Response = s3Client.listObjectsV2(listObjectsV2Request);
+
+        return listObjectsV2Response.contents();
     }
 
 

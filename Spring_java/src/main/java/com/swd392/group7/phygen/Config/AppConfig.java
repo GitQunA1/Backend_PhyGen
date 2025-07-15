@@ -1,6 +1,9 @@
 package com.swd392.group7.phygen.Config;
 
 
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,5 +37,20 @@ public class AppConfig {
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver());
         return templateEngine;
+    }
+
+    @Bean
+    public MutableDataSet flexmarkOptions(){
+        return new MutableDataSet();
+    }
+
+    @Bean
+    public Parser markdownParser(MutableDataSet flexmarkOptions) {
+        return Parser.builder(flexmarkOptions).build();
+    }
+
+    @Bean
+    public HtmlRenderer htmlRenderer(MutableDataSet flexmarkOptions) {
+        return HtmlRenderer.builder(flexmarkOptions).build();
     }
 }

@@ -54,6 +54,9 @@ import com.swd392.group7.phygen.Topic.Entity.Topic;
 import com.swd392.group7.phygen.Topic.Enum.Level;
 import com.swd392.group7.phygen.Topic.Exception.TopicException;
 import com.swd392.group7.phygen.Topic.Repository.TopicRepo;
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.util.data.MutableDataSet;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -93,6 +96,8 @@ public class ExamService {
     private final GeminiService geminiService;
     private final ExamSectionService examSectionService;
     private final TemplateEngine templateEngine;
+    private final Parser markdownParser;
+    private final HtmlRenderer htmlRenderer;
 
     public Exam findExamById(Long id) {
         return examRepo.findById(id).orElseThrow(() -> new ExamException("Cant found that Exam", HttpStatus.NOT_FOUND));
@@ -256,7 +261,7 @@ public class ExamService {
         String reformatMarkdown = markdown
                 .replace("\\\"", "\"")
                 .replace("\\n", "\n");
-
+//        reformatMarkdown = htmlRenderer.render();
 
 
         Document doc = Jsoup.parse(reformatMarkdown);

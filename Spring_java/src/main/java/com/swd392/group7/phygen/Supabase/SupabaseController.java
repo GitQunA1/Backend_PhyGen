@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,6 +34,13 @@ public class SupabaseController {
         String nameBucket = "swd392phygen.docs";
         String url = supabaseStorageService.getSignedUrl(fileName,nameBucket);
         ApiResponse<?> response = new ApiResponse<>(true,"Get signed Url successfully",url,null);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/fileName")
+    public ResponseEntity<?> listFileKeysInBucket(){
+        List<String> list = supabaseStorageService.listFileKeysInBucket();
+        ApiResponse<List<String>> response = new ApiResponse<>(true,"Get list file name successfully",list,null);
         return ResponseEntity.ok(response);
     }
 
