@@ -29,7 +29,8 @@ public class SupabaseController {
     }
 
     @GetMapping("/getSignUrl")
-    public ResponseEntity<?> getUrlFile(@RequestParam("fileName") String fileName,@RequestParam String nameBucket){
+    public ResponseEntity<?> getUrlFile(@RequestParam("fileName") String fileName){
+        String nameBucket = "swd392phygen.docs";
         String url = supabaseStorageService.getSignedUrl(fileName,nameBucket);
         ApiResponse<?> response = new ApiResponse<>(true,"Get signed Url successfully",url,null);
         return ResponseEntity.ok(response);

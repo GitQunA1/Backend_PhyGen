@@ -1,8 +1,5 @@
 package com.swd392.group7.phygen.AI.Structure.Prompt;
 
-import com.swd392.group7.phygen.AI.Structure.Dto.GenerateExamRequest;
-import com.swd392.group7.phygen.Exam.Dto.ExamFormatResponse;
-import com.swd392.group7.phygen.Exam.Dto.ExamStructureResponse;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
@@ -12,9 +9,9 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class PromptBuilder {
 
-    private final String generateExamTemplatePath = "examgenerate_template.txt";
-    private final String formatExamTemplatePath = "structureJsonOCR_Gemini_template.txt";
-    private final String schemaPath = "schema.json";
+    private final String generateExamTemplatePath = "Prompt/examgenerate_template.txt";
+    private final String formatExamTemplatePath = "Prompt/structureJsonOCR_Gemini_template.txt";
+    private final String schemaPath = "JsonStorage/schema.json";
 
     public String readSchemaJson() {
         try {

@@ -40,6 +40,21 @@ public class ExamVersionController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping(path = "/exam/V2/{examId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> create(
+            @Parameter(schema = @Schema (implementation = ExamVersionCreateRequest.class))
+            @RequestPart String examVersionJson,
+                                    @RequestPart String markdown,
+                                    @PathVariable Long examId) throws IOException {
+        ExamVersionCreateRequest examVersionRq = objectMapper.readValue(examVersionJson,ExamVersionCreateRequest.class);
+        examVersionRq.setNameBucket("swd392phygen.exam");
+        ExamVersionResponse examVersionRp = examVersionService.uploadV2(examVersionRq,examId,markdown);
+        ApiResponse<ExamVersionResponse> response = new ApiResponse<>(true,"Create ExamVersion successfully",examVersionRp,null);
+        return ResponseEntity.ok(response);
+    }
+
+
+
     @PutMapping("{id}")
     public ResponseEntity<?> update(@Valid @RequestBody ExamVersionUpdateRequest examVersionRq, @PathVariable Long id){
         ExamVersionResponse examVersionRp = examVersionService.update(examVersionRq, id);

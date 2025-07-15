@@ -23,7 +23,7 @@ public class AppConfig {
     @Bean
     public ClassLoaderTemplateResolver templateResolver() {
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-        templateResolver.setPrefix("templates/");
+        templateResolver.setPrefix("Templates/");
         templateResolver.setSuffix(".html");
         templateResolver.setTemplateMode("HTML");
         return templateResolver;

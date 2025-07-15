@@ -89,11 +89,11 @@ Cấu trúc JSON:
   "examId": {{EXAM_ID_PLACEHOLDER}}, 
   "generatedExams": [
       {
-        "examCode": "Mã đề: [Mã ngẫu nhiên 3 chữ số, duy nhất cho mỗi đề thi trong danh sách này]",
+        "examCode": "Ma_de_[Mã ngẫu nhiên 3 chữ số, duy nhất cho mỗi đề thi trong danh sách này]",
         "examContentMarkdown": "Nội dung đầy đủ của đề thi, được định dạng bằng Markdown. **Đảm bảo chuỗi này được escape JSON hợp lệ (ví dụ: '\"' thành '\\\"', 'enter' thành '\\n')**"
       },
       {
-        "examCode": "Mã đề: [Mã ngẫu nhiên 3 chữ số, duy nhất cho mỗi đề thi trong danh sách này]",
+        "examCode": "Ma_de_[Mã ngẫu nhiên 3 chữ số, duy nhất cho mỗi đề thi trong danh sách này]",
         "examContentMarkdown": "Nội dung đầy đủ của đề thi, được định dạng bằng Markdown. **Đảm bảo chuỗi này được escape JSON hợp lệ**"
       }
     ]

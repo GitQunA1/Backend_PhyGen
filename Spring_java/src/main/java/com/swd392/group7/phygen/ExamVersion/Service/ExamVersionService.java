@@ -37,11 +37,30 @@ public class ExamVersionService {
     public ExamVersion findExamVersionById(Long id){
         return examVersionRepo.findById(id).orElseThrow(()-> new ExamVersionException("Cant found that ExamVersion", HttpStatus.NOT_FOUND));
     }
-    public ExamVersionResponse upload(ExamVersionCreateRequest examVersionRq,Long examId, MultipartFile multipartFile ) throws IOException {
+
+    public ExamVersionResponse upload(ExamVersionCreateRequest examVersionRq,Long examId,MultipartFile multipartFile) throws IOException{
         Account account = accountService.getCurrentAccount();
         Exam exam = examService.findExamById(examId);
         ExamVersion examVersion = new ExamVersion();
         examVersion.setVersionCode(examVersionRq.getVersionCode());
+        String fileName = multipartFile.getOriginalFilename();
+        String key = account.getUsername() + "/" + fileName;
+        supabaseStorageService.uploadFile(multipartFile,key,examVersionRq.getNameBucket());
+        String pdfUrl = supabaseStorageService.getSignedUrl(key,examVersionRq.getNameBucket());
+        examVersion.setPdfUrl(pdfUrl);
+        examVersion.setExam(exam);
+        examVersionRepo.save(examVersion);
+        return modelMapper.map(examVersion, ExamVersionResponse.class);
+    }
+
+
+
+    public ExamVersionResponse uploadV2(ExamVersionCreateRequest examVersionRq,Long examId,String markdown ) throws IOException {
+        Account account = accountService.getCurrentAccount();
+        Exam exam = examService.findExamById(examId);
+        ExamVersion examVersion = new ExamVersion();
+        examVersion.setVersionCode(examVersionRq.getVersionCode());
+        MultipartFile multipartFile = examService.convertMarkdownToPdf(markdown,examVersionRq.getVersionCode());
         String fileName = multipartFile.getOriginalFilename();
         String key = account.getUsername() + "/" + fileName;
         supabaseStorageService.uploadFile(multipartFile,key,examVersionRq.getNameBucket());

@@ -2,6 +2,7 @@ package com.swd392.group7.phygen.Exam.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import com.swd392.group7.phygen.AI.GeminiAI.GeminiService;
 import com.swd392.group7.phygen.AI.Structure.Prompt.PromptBuilder;
 import com.swd392.group7.phygen.Account.Entity.Account;
@@ -10,6 +11,7 @@ import com.swd392.group7.phygen.Answer.Dto.AnswerStructureResponse;
 import com.swd392.group7.phygen.Answer.Entity.Answer;
 import com.swd392.group7.phygen.Answer.Exception.AnswerException;
 import com.swd392.group7.phygen.Answer.Repository.AnswerRepo;
+import com.swd392.group7.phygen.Common.ByteArrayMultipartFile;
 import com.swd392.group7.phygen.Common.PagedResponse;
 import com.swd392.group7.phygen.Exam.Dto.*;
 import com.swd392.group7.phygen.Exam.Entity.Exam;
@@ -53,13 +55,20 @@ import com.swd392.group7.phygen.Topic.Enum.Level;
 import com.swd392.group7.phygen.Topic.Exception.TopicException;
 import com.swd392.group7.phygen.Topic.Repository.TopicRepo;
 import lombok.RequiredArgsConstructor;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.modelmapper.ModelMapper;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,9 +92,10 @@ public class ExamService {
     private final PromptBuilder promptBuilder;
     private final GeminiService geminiService;
     private final ExamSectionService examSectionService;
+    private final TemplateEngine templateEngine;
 
-    public Exam findExamById(Long id){
-        return examRepo.findById(id).orElseThrow(()-> new ExamException("Cant found that Exam", HttpStatus.NOT_FOUND));
+    public Exam findExamById(Long id) {
+        return examRepo.findById(id).orElseThrow(() -> new ExamException("Cant found that Exam", HttpStatus.NOT_FOUND));
     }
 
     public ExamVersionGenerateResponse create(ExamCreateRequest examRq) throws JsonProcessingException {
@@ -104,7 +114,7 @@ public class ExamService {
         hardcodedSectionNames.add("Phần I:  Trắc nghiệm");
         hardcodedSectionNames.add("Phần II: Tự luận");
         examSectionCreateRequest.setSectionName(hardcodedSectionNames);
-        examSectionService.create(examSectionCreateRequest,exam.getId());
+        examSectionService.create(examSectionCreateRequest, exam.getId());
 
         ExamFormatResponse examFormatResponse = getListExamFormat(exam.getId());
         ExamStructureRequest examStructureRequest = new ExamStructureRequest();
@@ -119,15 +129,15 @@ public class ExamService {
         String examTemplate = promptBuilder
                 .buildGenerateExamPrompt()
                 .replace("{{EXAM_FORMAT_RESPONSE_JSON}}", examFormatJson)
-                .replace("{{EXAM_STRUCTURE_RESPONSE_JSON}}",examStructureJson)
-                .replace("{{EXAM_ID_PLACEHOLDER}}",exam.getId().toString())
-                .replace("{{NUMBER_OF_EXAMS_TO_GENERATE}}",examRq.getExamQuantity());
+                .replace("{{EXAM_STRUCTURE_RESPONSE_JSON}}", examStructureJson)
+                .replace("{{EXAM_ID_PLACEHOLDER}}", exam.getId().toString())
+                .replace("{{NUMBER_OF_EXAMS_TO_GENERATE}}", examRq.getExamQuantity());
 
         String examGeminiGenerate = geminiService.generateExam(examTemplate);
         return objectMapper.readValue(examGeminiGenerate, ExamVersionGenerateResponse.class);
     }
 
-    public ExamFormatResponse getListExamFormat(Long examId){
+    public ExamFormatResponse getListExamFormat(Long examId) {
         Exam exam = findExamById(examId);
         ExamResponse examResponse = modelMapper.map(exam, ExamResponse.class);
 
@@ -135,13 +145,13 @@ public class ExamService {
         examFormatResponse.setExamResponse(examResponse);
         examFormatResponse.setExamSectionFormatResponses(new ArrayList<>());
 
-        List<ExamSection> examSections = examSectionRepo.findAllByExamId(exam.getId()).orElseThrow(()-> new ExamSectionException("Empty list exam section",HttpStatus.NOT_FOUND));
+        List<ExamSection> examSections = examSectionRepo.findAllByExamId(exam.getId()).orElseThrow(() -> new ExamSectionException("Empty list exam section", HttpStatus.NOT_FOUND));
 
-        for (ExamSection examSection : examSections){
-            ExamSectionFormatResponse examSectionFormatResponse = modelMapper.map(examSection,ExamSectionFormatResponse.class);
+        for (ExamSection examSection : examSections) {
+            ExamSectionFormatResponse examSectionFormatResponse = modelMapper.map(examSection, ExamSectionFormatResponse.class);
             examSectionFormatResponse.setExamQuestionResponses(new ArrayList<>());
-            List<ExamQuestion> examQuestions = examQuestionRepo.findAllByExamSectionId(examSection.getId()).orElseThrow(()-> new ExamQuestionException("Empty list exam question",HttpStatus.NOT_FOUND));
-            for(ExamQuestion examQuestion : examQuestions){
+            List<ExamQuestion> examQuestions = examQuestionRepo.findAllByExamSectionId(examSection.getId()).orElseThrow(() -> new ExamQuestionException("Empty list exam question", HttpStatus.NOT_FOUND));
+            for (ExamQuestion examQuestion : examQuestions) {
                 ExamQuestionResponse examQuestionResponse = modelMapper.map(examQuestion, ExamQuestionResponse.class);
 
                 examSectionFormatResponse.getExamQuestionResponses().add(examQuestionResponse);
@@ -151,7 +161,7 @@ public class ExamService {
         return examFormatResponse;
     }
 
-    public ExamResponse update(ExamUpdateRequest examRq, Long id){
+    public ExamResponse update(ExamUpdateRequest examRq, Long id) {
         Exam oldExam = findExamById(id);
         oldExam.setExamType(examRq.getExamType());
         oldExam.setCreatedAt((examRq.getCreateAt()));
@@ -159,7 +169,7 @@ public class ExamService {
         return modelMapper.map(oldExam, ExamResponse.class);
     }
 
-    public void deleted(Long id){
+    public void deleted(Long id) {
         Exam exam = findExamById(id);
         exam.setDraft(true);
         examRepo.save(exam);
@@ -169,14 +179,14 @@ public class ExamService {
             int page,
             int size,
             String sortBy,
-            String sortDir){
+            String sortDir) {
         Account account = accountService.getCurrentAccount();
         Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
         Page<Exam> examPage = examRepo.findAllByAccountId(account.getId(), pageRequest);
-        if(examPage.isEmpty()){
-            throw new ExamException("Empty list exam for accountId: "+account.getId(),HttpStatus.NOT_FOUND);
+        if (examPage.isEmpty()) {
+            throw new ExamException("Empty list exam for accountId: " + account.getId(), HttpStatus.NOT_FOUND);
         }
         List<ExamResponse> responses = examPage.stream().map(exam -> modelMapper.map(exam, ExamResponse.class)).toList();
         return new PagedResponse<>(
@@ -189,60 +199,87 @@ public class ExamService {
         );
     }
 
-    public ExamStructureResponse getExamStructure(ExamStructureRequest request){
+    public ExamStructureResponse getExamStructure(ExamStructureRequest request) {
         Level level = Level.valueOf(request.getDifficultLevel().name());
 
         Subject subject = subjectService.findSubjectById(request.getSubjectId());
         SubjectStructureResponse subjectStructureResponse = modelMapper.map(subject, SubjectStructureResponse.class);
 
 
-        ExamMatrix examMatrix = examMatrixRepo.findBySubjectIdAndExamType(request.getSubjectId(),request.getExamType()).orElseThrow(()-> new ExamMatrixException("Empty list exam matrix",HttpStatus.NOT_FOUND));
+        ExamMatrix examMatrix = examMatrixRepo.findBySubjectIdAndExamType(request.getSubjectId(), request.getExamType()).orElseThrow(() -> new ExamMatrixException("Empty list exam matrix", HttpStatus.NOT_FOUND));
 
         ExamMatrixStructureResponse examMatrixStructureResponse = modelMapper.map(examMatrix, ExamMatrixStructureResponse.class);
         examMatrixStructureResponse.setMatrixSectionStructureResponses(new ArrayList<>());
 
-            List<MatrixSection> matrixSections = matrixSectionRepo.findAllByExamMatrixId(examMatrix.getId()).orElseThrow(() -> new MatrixSectionException("Empty list matrix section", HttpStatus.NOT_FOUND));
+        List<MatrixSection> matrixSections = matrixSectionRepo.findAllByExamMatrixId(examMatrix.getId()).orElseThrow(() -> new MatrixSectionException("Empty list matrix section", HttpStatus.NOT_FOUND));
 
-            for (MatrixSection matrixSection : matrixSections) {
-                MatrixSectionStructureResponse matrixSectionStructureResponse = modelMapper.map(matrixSection, MatrixSectionStructureResponse.class);
-                matrixSectionStructureResponse.setMatrixDetailStructureResponseList(new ArrayList<>());
+        for (MatrixSection matrixSection : matrixSections) {
+            MatrixSectionStructureResponse matrixSectionStructureResponse = modelMapper.map(matrixSection, MatrixSectionStructureResponse.class);
+            matrixSectionStructureResponse.setMatrixDetailStructureResponseList(new ArrayList<>());
 
-                List<MatrixDetail> matrixDetails = matrixDetailRepo.findAllByMatrixSectionIdAndDifficultyLevel(matrixSection.getId(), request.getDifficultLevel()).orElseThrow(() -> new MatrixDetailException("Empty list matrix detail", HttpStatus.NOT_FOUND));
+            List<MatrixDetail> matrixDetails = matrixDetailRepo.findAllByMatrixSectionIdAndDifficultyLevel(matrixSection.getId(), request.getDifficultLevel()).orElseThrow(() -> new MatrixDetailException("Empty list matrix detail", HttpStatus.NOT_FOUND));
 
-                for (MatrixDetail matrixDetail : matrixDetails) {
-                    MatrixDetailStructureResponse matrixDetailStructureResponse = modelMapper.map(matrixDetail, MatrixDetailStructureResponse.class);
+            for (MatrixDetail matrixDetail : matrixDetails) {
+                MatrixDetailStructureResponse matrixDetailStructureResponse = modelMapper.map(matrixDetail, MatrixDetailStructureResponse.class);
 
 
-                    Topic topic = topicRepo.findTopicByIdAndLevel(matrixDetail.getTopic().getId(),level).orElseThrow(()-> new TopicException("Cant found topic with level " + request.getDifficultLevel().toString(),HttpStatus.NOT_FOUND));
-                    TopicStructureResponse topicStructureResponse = modelMapper.map(topic, TopicStructureResponse.class);
-                    topicStructureResponse.setQuestionStructureResponses(new ArrayList<>());
+                Topic topic = topicRepo.findTopicByIdAndLevel(matrixDetail.getTopic().getId(), level).orElseThrow(() -> new TopicException("Cant found topic with level " + request.getDifficultLevel().toString(), HttpStatus.NOT_FOUND));
+                TopicStructureResponse topicStructureResponse = modelMapper.map(topic, TopicStructureResponse.class);
+                topicStructureResponse.setQuestionStructureResponses(new ArrayList<>());
 
-                    List<Question> questions = questionRepo.findAllByTopicId(topic.getId()).orElseThrow(() -> new QuestionException("Empty list question", HttpStatus.NOT_FOUND))
-                            .stream()
-                            .filter(question -> question.getDifficultyLevel().toString().equals(request.getDifficultLevel().toString()))
+                List<Question> questions = questionRepo.findAllByTopicId(topic.getId()).orElseThrow(() -> new QuestionException("Empty list question", HttpStatus.NOT_FOUND))
+                        .stream()
+                        .filter(question -> question.getDifficultyLevel().toString().equals(request.getDifficultLevel().toString()))
+                        .toList();
+
+                for (Question question : questions) {
+                    QuestionStructureResponse questionStructureResponse = modelMapper.map(question, QuestionStructureResponse.class);
+                    questionStructureResponse.setAnswerStructureResponses(new ArrayList<>());
+
+                    List<Answer> answers = answerRepo.findAllByQuestionId(question.getId()).orElseThrow(() -> new AnswerException("Empty list answer", HttpStatus.NOT_FOUND));
+                    List<AnswerStructureResponse> answerStructureResponses = answers.stream()
+                            .map(answer -> modelMapper.map(answer, AnswerStructureResponse.class))
                             .toList();
-
-                    for (Question question : questions) {
-                        QuestionStructureResponse questionStructureResponse = modelMapper.map(question, QuestionStructureResponse.class);
-                        questionStructureResponse.setAnswerStructureResponses(new ArrayList<>());
-
-                        List<Answer> answers = answerRepo.findAllByQuestionId(question.getId()).orElseThrow(()-> new AnswerException("Empty list answer", HttpStatus.NOT_FOUND));
-                        List<AnswerStructureResponse> answerStructureResponses = answers.stream()
-                                .map(answer -> modelMapper.map(answer, AnswerStructureResponse.class))
-                                .toList();
-                        questionStructureResponse.setAnswerStructureResponses(answerStructureResponses);
-                        topicStructureResponse.getQuestionStructureResponses().add(questionStructureResponse);
-                    }
-                    matrixDetailStructureResponse.setTopicStructureResponse(topicStructureResponse);
-                    matrixSectionStructureResponse.getMatrixDetailStructureResponseList().add(matrixDetailStructureResponse);
+                    questionStructureResponse.setAnswerStructureResponses(answerStructureResponses);
+                    topicStructureResponse.getQuestionStructureResponses().add(questionStructureResponse);
                 }
-                examMatrixStructureResponse.getMatrixSectionStructureResponses().add(matrixSectionStructureResponse);
+                matrixDetailStructureResponse.setTopicStructureResponse(topicStructureResponse);
+                matrixSectionStructureResponse.getMatrixDetailStructureResponseList().add(matrixDetailStructureResponse);
             }
-            subjectStructureResponse.setExamMatrixStructureResponse(examMatrixStructureResponse);
+            examMatrixStructureResponse.getMatrixSectionStructureResponses().add(matrixSectionStructureResponse);
+        }
+        subjectStructureResponse.setExamMatrixStructureResponse(examMatrixStructureResponse);
         return new ExamStructureResponse(subjectStructureResponse);
     }
 
-    public void convertMarkdownToPdf(String markdown){
+    public MultipartFile convertMarkdownToPdf(String markdown,String key){
+        String reformatMarkdown = markdown
+                .replace("\\\"", "\"")
+                .replace("\\n", "\n");
+
+
+
+        Document doc = Jsoup.parse(reformatMarkdown);
+        reformatMarkdown = doc.body().html();
+
+
+            Context context = new Context();
+            context.setVariable("contentFromMarkdown", markdown);
+            String renderHtml = templateEngine.process("examTemplate", context);
+
+            try (ByteArrayOutputStream os = new ByteArrayOutputStream()){
+                PdfRendererBuilder builder = new PdfRendererBuilder();
+                builder.withHtmlContent(renderHtml, new ClassPathResource("/").getURL().toString());
+                builder.toStream(os);
+                builder.run();
+                byte[] pdfBytes = os.toByteArray();
+                String contentType = "application/pdf";
+                return new ByteArrayMultipartFile(pdfBytes, "file",key, contentType);
+            }catch (Exception e) {
+                e.printStackTrace();
+                System.err.println("Lỗi khi tải file lên Supabase: " + e.getMessage());
+                return null;
+        }
 
     }
 }
