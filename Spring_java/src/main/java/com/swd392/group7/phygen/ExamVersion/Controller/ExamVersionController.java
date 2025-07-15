@@ -1,11 +1,14 @@
 package com.swd392.group7.phygen.ExamVersion.Controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.swd392.group7.phygen.Common.ApiResponse;
 import com.swd392.group7.phygen.Common.PagedResponse;
 import com.swd392.group7.phygen.ExamVersion.Dto.ExamVersionCreateRequest;
 import com.swd392.group7.phygen.ExamVersion.Dto.ExamVersionResponse;
 import com.swd392.group7.phygen.ExamVersion.Dto.ExamVersionUpdateRequest;
 import com.swd392.group7.phygen.ExamVersion.Service.ExamVersionService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +26,14 @@ import java.io.IOException;
 @SecurityRequirement(name = "api")
 public class ExamVersionController {
     private final ExamVersionService examVersionService;
+    private final ObjectMapper objectMapper;
 
     @PostMapping(path = "/exam/{examId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> create(@RequestParam("file") MultipartFile multipartFile,
-                                    @RequestBody ExamVersionCreateRequest examVersionRq,
+    public ResponseEntity<?> create(@RequestPart("file") MultipartFile multipartFile,
+                                    @Parameter(schema = @Schema (implementation = ExamVersionCreateRequest.class))
+                                    @RequestPart String examVersionJson,
                                     @PathVariable Long examId) throws IOException {
+        ExamVersionCreateRequest examVersionRq = objectMapper.readValue(examVersionJson,ExamVersionCreateRequest.class);
         examVersionRq.setNameBucket("swd392phygen.exam");
         ExamVersionResponse examVersionRp = examVersionService.upload(examVersionRq,examId,multipartFile);
         ApiResponse<ExamVersionResponse> response = new ApiResponse<>(true,"Create ExamVersion successfully",examVersionRp,null);

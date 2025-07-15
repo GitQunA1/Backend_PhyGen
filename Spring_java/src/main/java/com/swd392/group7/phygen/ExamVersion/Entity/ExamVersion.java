@@ -18,6 +18,7 @@ public class ExamVersion {
 
     String versionCode;
 
+    @Column(length = 40000)
     String pdfUrl;
 
     @ManyToOne
