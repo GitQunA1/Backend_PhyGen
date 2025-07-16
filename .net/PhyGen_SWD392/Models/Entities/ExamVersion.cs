@@ -13,7 +13,5 @@ public partial class ExamVersion
 
     public string? PdfUrl { get; set; }
 
-    public string? QuestionsOrder { get; set; }
-
     public virtual Exam? FinalExam { get; set; }
 }

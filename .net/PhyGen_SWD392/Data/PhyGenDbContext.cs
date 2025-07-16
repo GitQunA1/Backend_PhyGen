@@ -225,7 +225,6 @@ public partial class PhyGenDbContext : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.FinalExamId).HasColumnName("final_exam_id");
             entity.Property(e => e.PdfUrl).HasColumnName("pdf_url");
-            entity.Property(e => e.QuestionsOrder).HasColumnName("questions_order");
             entity.Property(e => e.VersionCode)
                 .HasMaxLength(10)
                 .HasColumnName("version_code");
