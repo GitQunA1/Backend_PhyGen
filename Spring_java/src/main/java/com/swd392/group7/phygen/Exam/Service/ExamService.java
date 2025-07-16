@@ -72,6 +72,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -261,19 +262,19 @@ public class ExamService {
         String reformatMarkdown = markdown
                 .replace("\\\"", "\"")
                 .replace("\\n", "\n");
-//        reformatMarkdown = htmlRenderer.render();
-
-
-        Document doc = Jsoup.parse(reformatMarkdown);
-        reformatMarkdown = doc.body().html();
+        String htmlMarkdown = htmlRenderer.render(markdownParser.parse(reformatMarkdown));
+        Document doc = Jsoup.parseBodyFragment(htmlMarkdown);
+        doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
+        htmlMarkdown = doc.body().html();
 
 
             Context context = new Context();
-            context.setVariable("contentFromMarkdown", markdown);
+            context.setVariable("contentFromMarkdown", htmlMarkdown);
             String renderHtml = templateEngine.process("examTemplate", context);
 
             try (ByteArrayOutputStream os = new ByteArrayOutputStream()){
                 PdfRendererBuilder builder = new PdfRendererBuilder();
+                builder.useFont(() -> getClass().getClassLoader().getResourceAsStream("Fonts/DejaVuSans.ttf"),"DejaVu Sans");
                 builder.withHtmlContent(renderHtml, new ClassPathResource("/").getURL().toString());
                 builder.toStream(os);
                 builder.run();

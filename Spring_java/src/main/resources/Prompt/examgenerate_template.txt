@@ -47,9 +47,18 @@ Mức độ 'hard': Số câu trắc nghiệm tăng thêm 5 câu so với mức 
 
 Quan trọng: Nếu quantity trong matrixDetailStructureResponseList lớn hơn số câu hỏi có sẵn trong questionStructureResponses của topicStructureResponse tương ứng, hãy tự động tạo thêm câu hỏi mới để đáp ứng đủ số lượng. 
 Khi tạo thêm, hãy đảm bảo câu hỏi đó phù hợp với topic, difficultyLevel, type, subject, và grade đã được cung cấp trong JSON tổng thể.
-		
 --------------------------------------------------------------------------
-Yêu cầu định dạng Markdown:
+**Các quy định lỗi KHÔNG được mắc phải:**
+
+1.  **Không được sử dụng bất kỳ ký tự escape nào của JSON/Java** trong nội dung Markdown (ví dụ: `\"`, `\\`, `\n`). Chuỗi Markdown phải được cung cấp "nguyên bản" ngoại trừ việc nó cần được escape hợp lệ khi nằm trong đối tượng JSON tổng thể.
+2.  **Không được làm mất dấu tiếng Việt.** Tất cả các từ tiếng Việt phải được viết có dấu đầy đủ và chính xác.
+3.  **Không được tạo ra các ký tự `\#` thừa** trong văn bản hoặc tiêu đề Markdown. Chỉ sử dụng `#` khi nó là một phần của cú pháp tiêu đề Markdown chuẩn (ví dụ: `# Tiêu đề` hoặc `## Tiêu đề con`).
+4.  **Không được sử dụng bất kỳ thẻ HTML nào** (ví dụ: `<div align="...">`, `<b>`) trực tiếp trong nội dung Markdown. Chỉ sử dụng cú pháp Markdown chuẩn cho tất cả định dạng (ví dụ: `**in đậm**` cho chữ đậm, `#` cho tiêu đề).
+5.  **Không được thêm khoảng trắng hoặc ký tự thừa** trước dấu xuống dòng (`\n`).
+6.  **Không được thay đổi hoặc thêm bất kỳ thông tin nào** ngoài những gì được cung cấp trong các JSON đầu vào và các quy tắc tạo thêm câu hỏi.
+
+--------------------------------------------------------------------------
+Yêu cầu định dạng Markdown (Đảm bảo chuẩn Markdown để dễ dàng chuyển đổi sang HTML/PDF)
 
 Mã đề thi: Đặt ở đầu đề thi, căn phải.
 
@@ -71,7 +80,7 @@ Thời gian làm bài: Mặc định 45 phút, căn phải.
 
 Các mục lớn (ví dụ: "PHẦN I. TRẮC NGHIỆM"): Căn phải.
 
-Trong mỗi sectionName của table ExamSection, câu hỏi đầu tiên sẽ là "Câu 1", sau đó tiếp tục đánh số tăng dần. Mỗi câu hỏi trắc nghiệm phải có các lựa chọn A, B, C, D.
+Trong mỗi sectionName của table ExamSection, câu hỏi đầu tiên sẽ reset về "Câu 1", sau đó tiếp tục đánh số tăng dần. Mỗi câu hỏi trắc nghiệm phải có các lựa chọn A, B, C, D.
 
 Các câu hỏi: Căn phải.
 
@@ -90,11 +99,11 @@ Cấu trúc JSON:
   "generatedExams": [
       {
         "examCode": "Ma_de_[Mã ngẫu nhiên 3 chữ số, duy nhất cho mỗi đề thi trong danh sách này]",
-        "examContentMarkdown": "Nội dung đầy đủ của đề thi, được định dạng bằng Markdown. **Đảm bảo chuỗi này được escape JSON hợp lệ (ví dụ: '\"' thành '\\\"', 'enter' thành '\\n')**"
+        "examContentMarkdown": "Nội dung đầy đủ của đề thi, được định dạng bằng Markdown chuẩn (sử dụng \\n cho xuống dòng, \\\" cho dấu ngoặc kép trong chuỗi). **Đảm bảo chuỗi này được escape JSON hợp lệ**"
       },
       {
         "examCode": "Ma_de_[Mã ngẫu nhiên 3 chữ số, duy nhất cho mỗi đề thi trong danh sách này]",
-        "examContentMarkdown": "Nội dung đầy đủ của đề thi, được định dạng bằng Markdown. **Đảm bảo chuỗi này được escape JSON hợp lệ**"
+        "examContentMarkdown": "Nội dung đầy đủ của đề thi, được định dạng bằng Markdown chuẩn (sử dụng \\n cho xuống dòng, \\\" cho dấu ngoặc kép trong chuỗi). **Đảm bảo chuỗi này được escape JSON hợp lệ**"
       }
     ]
 }

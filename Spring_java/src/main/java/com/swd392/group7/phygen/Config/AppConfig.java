@@ -51,6 +51,7 @@ public class AppConfig {
 
     @Bean
     public HtmlRenderer htmlRenderer(MutableDataSet flexmarkOptions) {
-        return HtmlRenderer.builder(flexmarkOptions).build();
+        return HtmlRenderer.builder(flexmarkOptions)
+                .build();
     }
 }
