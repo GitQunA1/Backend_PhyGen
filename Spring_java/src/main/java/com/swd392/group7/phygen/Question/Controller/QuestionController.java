@@ -17,7 +17,7 @@ import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/question")
+@RequestMapping("/api/questions")
 @CrossOrigin("*")
 @SecurityRequirement(name = "api")
 public class QuestionController {
@@ -44,7 +44,7 @@ public class QuestionController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("{topicId}")
+    @GetMapping("/by-topic/{topicId}")
     public ResponseEntity<?> getAllQuestionFromTopicId(
             @PathVariable Long topicId,
             @RequestParam(defaultValue = "0") int page,
@@ -57,7 +57,7 @@ public class QuestionController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/insert")
+    @PostMapping("/ai-generations/from-url")
     public ResponseEntity<?> insertDataFromGeminiJsonFormat(@RequestParam String fileUrl) throws IOException {
         SubjectDto subjectDto = questionService.insertDataFromGeminiJsonFormat(fileUrl);
         ApiResponse<SubjectDto> response = new ApiResponse<>(true,"Insert successfully",subjectDto,null);

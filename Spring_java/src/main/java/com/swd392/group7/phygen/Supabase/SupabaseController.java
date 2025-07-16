@@ -20,7 +20,7 @@ public class SupabaseController {
 
     private final SupabaseStorageService supabaseStorageService;
 
-    @PostMapping(value = "/upload_storage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file)throws IOException {
         String nameBucket = "swd392phygen.docs";
         String key = file.getOriginalFilename();
@@ -29,7 +29,7 @@ public class SupabaseController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/getSignUrl")
+    @GetMapping("/files/{fileName}/signed-url")
     public ResponseEntity<?> getUrlFile(@RequestParam("fileName") String fileName){
         String nameBucket = "swd392phygen.docs";
         String url = supabaseStorageService.getSignedUrl(fileName,nameBucket);
@@ -37,7 +37,7 @@ public class SupabaseController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/fileName")
+    @GetMapping("/file-names")
     public ResponseEntity<?> listFileKeysInBucket(){
         List<String> list = supabaseStorageService.listFileKeysInBucket();
         ApiResponse<List<String>> response = new ApiResponse<>(true,"Get list file name successfully",list,null);

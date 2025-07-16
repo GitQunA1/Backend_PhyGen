@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/exam")
+@RequestMapping("/api/exams")
 @CrossOrigin("*")
 @SecurityRequirement(name = "api")
 public class ExamController {
@@ -38,7 +38,7 @@ public class ExamController {
         ApiResponse<ExamResponse> response = new ApiResponse<>(true, "Deleted Exam successfully",null,null);
         return ResponseEntity.ok(response);
     }
-    @GetMapping("/getAllExamFromCurrentAccount")
+    @GetMapping("/my")
     public ResponseEntity<?> getAllExamFromAccountId(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -50,7 +50,7 @@ public class ExamController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/getExamStructure")
+    @PostMapping("/structure")
     public ResponseEntity<?> getExamStructure(@RequestBody ExamStructureRequest request){
         ExamStructureResponse examStructureResponse = examService.getExamStructure(request);
         ApiResponse<ExamStructureResponse> response = new ApiResponse<>(true,"Get Exam Structure successfully",examStructureResponse,null);

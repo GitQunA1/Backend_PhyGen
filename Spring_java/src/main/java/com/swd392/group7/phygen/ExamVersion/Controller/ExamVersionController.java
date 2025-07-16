@@ -21,14 +21,14 @@ import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/examVersion")
+@RequestMapping("/api/exam-versions")
 @CrossOrigin("*")
 @SecurityRequirement(name = "api")
 public class ExamVersionController {
     private final ExamVersionService examVersionService;
     private final ObjectMapper objectMapper;
 
-    @PostMapping(path = "/exam/{examId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(path = "/by-exam/{examId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@RequestPart("file") MultipartFile multipartFile,
                                     @Parameter(schema = @Schema (implementation = ExamVersionCreateRequest.class))
                                     @RequestPart String examVersionJson,
@@ -40,7 +40,7 @@ public class ExamVersionController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping(path = "/exam/V2/{examId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(path = "/by-exam/{examId}/version-2",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(
             @Parameter(schema = @Schema (implementation = ExamVersionCreateRequest.class))
             @RequestPart String examVersionJson,
@@ -69,7 +69,7 @@ public class ExamVersionController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/getAllExamVersionFromExamId/{examId}")
+    @GetMapping("/by-exam/{examId}")
     public ResponseEntity<?> getAllExamVersionFromExamId(
             @PathVariable Long examId,
             @RequestParam(defaultValue = "0") int page,

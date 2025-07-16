@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/answer")
+@RequestMapping("/api/answers")
 @CrossOrigin("*")
 @SecurityRequirement(name = "api")
 public class AnswerController {
 
     private final AnswerService answerService;
 
-    @PostMapping("{questionId}")
+    @PostMapping("/by-question/{questionId}")
     public ResponseEntity<?> create(@Valid @RequestBody AnswerCreateRequest answerRq, @PathVariable Long questionId) {
         AnswerResponse answerRp = answerService.createAnswer(answerRq, questionId);
         ApiResponse<AnswerResponse> response = new ApiResponse<>(true, "Answer created successfully", answerRp, null);
@@ -35,14 +35,14 @@ public class AnswerController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("{examId}")
+    @DeleteMapping("/by-exam/{examId}")
     public ResponseEntity<?> deleted(@PathVariable Long examId){
         answerService.deleted(examId);
         ApiResponse<AnswerResponse> response = new ApiResponse<>(true, "Answer deleted successfully",null,null);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("{questionId}")
+    @GetMapping("/by-question/{questionId}")
     public ResponseEntity<?> getAllAnswerFromQuestionId(
             @PathVariable Long questionId,
             @RequestParam(defaultValue = "0") int page,

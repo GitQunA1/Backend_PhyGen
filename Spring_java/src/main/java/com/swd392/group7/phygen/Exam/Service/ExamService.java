@@ -56,7 +56,6 @@ import com.swd392.group7.phygen.Topic.Exception.TopicException;
 import com.swd392.group7.phygen.Topic.Repository.TopicRepo;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
-import com.vladsch.flexmark.util.data.MutableDataSet;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -263,20 +262,31 @@ public class ExamService {
                 .replace("\\\"", "\"")
                 .replace("\\n", "\n")
                 .replace("\\", "")
-                .replaceAll("(Môn học:.*?)\\n(Khối lớp:)", "$1\n\n$2")
-                .replaceAll("(Khối lớp:.*?)\\n(Thời gian làm bài:)", "$1\n\n$2")
-                .replaceAll("(\\*\\*Câu \\d+\\*\\*\\n.+?)\\n(?=A\\.)", "$1\n\n");
-        String htmlMarkdown = htmlRenderer.render(markdownParser.parse(reformatMarkdown))
-                .replaceAll("(</strong>[^<]+?)\\s*(A\\.)", "$1<br/><br/>$2")
-                .replaceAll("(A\\.\\s.+?)\\s+(B\\.\\s)", "$1<br/>$2")
-                .replaceAll("(B\\.\\s.+?)\\s+(C\\.\\s)", "$1<br/>$2")
-                .replaceAll("(C\\.\\s.+?)\\s+(D\\.\\s)", "$1<br/>$2")
-                .replaceAll("(Môn học:.*?)(Khối lớp:)", "$1<br/>$2")
-                .replaceAll("(Khối lớp:.*?)(Thời gian làm bài:)", "$1<br/>$2");
+                .replaceAll("---\\s*(PHẦN.*?)\\s*---", "$1")
+                .replaceAll("(Lớp:\\s*\\d+)\\s+(Môn:\\s*[^\\n]+)\\s+(Thời gian:\\s*[^\\n]+)", "$1\n\n$2\n\n$3")
+                .replaceAll("(Câu \\d+:.*?)\\s*A\\.", "$1\n\nA.")
+                .replaceAll("A\\.(.*?)\\s*B\\.", "A.$1\n\nB.")
+                .replaceAll("B\\.(.*?)\\s*C\\.", "B.$1\n\nC.")
+                .replaceAll("C\\.(.*?)\\s*D\\.", "C.$1\n\nD.")
+                .replaceAll("(Mã đề:.*?)\\n+(ĐỀ KIỂM TRA.*?)\\n+\\s*(Lớp:)", "$1\n\n$2\n\n$3");
+
+
+        String htmlMarkdown = htmlRenderer.render(markdownParser.parse(reformatMarkdown));
+
+        htmlMarkdown = htmlMarkdown
+                .replaceAll("<pre><code>\\s*(Lớp:.*?Thời gian:.*?phút)\\s*", "<div class=\"exam-info\">$1</div>")
+                .replaceAll("(Lớp:\\s*\\d+)\\s+(Môn:.*?)\\s+(Thời gian:.*?phút)", "$1<br/>$2<br/>$3")
+                .replaceAll("<pre><code>\\s*---\\s*(PHẦN.*?)\\s*---\\s*</code></pre>", "<h3>$1</h3>")
+                .replaceAll("(Câu \\d+:.*?)(A\\.)", "$1<br/><br/>$2")
+                .replaceAll("(A\\.\\s*.*?)(B\\.)", "$1<br/><br/>$2")
+                .replaceAll("(B\\.\\s*.*?)(C\\.)", "$1<br/><br/>$2")
+                .replaceAll("(C\\.\\s*.*?)(D\\.)", "$1<br/><br/>$2")
+                .replaceAll("(Câu \\d+:.*?trình bày.*?\\.)", "<div class=\"essay-question\">$1</div>");
 
         Document doc = Jsoup.parseBodyFragment(htmlMarkdown);
         doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
         htmlMarkdown = doc.body().html();
+
 
 
             Context context = new Context();

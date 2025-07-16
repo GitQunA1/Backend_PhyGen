@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/examSection")
+@RequestMapping("/api/exam-sections")
 @CrossOrigin("*")
 @SecurityRequirement(name = "api")
 public class ExamSectionController {
@@ -24,7 +24,7 @@ public class ExamSectionController {
     private final ExamSectionService examSectionService;
 
 
-    @PostMapping("/exam/{examId}")
+    @PostMapping("/by-exam/{examId}")
     public ResponseEntity<?> create(@Valid @RequestBody ExamSectionCreateRequest examSectionRq, @PathVariable Long examId){
         List<ExamSectionResponse> examSectionRp = examSectionService.create(examSectionRq, examId);
         ApiResponse<List<ExamSectionResponse>> response = new ApiResponse<>(true,"Create exam section successfully",examSectionRp,null);
@@ -45,7 +45,7 @@ public class ExamSectionController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/exam/{examId}")
+    @GetMapping("/by-exam/{examId}")
     public ResponseEntity<?> getAllExamSectionFromThatExam(
             @PathVariable Long examId,
             @RequestParam(defaultValue = "0") int page,

@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/examQuestion")
+@RequestMapping("/api/exam-questions")
 @CrossOrigin("*")
 @SecurityRequirement(name = "api")
 public class ExamQuestionController {
 
     private final ExamQuestionService examQuestionService;
 
-    @PostMapping("/exam-section/{examSectionId}/questions/{questionId}")
+    @PostMapping("/by-exam-section/{examSectionId}/by-question/{questionId}")
     public ResponseEntity<?> create(@Valid @RequestBody ExamQuestionCreateRequest examQuestionRq, @PathVariable Long questionId, @PathVariable Long examSectionId){
         ExamQuestionResponse examQuestionRp = examQuestionService.create(examQuestionRq, questionId,examSectionId);
         ApiResponse<ExamQuestionResponse> response = new ApiResponse<>(true,"Create Exam Question successfully",examQuestionRp,null);
@@ -36,7 +36,7 @@ public class ExamQuestionController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/question/{questionId}")
+    @GetMapping("/by-question/{questionId}")
     public ResponseEntity<?> getAllExamQuestionFromQuestionId(
             @PathVariable Long questionId,
             @RequestParam(defaultValue = "0") int page,
@@ -49,7 +49,7 @@ public class ExamQuestionController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/exam-section/{examSectionId}")
+    @GetMapping("/by-exam-section/{examSectionId}")
     public ResponseEntity<?> getAllExamQuestionFromExamSectionId(
             @PathVariable Long examSectionId,
             @RequestParam(defaultValue = "0") int page,

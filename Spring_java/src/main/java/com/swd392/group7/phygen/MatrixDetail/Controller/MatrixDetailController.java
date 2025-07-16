@@ -16,13 +16,13 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/matrixDetail")
+@RequestMapping("/api/matrix-details")
 @CrossOrigin("*")
 @SecurityRequirement(name = "api")
 public class MatrixDetailController {
 
 
-    @GetMapping("/difficultyLevel")
+    @GetMapping("/enum-difficult-level")
     public ResponseEntity<?> getAllDifficultyLevel(){
         List<String> difficultyLevel = Arrays.stream(DifficultyLevel.values())
                 .map(Enum::name)

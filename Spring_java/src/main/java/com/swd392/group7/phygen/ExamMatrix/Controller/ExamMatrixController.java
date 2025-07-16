@@ -12,13 +12,13 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/examMatrix")
+@RequestMapping("/api/exam-matrices")
 @CrossOrigin("*")
 @SecurityRequirement(name = "api")
 public class ExamMatrixController {
     private final ExamMatrixService examMatrixService;
 
-    @GetMapping("/subject/{subjectId}")
+    @GetMapping("/by-subject/{subjectId}")
     public ResponseEntity<?> showExamType(@PathVariable Long subjectId){
         List<ExamMatrixEnumResponse> examMatrixEnumResponses = examMatrixService.showExamType(subjectId);
         ApiResponse<List<ExamMatrixEnumResponse>> response = new ApiResponse<>(true,"Show list ExamType",examMatrixEnumResponses,null);
