@@ -261,8 +261,19 @@ public class ExamService {
     public MultipartFile convertMarkdownToPdf(String markdown,String key){
         String reformatMarkdown = markdown
                 .replace("\\\"", "\"")
-                .replace("\\n", "\n");
-        String htmlMarkdown = htmlRenderer.render(markdownParser.parse(reformatMarkdown));
+                .replace("\\n", "\n")
+                .replace("\\", "")
+                .replaceAll("(Môn học:.*?)\\n(Khối lớp:)", "$1\n\n$2")
+                .replaceAll("(Khối lớp:.*?)\\n(Thời gian làm bài:)", "$1\n\n$2")
+                .replaceAll("(\\*\\*Câu \\d+\\*\\*\\n.+?)\\n(?=A\\.)", "$1\n\n");
+        String htmlMarkdown = htmlRenderer.render(markdownParser.parse(reformatMarkdown))
+                .replaceAll("(</strong>[^<]+?)\\s*(A\\.)", "$1<br/><br/>$2")
+                .replaceAll("(A\\.\\s.+?)\\s+(B\\.\\s)", "$1<br/>$2")
+                .replaceAll("(B\\.\\s.+?)\\s+(C\\.\\s)", "$1<br/>$2")
+                .replaceAll("(C\\.\\s.+?)\\s+(D\\.\\s)", "$1<br/>$2")
+                .replaceAll("(Môn học:.*?)(Khối lớp:)", "$1<br/>$2")
+                .replaceAll("(Khối lớp:.*?)(Thời gian làm bài:)", "$1<br/>$2");
+
         Document doc = Jsoup.parseBodyFragment(htmlMarkdown);
         doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
         htmlMarkdown = doc.body().html();
