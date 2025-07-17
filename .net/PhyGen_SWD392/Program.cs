@@ -90,6 +90,7 @@ builder.Services.AddScoped<ForgetPasswordService>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ImageService>();
+builder.Services.AddScoped<GoogleAuthService>();
 
 builder.Services.Configure<CloudinarySettings>(
     builder.Configuration.GetSection("CloudinarySettings"));

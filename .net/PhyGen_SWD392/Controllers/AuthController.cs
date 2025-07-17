@@ -1,10 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FirebaseAdmin.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using PhyGen_SWD392.Helpers;
 using PhyGen_SWD392.Models.DTOs;
 using PhyGen_SWD392.Services;
 using PhyGen_SWD392.Settings;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace PhyGen_SWD392.Controllers
 {
@@ -14,11 +19,13 @@ namespace PhyGen_SWD392.Controllers
     {
         private readonly AuthService _authService;
         private readonly EmailVerificationService _service;
+        private readonly GoogleAuthService _googleAuthService;
 
-        public AuthController(AuthService authService, EmailVerificationService service)
+        public AuthController(AuthService authService, EmailVerificationService service, GoogleAuthService googleAuthService)
         {
             _authService = authService;
             _service = service;
+            _googleAuthService = googleAuthService;
         }
 
 
@@ -74,6 +81,28 @@ namespace PhyGen_SWD392.Controllers
             };
 
             return Ok(ApiResponse<object>.SuccessResponse(response, "Login successful"));
+        }
+
+        [AllowAnonymous]
+        [HttpPost("login/google")]
+        public async Task<IActionResult> LoginWithGoogle([FromBody] FirebaseLoginDto dto)
+        {
+            var (token, account) = await _googleAuthService.LoginWithGoogleAsync(dto.IdToken);
+
+            if (token == null) return Unauthorized("Invalid Google token");
+
+            return Ok(new
+            {
+                token,
+                expiresIn = 3600,
+                user = new
+                {
+                    account.Id,
+                    account.Email,
+                    account.Username,
+                    account.RoleEnum
+                }
+            });
         }
     }
 }
