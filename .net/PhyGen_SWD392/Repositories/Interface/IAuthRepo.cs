@@ -8,6 +8,7 @@ namespace PhyGen_SWD392.Repositories.Interface
         Task<Account?> GetAccountByUsernameAsync(string username);
         Task<Account?> GetAccountByCredentialsAsync(string email, string password);
         Task<Account?> GetAccountByUsernameAndPasswordAsync(string username, string password);
-        Task AddAsync(Account account); 
+        Task AddAsync(Account account);
+        Task UpdateAsync(Account account);
     }
 }

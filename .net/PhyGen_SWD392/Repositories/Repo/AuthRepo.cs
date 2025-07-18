@@ -45,7 +45,10 @@ namespace PhyGen_SWD392.Repositories.Repo
             var isPasswordValid = BCrypt.Net.BCrypt.Verify(password, account.Password);
             return isPasswordValid ? account : null;
         }
-
-
+        public async Task UpdateAsync(Account account)
+        {
+            _context.Accounts.Update(account);
+            await _context.SaveChangesAsync();
+        }
     }
 }

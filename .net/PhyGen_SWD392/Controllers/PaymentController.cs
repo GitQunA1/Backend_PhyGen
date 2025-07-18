@@ -13,11 +13,13 @@ namespace PhyGen_SWD392.Controllers
     {
         private readonly VnPayService _vnPayService;
         private readonly AccountUserService _accountUserService;
+        private readonly RedisLogService _redisLogService;
 
-        public PaymentController(VnPayService vnPayService, AccountUserService accountUserService)
+        public PaymentController(VnPayService vnPayService, AccountUserService accountUserService, RedisLogService redisLogService)
         {
             _vnPayService = vnPayService;
             _accountUserService = accountUserService;
+            _redisLogService = redisLogService;
         }
 
         [Authorize]
@@ -40,7 +42,6 @@ namespace PhyGen_SWD392.Controllers
             var paymentUrl = _vnPayService.CreatePaymentUrl(HttpContext, model);
             return Ok(new { paymentUrl });
         }
-
         [AllowAnonymous]
         [HttpGet("vnpay-return")]
         public async Task<IActionResult> PaymentCallback()
@@ -55,6 +56,28 @@ namespace PhyGen_SWD392.Controllers
                 responseCode == "00" &&
                 transactionStatus == "00";
 
+            var orderInfo = result.OrderDescription;
+            int userId = 0;
+
+            if (!string.IsNullOrEmpty(orderInfo) && orderInfo.StartsWith("UpgradePremiumForUser:"))
+            {
+                int.TryParse(orderInfo.Replace("UpgradePremiumForUser:", ""), out userId);
+            }
+
+            await _redisLogService.LogVnPayTransactionAsync(new
+            {
+                Timestamp = DateTime.UtcNow,
+                IsSuccess = isPaidSuccessfully,
+                ResponseCode = responseCode,
+                TransactionStatus = transactionStatus,
+                OrderId = result.OrderId,
+                TransactionId = result.TransactionId,
+                OrderInfo = orderInfo,
+                UserId = userId > 0 ? userId : (int?)null,
+                Amount = 599000,
+                RawQuery = Request.Query.ToString(),
+            });
+
             if (!isPaidSuccessfully)
             {
                 return BadRequest(new
@@ -64,14 +87,6 @@ namespace PhyGen_SWD392.Controllers
                     responseCode,
                     transactionStatus
                 });
-            }
-
-            var orderInfo = result.OrderDescription;
-            int userId = 0;
-
-            if (!string.IsNullOrEmpty(orderInfo) && orderInfo.StartsWith("UpgradePremiumForUser:"))
-            {
-                int.TryParse(orderInfo.Replace("UpgradePremiumForUser:", ""), out userId);
             }
 
             if (userId <= 0)
@@ -102,5 +117,7 @@ namespace PhyGen_SWD392.Controllers
                 vnp_ResponseCode = responseCode
             });
         }
+
+
     }
 }
