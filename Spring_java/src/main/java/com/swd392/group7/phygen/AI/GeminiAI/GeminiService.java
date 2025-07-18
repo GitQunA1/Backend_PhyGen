@@ -7,7 +7,10 @@ import com.google.genai.types.GenerateContentConfig;
 import com.google.genai.types.GenerateContentResponse;
 import com.swd392.group7.phygen.AI.MistralAI.MistralAIService;
 import com.swd392.group7.phygen.AI.Structure.Prompt.PromptBuilder;
+import com.swd392.group7.phygen.Account.Entity.Account;
+import com.swd392.group7.phygen.Account.Service.AccountService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +37,21 @@ public class GeminiService {
     private final PromptBuilder promptBuilder;
 
     private final ObjectMapper objectMapper;
+
+    private final AccountService accountService;
+
+
+    public String chatBot(String text){
+        Account account = accountService.getCurrentAccount();
+        String prompt = promptBuilder.chatWithGeminiPrompt(account.getUsername(),text);
+
+        GenerateContentResponse response =client.models.generateContent(
+                "gemini-2.5-flash",
+                prompt,
+                null
+        );
+        return response.text();
+    }
 
 
     public String generateExam(String prompt){

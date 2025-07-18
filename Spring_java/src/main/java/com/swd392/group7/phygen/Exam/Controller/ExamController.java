@@ -5,7 +5,9 @@ import com.swd392.group7.phygen.Common.ApiResponse;
 import com.swd392.group7.phygen.Common.PagedResponse;
 import com.swd392.group7.phygen.Exam.Dto.*;
 import com.swd392.group7.phygen.Exam.Service.ExamService;
+import com.swd392.group7.phygen.ExamMatrix.Enum.ExamType;
 import com.swd392.group7.phygen.ExamVersion.Dto.ExamVersionGenerateResponse;
+import com.swd392.group7.phygen.MatrixDetail.Enum.DifficultyLevel;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -50,9 +52,12 @@ public class ExamController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/structure")
-    public ResponseEntity<?> getExamStructure(@RequestBody ExamStructureRequest request){
-        ExamStructureResponse examStructureResponse = examService.getExamStructure(request);
+    @GetMapping("/structure")
+    public ResponseEntity<?> getExamStructure(@RequestParam ExamType examType,
+                                              @RequestParam Long subjectId,
+                                              @RequestParam DifficultyLevel difficultLevel){
+        ExamStructureRequest examStructureRequest = new ExamStructureRequest(examType,subjectId,difficultLevel);
+        ExamStructureResponse examStructureResponse = examService.getExamStructure(examStructureRequest);
         ApiResponse<ExamStructureResponse> response = new ApiResponse<>(true,"Get Exam Structure successfully",examStructureResponse,null);
         return ResponseEntity.ok(response);
     }

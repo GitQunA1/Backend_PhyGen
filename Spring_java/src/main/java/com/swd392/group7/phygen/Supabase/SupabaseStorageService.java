@@ -70,6 +70,23 @@ public class SupabaseStorageService {
                 .collect(Collectors.toList());
     }
 
+    public List<FileEntryDto> listFileKeysAndCreationDatesInBucket() {
+        String bucketName = "swd392phygen.exam";
+        ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
+                .bucket(bucketName)
+                .build();
+
+        ListObjectsV2Response listObjectsV2Response = s3Client.listObjectsV2(listObjectsV2Request);
+
+        return listObjectsV2Response.contents().stream()
+                .filter(s3Object -> {
+                    String key = s3Object.key();
+                    return !key.endsWith(".emptyFolderPlaceholder") && !key.endsWith("/");
+                })
+                .map(s3Object -> new FileEntryDto(s3Object.key(), s3Object.lastModified()))
+                .collect(Collectors.toList());
+    }
+
     public List<S3Object> listFilesInBucket(String bucketName) {
         ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
                 .bucket(bucketName)
