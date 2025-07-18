@@ -13,6 +13,7 @@ using PhyGen_SWD392.Helpers;
 using PhyGen_SWD392.Models.Entities;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 //var frontendUrls = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
@@ -77,6 +78,9 @@ builder.Services.AddScoped<MatrixSectionService>();
 builder.Services.AddScoped<IMatrixDetailRepo, MatrixDetailRepo>();
 builder.Services.AddScoped<MatrixDetailService>();
 builder.Services.AddScoped<IQuestionRepo, QuestionRepo>();
+builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+builder.Services.AddScoped<DashboardService>();
+
 builder.Services.AddScoped<AIGenerationService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -104,6 +108,11 @@ builder.Services.AddSingleton(cloudinary =>
     return new CloudinaryDotNet.Cloudinary(account);
 });
 
+builder.Services.AddSingleton<IConnectionMultiplexer>(
+    ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis"))
+);
+
+builder.Services.AddScoped<RedisLogService>();
 FirebaseApp.Create(new AppOptions()
 {
     Credential = GoogleCredential.FromFile(builder.Configuration["Firebase:CredentialPath"])
