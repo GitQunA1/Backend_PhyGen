@@ -76,7 +76,7 @@ namespace PhyGen_SWD392.Services
 
                 await _authRepo.AddAsync(account);
             }
-            var jwt = _authService.GenerateJwtToken(account);
+            var jwt = _authService.GenerateAccessToken(account);
             return (jwt, account);
         }
     }

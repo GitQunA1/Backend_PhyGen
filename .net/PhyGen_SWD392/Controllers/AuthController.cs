@@ -1,15 +1,9 @@
 ﻿using FirebaseAdmin.Auth;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using PhyGen_SWD392.Helpers;
 using PhyGen_SWD392.Models.DTOs;
 using PhyGen_SWD392.Services;
-using PhyGen_SWD392.Settings;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace PhyGen_SWD392.Controllers
 {
@@ -28,7 +22,6 @@ namespace PhyGen_SWD392.Controllers
             _googleAuthService = googleAuthService;
         }
 
-
         [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] AccountRegisterDto dto)
@@ -40,38 +33,34 @@ namespace PhyGen_SWD392.Controllers
                 var error = new List<string> { "Email already exists or passwords do not match." };
                 return BadRequest(ApiResponse<string>.ErrorResponse(error, "Register failed"));
             }
+
             var verifySent = await _service.RequestEmailVerificationAsync(dto.Email);
-            if (!verifySent)
-            {
-                return Ok(ApiResponse<string>.SuccessResponse(
-                    null, "Register successful, but failed to send verification code."));
-            }
+            var message = verifySent
+                ? "Register successful. Verification code sent to email."
+                : "Register successful, but failed to send verification code.";
 
-            return Ok(ApiResponse<string>.SuccessResponse(
-                null, "Register successful. Verification code sent to email."));
+            return Ok(ApiResponse<string>.SuccessResponse(null, message));
         }
-
 
         [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] AccountLoginDto dto)
         {
-            var account = await _authService.LoginAsync(dto);
+            var result = await _authService.LoginWithTokenAsync(dto);
+            if (result == null)
+                return Unauthorized(ApiResponse<string>.ErrorResponse(
+                    new List<string> { "Invalid email/password or inactive account." }, "Login failed"));
 
-            if (account == null)
-            {
-                var error = new List<string> { "Invalid email/password or inactive account." };
-                return Unauthorized(ApiResponse<string>.ErrorResponse(error, "Login failed"));
-            }
-            var token = _authService.GenerateJwtToken(account);
-            var expiresIn = _authService.GetTokenExpirationMinutes();
+            var account = await _authService.LoginAsync(dto); 
 
             var response = new
             {
-                Token = token,
-                ExpiresIn = expiresIn,
-                Account = new
+                token = result.AccessToken,
+                refreshToken = result.RefreshToken,
+                expiresIn = result.ExpiresIn,
+                user = new
                 {
+                    account!.Id,
                     account.Username,
                     account.Email,
                     account.EmailVerified,
@@ -83,15 +72,22 @@ namespace PhyGen_SWD392.Controllers
             return Ok(ApiResponse<object>.SuccessResponse(response, "Login successful"));
         }
 
+
         [AllowAnonymous]
         [HttpPost("login/google")]
         public async Task<IActionResult> LoginWithGoogle([FromBody] FirebaseLoginDto dto)
         {
             var (token, account) = await _googleAuthService.LoginWithGoogleAsync(dto.IdToken);
 
-            if (token == null) return Unauthorized("Invalid Google token");
+            if (token == null)
+            {
+                return Unauthorized(ApiResponse<string>.ErrorResponse(
+                    new List<string> { "Invalid Google token" },
+                    "Login with Google failed"
+                ));
+            }
 
-            return Ok(new
+            var response = new
             {
                 token,
                 expiresIn = 3600,
@@ -100,9 +96,25 @@ namespace PhyGen_SWD392.Controllers
                     account.Id,
                     account.Email,
                     account.Username,
-                    account.RoleEnum
+                    Role = account.RoleEnum.ToString()
                 }
-            });
+            };
+
+            return Ok(ApiResponse<object>.SuccessResponse(response, "Login with Google successful"));
+        }
+
+        [AllowAnonymous]
+        [HttpPost("refresh-token")]
+        public IActionResult RefreshToken([FromBody] string refreshToken)
+        {
+            var result = _authService.RefreshAccessToken(refreshToken);
+            if (result == null)
+                return Unauthorized(ApiResponse<string>.ErrorResponse(
+                    new[] { "Invalid or expired refresh token" }.ToList(),
+                    "Refresh token failed"
+                ));
+
+            return Ok(ApiResponse<AuthResultDto>.SuccessResponse(result, "Token refreshed successfully"));
         }
     }
 }
