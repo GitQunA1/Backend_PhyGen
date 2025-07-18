@@ -57,10 +57,10 @@ namespace PhyGen_SWD392.Services
             return _mapper.Map<MatrixDetailDTO>(detail);
         }
 
-        public async Task<List<MatrixDetailDTO>> GetAllMatrixDetailsAsync()
+        public async Task<List<MatrixDetailDTO>> GetAllWithQueryAsync(MatrixDetailQueryParameters queryParams)
         {
-            var details = await _repo.GetAllAsync();
-            return _mapper.Map<List<MatrixDetailDTO>>(details);
+            var pagedResult = await _repo.GetAllWithQueryAsync(queryParams);
+            return _mapper.Map<List<MatrixDetailDTO>>(pagedResult.Items);
         }
     }
 }

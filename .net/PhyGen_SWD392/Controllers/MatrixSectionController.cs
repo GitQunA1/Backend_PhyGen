@@ -16,23 +16,24 @@ namespace PhyGen_SWD392.Controllers
         {
             _service = service;
         }
-        [Authorize(Roles = "admin")]
-        [HttpGet]
-        public async Task<IActionResult> GetAllIncludeDeletedAsync()
-        {
-            var sections = await _service.GetAllIncludeDeletedAsync();
-
-            return Ok(ApiResponse<List<MatrixSectionDTO>>.SuccessResponse(sections, "Get All successfully"));
-        }
 
         [Authorize(Roles = "admin,user")]
-        [HttpGet("active")]
-        public async Task<IActionResult> GetActiveMatrixSectionsAsync()
+        [HttpGet]
+        public async Task<IActionResult> GetAll([FromQuery] MatrixSectionQueryParameters queryParams)
         {
-            var sections = await _service.GetActiveMatrixSectionsAsync();
-
-            return Ok(ApiResponse<List<MatrixSectionDTO>>.SuccessResponse(sections, "Get All successfully"));
+            var result = await _service.GetAllAsync(queryParams);
+            return Ok(ApiResponse<List<MatrixSectionDTO>>.SuccessResponse(result, "Get All successfully"));
         }
+
+        //[Authorize(Roles = "admin,user")]
+        //[HttpGet("active")]
+        //public async Task<IActionResult> GetActiveMatrixSectionsAsync()
+        //{
+        //    var sections = await _service.GetActiveMatrixSectionsAsync();
+
+        //    return Ok(ApiResponse<List<MatrixSectionDTO>>.SuccessResponse(sections, "Get All successfully"));
+        //}
+
         [Authorize(Roles = "admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMatrixSectionByIdAsync(int id)

@@ -17,14 +17,15 @@ namespace PhyGen_SWD392.Controllers
         {
             _service = service;
         }
+
         [Authorize(Roles = "admin,user")]
         [HttpGet]
-        public async Task<IActionResult> GetAllMatrixDetailsAsync()
+        public async Task<IActionResult> GetAll([FromQuery] MatrixDetailQueryParameters queryParams)
         {
-            var details = await _service.GetAllMatrixDetailsAsync();
-
+            var details = await _service.GetAllWithQueryAsync(queryParams);
             return Ok(ApiResponse<List<MatrixDetailDTO>>.SuccessResponse(details, "Get All successfully"));
         }
+
         [Authorize(Roles = "admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMatrixDetailByIdAsync(int id)

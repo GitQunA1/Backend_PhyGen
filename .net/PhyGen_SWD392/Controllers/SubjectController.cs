@@ -16,20 +16,23 @@ namespace PhyGen_SWD392.Controllers
         {
            _service = service; 
         }
-        [Authorize(Roles = "admin")]
-        [HttpGet]
-        public async Task<IActionResult> GetAllSubjectsIncludeDeletedAsync()
-        {
-            var subjectDTOs = await _service.GetAllIncludeDeletedAsync();
-            return Ok(ApiResponse<List<SubjectDTO>>.SuccessResponse(subjectDTOs, "Get All successfully"));
-        }
+
         [Authorize(Roles = "admin,user")]
-        [HttpGet("active")]
-        public async Task<IActionResult> GetActiveSubjectsAsync()
+        [HttpGet]
+        public async Task<IActionResult> GetAll([FromQuery] SubjectQueryParameters queryParams)
         {
-            var subjects = await _service.GetActiveSubjectsAsync();
-            return Ok(ApiResponse<List<SubjectDTO>>.SuccessResponse(subjects.ToList(), "Get All successfully"));
+            var subjects = await _service.GetAllWithQueryAsync(queryParams);
+            return Ok(ApiResponse<List<SubjectDTO>>.SuccessResponse(subjects, "Get All successfully"));
         }
+
+        //[Authorize(Roles = "admin,user")]
+        //[HttpGet("active")]
+        //public async Task<IActionResult> GetActiveSubjectsAsync()
+        //{
+        //    var subjects = await _service.GetActiveSubjectsAsync();
+        //    return Ok(ApiResponse<List<SubjectDTO>>.SuccessResponse(subjects.ToList(), "Get All successfully"));
+        //}
+
         [Authorize(Roles = "admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSubjectByIdAsync(int id)
@@ -42,6 +45,7 @@ namespace PhyGen_SWD392.Controllers
 
             return Ok(ApiResponse<SubjectDTO>.SuccessResponse(subjectDTO, "Get By Id successfully"));
         }
+
         [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> CreateSubjectAsync([FromBody] SubjectRequest subjectRequest)
@@ -56,6 +60,7 @@ namespace PhyGen_SWD392.Controllers
                 return BadRequest(ApiResponse<SubjectDTO>.ErrorResponse(new List<string> { ex.Message }, "Failed to create subject"));
             }
         }
+
         [Authorize(Roles = "admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateSubjectAsync(int id, [FromBody] SubjectRequest subjectRequest)
@@ -66,6 +71,7 @@ namespace PhyGen_SWD392.Controllers
 
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Subject updated successfully"));
         }
+
         [Authorize(Roles = "admin")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> SoftDeleteAsync(int id)
@@ -76,5 +82,6 @@ namespace PhyGen_SWD392.Controllers
 
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Subject deleted successfully"));
         }
+
     }
 }

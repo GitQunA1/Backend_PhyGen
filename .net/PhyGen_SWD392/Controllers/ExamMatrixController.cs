@@ -8,7 +8,7 @@ using PhyGen_SWD392.Services;
 namespace PhyGen_SWD392.Controllers
 {
     [ApiController]
-    [Route("api/exam_matrixs")]
+    [Route("api/exam_matrices")]
 
     public class ExamMatrixController : ControllerBase
     {
@@ -17,22 +17,23 @@ namespace PhyGen_SWD392.Controllers
         {
             _service = service;
         }
-        [Authorize(Roles = "admin")]
+
+        [Authorize(Roles = "admin, user")]
         [HttpGet]
-        public async Task<IActionResult> GetAllIncludeDeletedAsync()
+        public async Task<IActionResult> GetAll([FromQuery] ExamMatrixQueryParameters queryParams)
         {
-            var examMatrices = await _service.GetAllIncludeDeletedAsync();
-
-            return Ok(ApiResponse<List<ExamMatrixDTO>>.SuccessResponse(examMatrices, "Get All successfully"));
+            var result = await _service.GetAllAsync(queryParams);
+            return Ok(ApiResponse<List<ExamMatrixDTO>>.SuccessResponse(result, "Get All successfully"));
         }
-        [Authorize(Roles = "admin,user")]
-        [HttpGet("active")]
-        public async Task<IActionResult> GetActiveExamMatrixAsync()
-        {
-            var examMatrices = await _service.GetActiveExamMatrixAsync();
 
-            return Ok(ApiResponse<List<ExamMatrixDTO>>.SuccessResponse(examMatrices, "Get All successfully"));
-        }
+        //[Authorize(Roles = "admin,user")]
+        //[HttpGet("active")]
+        //public async Task<IActionResult> GetActiveExamMatrixAsync()
+        //{
+        //    var examMatrices = await _service.GetActiveExamMatrixAsync();
+
+        //    return Ok(ApiResponse<List<ExamMatrixDTO>>.SuccessResponse(examMatrices, "Get All successfully"));
+        //}
         [Authorize(Roles = "admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetExamMatrixByIdAsync(int id)

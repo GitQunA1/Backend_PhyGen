@@ -18,20 +18,23 @@ namespace PhyGen_SWD392.Controllers
         {
             _topicService = topicService;
         }
-        [Authorize(Roles = "admin")]
-        [HttpGet]
-        public async Task<IActionResult> GetAllTopicsIncludeDeletedAsync()
-        {
-            var topics = await _topicService.GetAllIncludeDeletedAsync();
-            return Ok(ApiResponse<List<TopicDTO>>.SuccessResponse(topics.ToList(), "Get All successfully"));
-        }
+
         [Authorize(Roles = "admin,user")]
-        [HttpGet("active")]
-        public async Task<IActionResult> GetActiveTopicsAsync()
+        [HttpGet]
+        public async Task<IActionResult> GetAll([FromQuery] TopicQueryParameters queryParams)
         {
-            var topics = await _topicService.GetActiveTopicsAsync();
-            return Ok(ApiResponse<List<TopicDTO>>.SuccessResponse(topics.ToList(), "Get All successfully"));
+            var topics = await _topicService.GetAllWithQueryAsync(queryParams);
+            return Ok(ApiResponse<List<TopicDTO>>.SuccessResponse(topics, "Get All successfully"));
         }
+
+        //[Authorize(Roles = "admin,user")]
+        //[HttpGet("active")]
+        //public async Task<IActionResult> GetActiveTopicsAsync()
+        //{
+        //    var topics = await _topicService.GetActiveTopicsAsync();
+        //    return Ok(ApiResponse<List<TopicDTO>>.SuccessResponse(topics.ToList(), "Get All successfully"));
+        //}
+
         [Authorize(Roles = "admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTopicByIdAsync(int id)
@@ -42,6 +45,7 @@ namespace PhyGen_SWD392.Controllers
 
             return Ok(ApiResponse<TopicDTO>.SuccessResponse(topicDto, "Get By Id successfully"));
         }
+
         [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> CreateTopicAsync([FromBody] TopicRequest topicRequest)
@@ -56,6 +60,7 @@ namespace PhyGen_SWD392.Controllers
                 return BadRequest(ApiResponse<TopicDTO>.ErrorResponse(new List<string> { ex.Message }, "Failed to create topic"));
             }
         }
+
         [Authorize(Roles = "admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTopicAsync(int id, [FromBody] TopicRequest topicRequest)
@@ -66,6 +71,7 @@ namespace PhyGen_SWD392.Controllers
 
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Topic updated successfully"));
         }
+
         [Authorize(Roles = "admin")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> SoftDeleteTopicAsync(int id)

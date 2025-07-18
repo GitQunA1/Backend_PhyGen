@@ -64,10 +64,10 @@ namespace PhyGen_SWD392.Services
             return _mapper.Map<SubjectDTO>(subject);
         }
 
-        public async Task<List<SubjectDTO>> GetAllIncludeDeletedAsync()
+        public async Task<List<SubjectDTO>> GetAllWithQueryAsync(SubjectQueryParameters queryParams)
         {
-            var subjects = await _subjectRepo.GetAllAsync();
-            return _mapper.Map<List<SubjectDTO>>(subjects);
+            var pagedResult = await _subjectRepo.GetAllWithQueryAsync(queryParams);
+            return _mapper.Map<List<SubjectDTO>>(pagedResult.Items);
         }
 
         public async Task<List<SubjectDTO>> GetActiveSubjectsAsync()

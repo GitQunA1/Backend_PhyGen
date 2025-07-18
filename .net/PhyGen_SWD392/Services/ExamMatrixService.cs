@@ -24,6 +24,12 @@ namespace PhyGen_SWD392.Services
             _subjectService = subjectService;
         }
 
+        public async Task<List<ExamMatrixDTO>> GetAllAsync(ExamMatrixQueryParameters queryParams)
+        {
+            var pagedResult = await _repo.GetAllWithQueryAsync(queryParams);
+            return _mapper.Map<List<ExamMatrixDTO>>(pagedResult.Items);
+        }
+
         public async Task<ExamMatrixDTO> CreateExamMatrixAsync(ExamMatrixRequest examMatrixRequest, int userID)
         {
             var subject = await _subjectService.GetSubjectByIdAsync(examMatrixRequest.SubjectId);

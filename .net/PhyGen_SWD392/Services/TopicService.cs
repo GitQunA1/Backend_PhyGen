@@ -68,11 +68,10 @@ namespace PhyGen_SWD392.Services
             return topicDto;
         }
 
-        public async Task<List<TopicDTO>> GetAllIncludeDeletedAsync()
+        public async Task<List<TopicDTO>> GetAllWithQueryAsync(TopicQueryParameters queryParams)
         {
-            var topics = await _topicRepo.GetAllAsync();
-            var topicDto = _mapper.Map<List<TopicDTO>>(topics);
-            return topicDto;
+            var pagedResult = await _topicRepo.GetAllWithQueryAsync(queryParams);
+            return _mapper.Map<List<TopicDTO>>(pagedResult.Items);
         }
 
         public async Task<List<TopicDTO>> GetActiveTopicsAsync()
