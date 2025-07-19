@@ -24,7 +24,7 @@ namespace PhyGen_SWD392.Controllers
         public async Task<IActionResult> GetAll([FromQuery] TopicQueryParameters queryParams)
         {
             var topics = await _topicService.GetAllWithQueryAsync(queryParams);
-            return Ok(ApiResponse<List<TopicDTO>>.SuccessResponse(topics, "Get All successfully"));
+            return Ok(ApiResponse<PagedResult<TopicDTO>>.SuccessResponse(topics, "Get All successfully"));
         }
 
         //[Authorize(Roles = "admin,user")]

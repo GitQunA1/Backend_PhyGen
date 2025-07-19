@@ -23,7 +23,7 @@ namespace PhyGen_SWD392.Controllers
         public async Task<IActionResult> GetAll([FromQuery] MatrixDetailQueryParameters queryParams)
         {
             var details = await _service.GetAllWithQueryAsync(queryParams);
-            return Ok(ApiResponse<List<MatrixDetailDTO>>.SuccessResponse(details, "Get All successfully"));
+            return Ok(ApiResponse<PagedResult<MatrixDetailDTO>>.SuccessResponse(details, "Get All successfully"));
         }
 
         [Authorize(Roles = "admin")]

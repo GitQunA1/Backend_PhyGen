@@ -23,7 +23,7 @@ namespace PhyGen_SWD392.Controllers
         public async Task<IActionResult> GetAll([FromQuery] ExamMatrixQueryParameters queryParams)
         {
             var result = await _service.GetAllAsync(queryParams);
-            return Ok(ApiResponse<List<ExamMatrixDTO>>.SuccessResponse(result, "Get All successfully"));
+            return Ok(ApiResponse<PagedResult<ExamMatrixDTO>>.SuccessResponse(result, "Get All successfully"));
         }
 
         //[Authorize(Roles = "admin,user")]

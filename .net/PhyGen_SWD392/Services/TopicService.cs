@@ -68,10 +68,17 @@ namespace PhyGen_SWD392.Services
             return topicDto;
         }
 
-        public async Task<List<TopicDTO>> GetAllWithQueryAsync(TopicQueryParameters queryParams)
+        public async Task<PagedResult<TopicDTO>> GetAllWithQueryAsync(TopicQueryParameters queryParams)
         {
             var pagedResult = await _topicRepo.GetAllWithQueryAsync(queryParams);
-            return _mapper.Map<List<TopicDTO>>(pagedResult.Items);
+            var mappedItems = _mapper.Map<List<TopicDTO>>(pagedResult.Items);
+            return new PagedResult<TopicDTO>
+            {
+                Total = pagedResult.Total,
+                Page = pagedResult.Page,
+                PageSize = pagedResult.PageSize,
+                Items = mappedItems
+            };
         }
 
         public async Task<List<TopicDTO>> GetActiveTopicsAsync()

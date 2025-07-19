@@ -22,7 +22,7 @@ namespace PhyGen_SWD392.Controllers
         public async Task<IActionResult> GetAll([FromQuery] SubjectQueryParameters queryParams)
         {
             var subjects = await _service.GetAllWithQueryAsync(queryParams);
-            return Ok(ApiResponse<List<SubjectDTO>>.SuccessResponse(subjects, "Get All successfully"));
+            return Ok(ApiResponse<PagedResult<SubjectDTO>>.SuccessResponse(subjects, "Get All successfully"));
         }
 
         //[Authorize(Roles = "admin,user")]
