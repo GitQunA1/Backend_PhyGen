@@ -35,6 +35,7 @@ import com.swd392.group7.phygen.ExamSection.Repository.ExamSectionRepo;
 import com.swd392.group7.phygen.ExamSection.Service.ExamSectionService;
 import com.swd392.group7.phygen.ExamVersion.Dto.ExamVersionGenerateResponse;
 import com.swd392.group7.phygen.MatrixDetail.Dto.MatrixDetailStructureResponse;
+import com.swd392.group7.phygen.MatrixDetail.Enum.DifficultyLevel;
 import com.swd392.group7.phygen.MatrixDetail.Exception.MatrixDetailException;
 import com.swd392.group7.phygen.MatrixDetail.MatrixDetail;
 import com.swd392.group7.phygen.MatrixDetail.Repository.MatrixDetailRepo;
@@ -228,26 +229,13 @@ public class ExamService {
                 MatrixDetailStructureResponse matrixDetailStructureResponse = modelMapper.map(matrixDetail, MatrixDetailStructureResponse.class);
 
 
-                Topic topic = topicRepo.findTopicByIdAndLevel(matrixDetail.getTopic().getId(), level).orElseThrow(() -> new TopicException("Cant found topic with level " + request.getDifficultLevel().toString(), HttpStatus.NOT_FOUND));
-                TopicStructureResponse topicStructureResponse = modelMapper.map(topic, TopicStructureResponse.class);
+                Topic rootTopic = topicRepo.findTopicByIdAndLevel(matrixDetail.getTopic().getId(), level).orElseThrow(() -> new TopicException("Cant found topic with level " + request.getDifficultLevel().toString(), HttpStatus.NOT_FOUND));
+                TopicStructureResponse rootTopicStructureResponse = buildTopicTree(rootTopic, request.getDifficultLevel());
+
+                TopicStructureResponse topicStructureResponse = modelMapper.map(rootTopicStructureResponse, TopicStructureResponse.class);
                 topicStructureResponse.setQuestionStructureResponses(new ArrayList<>());
 
-                List<Question> questions = questionRepo.findAllByTopicId(topic.getId()).orElseThrow(() -> new QuestionException("Empty list question", HttpStatus.NOT_FOUND))
-                        .stream()
-                        .filter(question -> question.getDifficultyLevel().toString().equals(request.getDifficultLevel().toString()))
-                        .toList();
 
-                for (Question question : questions) {
-                    QuestionStructureResponse questionStructureResponse = modelMapper.map(question, QuestionStructureResponse.class);
-                    questionStructureResponse.setAnswerStructureResponses(new ArrayList<>());
-
-                    List<Answer> answers = answerRepo.findAllByQuestionId(question.getId()).orElseThrow(() -> new AnswerException("Empty list answer", HttpStatus.NOT_FOUND));
-                    List<AnswerStructureResponse> answerStructureResponses = answers.stream()
-                            .map(answer -> modelMapper.map(answer, AnswerStructureResponse.class))
-                            .toList();
-                    questionStructureResponse.setAnswerStructureResponses(answerStructureResponses);
-                    topicStructureResponse.getQuestionStructureResponses().add(questionStructureResponse);
-                }
                 matrixDetailStructureResponse.setTopicStructureResponse(topicStructureResponse);
                 matrixSectionStructureResponse.getMatrixDetailStructureResponseList().add(matrixDetailStructureResponse);
             }
@@ -307,6 +295,46 @@ public class ExamService {
                 System.err.println("Lỗi khi tải file lên Supabase: " + e.getMessage());
                 return null;
         }
-
     }
+
+    private TopicStructureResponse buildTopicTree(Topic currentTopic, DifficultyLevel difficultLevel) {
+        TopicStructureResponse topicStructureResponse = modelMapper.map(currentTopic, TopicStructureResponse.class);
+        topicStructureResponse.setQuestionStructureResponses(new ArrayList<>());
+        topicStructureResponse.setTopicStructureResponses(new ArrayList<>());
+
+        // 1. Thêm các câu hỏi trực tiếp thuộc về chủ đề này (ở mức độ khó yêu cầu)
+        List<Question> questions = questionRepo.findAllByTopicId(currentTopic.getId())
+                .orElseThrow(() -> new QuestionException("Empty list question for topic " + currentTopic.getId(), HttpStatus.NOT_FOUND))
+                .stream()
+                .filter(question -> question.getDifficultyLevel().toString().equals(difficultLevel.toString()))
+                .toList();
+
+        for (Question question : questions) {
+            QuestionStructureResponse questionStructureResponse = modelMapper.map(question, QuestionStructureResponse.class);
+            questionStructureResponse.setAnswerStructureResponses(new ArrayList<>());
+
+            List<Answer> answers = answerRepo.findAllByQuestionId(question.getId())
+                    .orElseThrow(() -> new AnswerException("Empty list answer for question " + question.getId(), HttpStatus.NOT_FOUND));
+            List<AnswerStructureResponse> answerStructureResponses = answers.stream()
+                    .map(answer -> modelMapper.map(answer, AnswerStructureResponse.class))
+                    .toList();
+            questionStructureResponse.setAnswerStructureResponses(answerStructureResponses);
+            topicStructureResponse.getQuestionStructureResponses().add(questionStructureResponse);
+        }
+
+        // 2. Tìm và thêm các chủ đề con
+        // Giả định bạn có một phương thức trong topicRepo để tìm các chủ đề con dựa trên parentId
+        List<Topic> subTopics = topicRepo.findAllByParentId(currentTopic.getId()).orElseThrow(()-> new TopicException("No subtopic found",HttpStatus.NOT_FOUND)); // Trả về danh sách rỗng nếu không có
+
+        for (Topic subTopic : subTopics) {
+            // Đệ quy gọi lại hàm để xây dựng cây cho chủ đề con
+            TopicStructureResponse subTopicResponse = buildTopicTree(subTopic, difficultLevel);
+            topicStructureResponse.getTopicStructureResponses().add(subTopicResponse);
+        }
+
+        return topicStructureResponse;
+    }
+
+
+
 }

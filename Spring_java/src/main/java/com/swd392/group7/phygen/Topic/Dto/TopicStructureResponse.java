@@ -18,4 +18,5 @@ public class TopicStructureResponse {
     String name;
     Level level;
     List<QuestionStructureResponse> questionStructureResponses;
+    List<TopicStructureResponse> topicStructureResponses;
 }

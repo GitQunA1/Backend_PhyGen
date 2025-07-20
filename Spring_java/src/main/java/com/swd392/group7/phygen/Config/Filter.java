@@ -42,7 +42,9 @@ public class Filter extends OncePerRequestFilter {
             "/swagger-resources/**",
             "/api/Gemini/**",
             "/api/OCR/**",
-            "/api/Qdrant/**"
+            "/api/Qdrant/**",
+            "/api/exams/structure",
+            "/api/topics/**"
     );
 
 
