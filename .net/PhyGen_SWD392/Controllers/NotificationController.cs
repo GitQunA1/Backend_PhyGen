@@ -5,7 +5,7 @@ using PhyGen_SWD392.Services;
 
 namespace PhyGen_SWD392.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/notifications")]
     [ApiController]
     public class NotificationController : ControllerBase
     {
@@ -16,7 +16,7 @@ namespace PhyGen_SWD392.Controllers
             _firebaseService = firebaseService;
         }
 
-        [HttpPost("send-premium-success")]
+        [HttpPost("premium_upgrade")]
         public async Task<IActionResult> SendPremiumUpgradeNotification([FromBody] string deviceToken)
         {
             var title = "Nâng cấp thành công";

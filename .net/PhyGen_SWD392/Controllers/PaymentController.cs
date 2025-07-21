@@ -7,7 +7,7 @@ using System.Security.Claims;
 
 namespace PhyGen_SWD392.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/payments")]
     [ApiController]
     public class PaymentController : ControllerBase
     {
@@ -23,7 +23,7 @@ namespace PhyGen_SWD392.Controllers
         }
 
         [Authorize]
-        [HttpPost("create")]
+        [HttpPost("vnpay")]
         public IActionResult CreatePaymentUrl([FromBody] VnPaymentRequestModel model)
         {
             var userIdClaim = User.Claims.FirstOrDefault(c =>
@@ -43,7 +43,7 @@ namespace PhyGen_SWD392.Controllers
             return Ok(new { paymentUrl });
         }
         [AllowAnonymous]
-        [HttpGet("vnpay-return")]
+        [HttpGet("vnpay/return")]
         public async Task<IActionResult> PaymentCallback()
         {
             var result = _vnPayService.PaymentExecute(Request.Query);

@@ -1,4 +1,6 @@
-﻿using PhyGen_SWD392.Models.Entities;
+﻿using PhyGen_SWD392.Models.DTOs;
+using PhyGen_SWD392.Models.Entities;
+using PhyGen_SWD392.Models.Requests;
 using PhyGen_SWD392.Repositories.Interface;
 
 namespace PhyGen_SWD392.Services
@@ -17,9 +19,9 @@ namespace PhyGen_SWD392.Services
             return await _accountRepo.CreateAccountAsync(account);
         }
 
-        public async Task<IEnumerable<Account>> GetAllAccountsAsync()
+        public async Task<PagedResult<Account>> GetAllAccountsAsync(AccountQueryParameters queryParams)
         {
-            return await _accountRepo.GetAllUserAccountsAsync();
+            return await _accountRepo.GetAllUserAccountsAsync(queryParams);
         }
 
         public async Task<Account?> GetAccountByIdAsync(int id)

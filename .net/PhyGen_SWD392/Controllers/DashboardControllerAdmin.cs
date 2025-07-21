@@ -4,7 +4,7 @@ using PhyGen_SWD392.Services;
 
 namespace PhyGen_SWD392.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/admin/dashboard")]
     [ApiController]
     [Authorize(Roles = "admin")]
     public class DashboardControllerAdmin : Controller
