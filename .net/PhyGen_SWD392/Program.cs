@@ -149,12 +149,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var app = builder.Build();
 
+
 //if (app.Environment.IsDevelopment())
 //{
 //    app.UseSwagger();
 //    app.UseSwaggerUI();
 //}
-
 app.UseCors("AllowFrontend");
 
 app.Use(async (context, next) =>
