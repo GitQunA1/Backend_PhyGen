@@ -446,3 +446,7 @@ secrets/
 *.secret
 appsettings.Production.json
 appsettings.Staging.json
+
+# === SENSITIVE CONFIGURATION ===
+appsettings.json
+firebase-service-account.json

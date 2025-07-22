@@ -6,13 +6,16 @@ namespace PhyGen_SWD392.Services
 {
     public class FirebaseNotificationService
     {
-        public FirebaseNotificationService()
+        public FirebaseNotificationService(IConfiguration configuration)
         {
             if (FirebaseApp.DefaultInstance == null)
             {
+                var firebaseJson = configuration["Firebase:CredentialJson"];
+                var credential = GoogleCredential.FromJson(firebaseJson);
+
                 FirebaseApp.Create(new AppOptions
                 {
-                    Credential = GoogleCredential.FromFile("firebase-service-account.json")
+                    Credential = credential
                 });
             }
         }

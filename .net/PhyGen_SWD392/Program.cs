@@ -113,10 +113,14 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(
 );
 
 builder.Services.AddScoped<RedisLogService>();
-FirebaseApp.Create(new AppOptions()
+
+var firebaseJson = builder.Configuration["Firebase:CredentialJson"];
+var credential = GoogleCredential.FromJson(firebaseJson);
+FirebaseApp.Create(new AppOptions
 {
-    Credential = GoogleCredential.FromFile(builder.Configuration["Firebase:CredentialPath"])
+    Credential = credential
 });
+
 builder.Services.AddScoped<FirebaseNotificationService>();
 
 builder.Services.AddDbContext<PhyGenDbContext>(options =>
