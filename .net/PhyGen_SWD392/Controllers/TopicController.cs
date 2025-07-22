@@ -19,7 +19,7 @@ namespace PhyGen_SWD392.Controllers
             _topicService = topicService;
         }
 
-        [Authorize(Roles = "admin,user")]
+        [Authorize(Roles = "admin,user, manager")]
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] TopicQueryParameters queryParams)
         {
@@ -35,7 +35,7 @@ namespace PhyGen_SWD392.Controllers
         //    return Ok(ApiResponse<List<TopicDTO>>.SuccessResponse(topics.ToList(), "Get All successfully"));
         //}
 
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin, manager")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTopicByIdAsync(int id)
         {
@@ -46,7 +46,7 @@ namespace PhyGen_SWD392.Controllers
             return Ok(ApiResponse<TopicDTO>.SuccessResponse(topicDto, "Get By Id successfully"));
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin, manager")]
         [HttpPost]
         public async Task<IActionResult> CreateTopicAsync([FromBody] TopicRequest topicRequest)
         {
@@ -61,7 +61,7 @@ namespace PhyGen_SWD392.Controllers
             }
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin, manager")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTopicAsync(int id, [FromBody] TopicRequest topicRequest)
         {
@@ -72,7 +72,7 @@ namespace PhyGen_SWD392.Controllers
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Topic updated successfully"));
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin, manager")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> SoftDeleteTopicAsync(int id)
         {
