@@ -23,11 +23,13 @@ public class PromptBuilder {
         }
     }
 
-    public String chatWithGeminiPrompt(String userName,String text){
+    public String chatWithGeminiPrompt(String userName, String historyChatJson, String text,String status){
         try{
             String template = readTemplate(answerUserTemplatePath);
             return template.replace("{{USER_NAME}}",userName)
-                    .replace("{{USER_INPUT}}",text);
+                    .replace("{{HISTORY_CHAT}}",historyChatJson)
+                    .replace("{{USER_INPUT}}",text)
+                    .replace("{{STATUS}}",status);
         }catch(IOException e){
             throw new RuntimeException("❌ Không thể đọc file schema.json từ resources: " );
         }

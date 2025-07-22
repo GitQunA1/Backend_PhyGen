@@ -13,7 +13,7 @@ import com.swd392.group7.phygen.Account.Service.AccountService;
 import com.swd392.group7.phygen.Topic.Dto.TopicGeminiPromptResponse;
 import com.swd392.group7.phygen.Topic.Service.TopicService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,10 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,16 +48,60 @@ public class GeminiService {
 
     private final TopicService topicService;
 
-    public String chatBot(String text){
+    private final GeminiRepository geminiRepository;
+
+    private final ModelMapper modelMapper;
+
+    public void saveConversation(String userName, String userQuestion, String geminiAnswer){
+        GeminiChatConversation geminiChatConversation = new GeminiChatConversation();
+        geminiChatConversation.setUserName(userName);
+        geminiChatConversation.setCreatedAt(LocalDateTime.now());
+
+        List<ConversationResponse> conversationResponses = new ArrayList<>();
+        ConversationResponse response = new ConversationResponse();
+        response.setUserQuestion(userQuestion);
+        response.setGeminiAnswer(geminiAnswer);
+        conversationResponses.add(response);
+
+        geminiChatConversation.setConversationResponses(conversationResponses);
+
+
+        geminiRepository.save(geminiChatConversation);
+    }
+
+    public List<HistoryChatResponse> getAllConversationFromUsername(String userName){
+        List<GeminiChatConversation> geminiChatConversations = geminiRepository.findAllByUserName(userName);
+
+        return geminiChatConversations.stream()
+                .map(geminiChatConversation -> modelMapper.map(geminiChatConversation, HistoryChatResponse.class))
+                .sorted(Comparator.comparing(HistoryChatResponse::getCreatedAt))
+                .toList();
+    }
+
+    public String chatBot(String text) throws JsonProcessingException {
         Account account = accountService.getCurrentAccount();
-        String prompt = promptBuilder.chatWithGeminiPrompt(account.getUsername(),text);
+
+        List<HistoryChatResponse> historyChatResponses = getAllConversationFromUsername(account.getUsername());
+        String historyChatJson = objectMapper.writeValueAsString(historyChatResponses);
+
+        GeminiChatConversation latestConversation = geminiRepository.findFirstByUserNameOrderByCreatedAtDesc(account.getUsername());
+        String status = (latestConversation != null &&
+                Duration.between(latestConversation.getCreatedAt(), LocalDateTime.now()).toMinutes() < 30)
+                ? ConversationStatus.continued.name()
+                : ConversationStatus.hi.name();
+
+        String prompt = promptBuilder.chatWithGeminiPrompt(account.getUsername(),historyChatJson,text,status);
 
         GenerateContentResponse response =client.models.generateContent(
                 "gemini-2.5-flash",
                 prompt,
                 null
         );
-        return response.text();
+        String geminiAnswer = response.text();
+
+        saveConversation(account.getUsername(),text,geminiAnswer);
+
+        return geminiAnswer;
     }
 
 

@@ -22,7 +22,7 @@ public class GeminiController {
     private final GeminiService geminiService;
 
     @PostMapping("/chat-bot")
-    public ResponseEntity<?> chatWithGemini(String text){
+    public ResponseEntity<?> chatWithGemini(String text) throws JsonProcessingException {
         String answer = geminiService.chatBot(text);
         ApiResponse<?> response = new ApiResponse<>(true,"Here the response from chat gemini",answer,null);
         return ResponseEntity.ok(response);
