@@ -7,5 +7,7 @@ namespace PhyGen_SWD392.Models.DTOs
         public int TotalUsers { get; set; }
         public int EmailVerifiedUsers { get; set; }
         public Dictionary<AccountTypeEnum, int> UsersByAccountType { get; set; }
+        public int AdminCount { get; set; }
+        public int ManagerCount { get; set; }
     }
 }
