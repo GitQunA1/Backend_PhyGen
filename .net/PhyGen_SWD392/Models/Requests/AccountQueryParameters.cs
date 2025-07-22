@@ -5,6 +5,8 @@
         public string? Search { get; set; }
         public string? Status { get; set; }
         public string? Role { get; set; }
+        public string? AccountType { get; set; }
+        public bool? EmailVerified { get; set; }
         public string? SortBy { get; set; }
         public bool Desc { get; set; } = false;
         public int Page { get; set; } = 1;

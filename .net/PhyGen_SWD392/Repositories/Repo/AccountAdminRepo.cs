@@ -31,20 +31,36 @@ namespace PhyGen_SWD392.Repositories.Repo
                 .Where(a => a.Role != RoleEnum.admin.ToString())
                 .AsQueryable();
 
-            // Filter
             if (!string.IsNullOrEmpty(queryParams.Role))
                 query = query.Where(a => a.Role == queryParams.Role);
+
             if (!string.IsNullOrEmpty(queryParams.Status))
                 query = query.Where(a => a.Status == queryParams.Status);
 
-            // Search
+            if (!string.IsNullOrEmpty(queryParams.AccountType))
+            {
+                if (Enum.TryParse<AccountTypeEnum>(queryParams.AccountType, true, out var accountTypeEnum))
+                {
+                    query = query.Where(a => a.AccountType == accountTypeEnum.ToString());
+                }
+            }
+
+            if (queryParams.EmailVerified.HasValue)
+            {
+                query = query.Where(a => a.EmailVerified == queryParams.EmailVerified.Value);
+            }
+
             if (!string.IsNullOrEmpty(queryParams.Search))
             {
                 var keyword = queryParams.Search.ToLower();
                 query = query.Where(a =>
                     a.Username.ToLower().Contains(keyword) ||
                     a.Email.ToLower().Contains(keyword) ||
-                    a.School.ToLower().Contains(keyword)
+                    (a.School != null && a.School.ToLower().Contains(keyword)) ||
+                    (a.Address != null && a.Address.ToLower().Contains(keyword)) ||
+                    (a.Status != null && a.Status.ToLower().Contains(keyword)) ||
+                    (a.AccountType != null && a.AccountType.ToLower().Contains(keyword)) ||
+                    (a.Role != null && a.Role.ToLower().Contains(keyword))
                 );
             }
 
@@ -61,6 +77,21 @@ namespace PhyGen_SWD392.Repositories.Repo
                         break;
                     case "status":
                         query = queryParams.Desc ? query.OrderByDescending(a => a.Status) : query.OrderBy(a => a.Status);
+                        break;
+                    case "accounttype":
+                        query = queryParams.Desc ? query.OrderByDescending(a => a.AccountType) : query.OrderBy(a => a.AccountType);
+                        break;
+                    case "emailverified":
+                        query = queryParams.Desc ? query.OrderByDescending(a => a.EmailVerified) : query.OrderBy(a => a.EmailVerified);
+                        break;
+                    case "school":
+                        query = queryParams.Desc ? query.OrderByDescending(a => a.School) : query.OrderBy(a => a.School);
+                        break;
+                    case "address":
+                        query = queryParams.Desc ? query.OrderByDescending(a => a.Address) : query.OrderBy(a => a.Address);
+                        break;
+                    case "role":
+                        query = queryParams.Desc ? query.OrderByDescending(a => a.Role) : query.OrderBy(a => a.Role);
                         break;
                     default:
                         query = query.OrderBy(a => a.Id); // fallback
@@ -85,6 +116,7 @@ namespace PhyGen_SWD392.Repositories.Repo
                 Items = items
             };
         }
+
 
 
         public async Task<Account?> GetAccountByIdAsync(int id)
