@@ -6,7 +6,7 @@ namespace PhyGen_SWD392.Controllers
 {
     [Route("api/admin/dashboard")]
     [ApiController]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "admin,manager")]
     public class DashboardControllerAdmin : Controller
     {
         private readonly DashboardService _dashboardService;
