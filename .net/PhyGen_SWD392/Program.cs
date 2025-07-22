@@ -172,6 +172,7 @@ var app = builder.Build();
 //    app.UseSwagger();
 //    app.UseSwaggerUI();
 //}
+
 app.UseCors("AllowFrontend");
 
 app.Use(async (context, next) =>
