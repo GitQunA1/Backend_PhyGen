@@ -2,7 +2,7 @@ package com.swd392.group7.phygen.ExamMatrix.Entity;
 
 import com.swd392.group7.phygen.Account.Entity.Account;
 import com.swd392.group7.phygen.ExamMatrix.Enum.ExamType;
-import com.swd392.group7.phygen.ExamMatrix.Enum.Status;
+import com.swd392.group7.phygen.ExamMatrix.Enum.ExamMatrixStatus;
 import com.swd392.group7.phygen.MatrixSection.MatrixSection;
 import com.swd392.group7.phygen.Subject.Entity.Subject;
 import jakarta.persistence.*;
@@ -28,7 +28,8 @@ public class ExamMatrix {
     ExamType examType;
 
     @Enumerated(EnumType.STRING)
-    Status status;
+    @Column(name = "status")
+    ExamMatrixStatus examMatrixStatus;
 
     @ManyToOne
     @JoinColumn(name = "created_by")

@@ -52,6 +52,8 @@ public class ExamController {
         return ResponseEntity.ok(response);
     }
 
+
+
     @GetMapping("/structure")
     public ResponseEntity<?> getExamStructure(@RequestParam ExamType examType,
                                               @RequestParam Long subjectId,

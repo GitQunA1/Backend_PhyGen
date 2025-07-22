@@ -83,12 +83,12 @@ public class QuestionService {
         if(questionPage.isEmpty()) {
             throw new QuestionException("Empty list question for topicID: " + topicId, HttpStatus.NOT_FOUND);
         }
-        List<QuestionResponse> respons = questionPage
+        List<QuestionResponse> responses = questionPage
                 .stream()
                 .map(question -> modelMapper.map(question, QuestionResponse.class))
                 .toList();
         return new PagedResponse<>(
-                respons,
+                responses,
                 page,
                 size,
                 questionPage.getTotalElements(),

@@ -21,6 +21,7 @@ import com.swd392.group7.phygen.Exam.Exception.ExamException;
 import com.swd392.group7.phygen.Exam.Repository.ExamRepo;
 import com.swd392.group7.phygen.ExamMatrix.Dto.ExamMatrixStructureResponse;
 import com.swd392.group7.phygen.ExamMatrix.Entity.ExamMatrix;
+import com.swd392.group7.phygen.ExamMatrix.Enum.ExamMatrixStatus;
 import com.swd392.group7.phygen.ExamMatrix.Exception.ExamMatrixException;
 import com.swd392.group7.phygen.ExamMatrix.Repository.ExamMatrixRepo;
 import com.swd392.group7.phygen.ExamQuestion.Dto.ExamQuestionResponse;
@@ -72,7 +73,6 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -212,7 +212,7 @@ public class ExamService {
         SubjectStructureResponse subjectStructureResponse = modelMapper.map(subject, SubjectStructureResponse.class);
 
 
-        ExamMatrix examMatrix = examMatrixRepo.findBySubjectIdAndExamType(request.getSubjectId(), request.getExamType()).orElseThrow(() -> new ExamMatrixException("Empty list exam matrix", HttpStatus.NOT_FOUND));
+        ExamMatrix examMatrix = examMatrixRepo.findBySubjectIdAndExamTypeAndExamMatrixStatus(request.getSubjectId(), request.getExamType(), ExamMatrixStatus.active).orElseThrow(() -> new ExamMatrixException("Empty list exam matrix", HttpStatus.NOT_FOUND));
 
         ExamMatrixStructureResponse examMatrixStructureResponse = modelMapper.map(examMatrix, ExamMatrixStructureResponse.class);
         examMatrixStructureResponse.setMatrixSectionStructureResponses(new ArrayList<>());
