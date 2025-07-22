@@ -129,23 +129,39 @@ namespace PhyGen_SWD392.Repositories.Repo
             var account = await _context.Accounts.FindAsync(updatedAccount.Id);
             if (account == null) return false;
 
-            account.Username = updatedAccount.Username;
-
-            //Kiểm tra mật khẩu cũ với mật khẩu mới có trùng không
-            if (!BCrypt.Net.BCrypt.Verify(updatedAccount.Password, account.Password))
-            {
-                account.Password = BCrypt.Net.BCrypt.HashPassword(updatedAccount.Password);
-            }
-
-            account.Email = updatedAccount.Email;
+            account.Username = updatedAccount.Username ?? account.Username;
+            account.Email = updatedAccount.Email ?? account.Email;
             account.EmailVerified = updatedAccount.EmailVerified;
             account.Role = updatedAccount.Role;
             account.AccountType = updatedAccount.AccountType;
             account.Status = updatedAccount.Status;
 
+            if (!string.IsNullOrWhiteSpace(updatedAccount.Password))
+            {
+                try
+                {
+                    bool isSame = false;
+
+                    if (!string.IsNullOrWhiteSpace(account.Password))
+                    {
+                        isSame = BCrypt.Net.BCrypt.Verify(updatedAccount.Password, account.Password);
+                    }
+
+                    if (!isSame)
+                    {
+                        account.Password = BCrypt.Net.BCrypt.HashPassword(updatedAccount.Password);
+                    }
+                }
+                catch (BCrypt.Net.SaltParseException)
+                {
+                    account.Password = BCrypt.Net.BCrypt.HashPassword(updatedAccount.Password);
+                }
+            }
+
             await _context.SaveChangesAsync();
             return true;
         }
+
 
         public async Task<bool> DeleteAccountAsync(int id)
         {
