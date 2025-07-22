@@ -1,5 +1,6 @@
 package com.swd392.group7.phygen.AI.GeminiAI;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.swd392.group7.phygen.AI.Structure.Dto.GenerateExamRequest;
 import com.swd392.group7.phygen.AI.Structure.Dto.SubjectDto;
 import com.swd392.group7.phygen.Common.ApiResponse;
@@ -35,8 +36,8 @@ public class GeminiController {
     }
 
     @GetMapping("/formatJson")
-    public ResponseEntity<?> formatJson(@RequestParam String fileUrl){
-        String formatJson = geminiService.formatJson(fileUrl);
+    public ResponseEntity<?> formatJson(@RequestParam String fileUrl, @RequestParam Long subjectId) throws JsonProcessingException {
+        String formatJson = geminiService.formatJson(fileUrl,subjectId);
         ApiResponse<?> response = new ApiResponse<>(true,"Format thanh cong",formatJson,null);
         return ResponseEntity.ok(response);
     }

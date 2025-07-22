@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Component
 public class PromptBuilder {
@@ -40,10 +41,11 @@ public class PromptBuilder {
         }
     }
 
-    public String buildFormatJsonPrompt(String document){
+    public String buildFormatJsonPrompt(String document, String topicStructureJson){
         try{
             String template = readTemplate(formatExamTemplatePath);
-            return template.replace("{{DOCUMENT_CONTENT}}",document);
+            return template.replace("{{DOCUMENT_CONTENT}}",document)
+                    .replace("{{TOPIC_STRUCTURE_CONTENT}}",topicStructureJson);
         }catch (IOException e){
             throw new RuntimeException("Khong the format tai lieu nay", e);
         }

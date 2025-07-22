@@ -1,9 +1,11 @@
 package com.swd392.group7.phygen.AI.MistralAI;
 
 import com.swd392.group7.phygen.AI.Cohere.CohereService;
+import com.swd392.group7.phygen.AI.Structure.Dto.MistralOcrResponse;
 import com.swd392.group7.phygen.Qdrant.QdrantService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,8 @@ public class MistralAIService {
     private final CohereService cohereService;
 
     private final QdrantService qdrantService;
+
+    private final ModelMapper modelMapper;
 
     @Value("${mistral_api_key}")
     private String MISTRAL_KEY;
@@ -50,9 +55,13 @@ public class MistralAIService {
 
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
             String endpoint = "https://api.mistral.ai/v1/ocr";
-            ResponseEntity<String> response = restTemplate.postForEntity(endpoint, request, String.class);
-
-            return response.getBody();
+            ResponseEntity<MistralOcrResponse> response = restTemplate.postForEntity(endpoint, request, MistralOcrResponse.class);
+            String combinedMarkdown = response.getBody().getPages().stream()
+                    .sorted((p1, p2) -> Integer.compare(p1.getIndex(), p2.getIndex()))
+                    .map(MistralOcrResponse.SimplePageResponse::getMarkdown)
+                    .filter(java.util.Objects::nonNull)
+                    .collect(Collectors.joining("\n\n"));
+            return combinedMarkdown.trim();
         } catch (HttpClientErrorException e) {
             throw new MistralAIException("Mistral OCR API error: " + e.getResponseBodyAsString(), HttpStatus.UNPROCESSABLE_ENTITY);
         } catch (Exception e) {

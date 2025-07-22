@@ -1,5 +1,6 @@
 package com.swd392.group7.phygen.AI.GeminiAI;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.genai.Client;
@@ -9,6 +10,8 @@ import com.swd392.group7.phygen.AI.MistralAI.MistralAIService;
 import com.swd392.group7.phygen.AI.Structure.Prompt.PromptBuilder;
 import com.swd392.group7.phygen.Account.Entity.Account;
 import com.swd392.group7.phygen.Account.Service.AccountService;
+import com.swd392.group7.phygen.Topic.Dto.TopicGeminiPromptResponse;
+import com.swd392.group7.phygen.Topic.Service.TopicService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -40,6 +43,7 @@ public class GeminiService {
 
     private final AccountService accountService;
 
+    private final TopicService topicService;
 
     public String chatBot(String text){
         Account account = accountService.getCurrentAccount();
@@ -65,9 +69,11 @@ public class GeminiService {
         return extractJson;
     }
 
-    public String formatJson(String fileUrl) {
+    public String formatJson(String fileUrl,Long subjectId) throws JsonProcessingException {
         String document = mistralAIService.importDocUrl(fileUrl);
-        String prompt = promptBuilder.buildFormatJsonPrompt(document);
+        List<TopicGeminiPromptResponse> topicStructure  = topicService.topicStructureGeminiPrompt(subjectId);
+        String topicStructureJson = objectMapper.writeValueAsString(topicStructure);
+        String prompt = promptBuilder.buildFormatJsonPrompt(document,topicStructureJson);
         try {
             ObjectNode configNode = objectMapper.createObjectNode();
             configNode.put("responseMimeType", "application/json");

@@ -98,8 +98,8 @@ public class QuestionService {
 
     }
 
-    public SubjectDto insertDataFromGeminiJsonFormat(String fileUrl) throws IOException {
-            String geminiJsonFormat = geminiService.formatJson(fileUrl);
+    public SubjectDto insertDataFromGeminiJsonFormat(String fileUrl,Long subjectId) throws IOException {
+            String geminiJsonFormat = geminiService.formatJson(fileUrl,subjectId);
             SubjectDto subjectDto = objectMapper.readValue(geminiJsonFormat, SubjectDto.class);
             System.out.println("DTO sau khi parse JSON:\n" + subjectDto);
             Subject subject = modelMapper.map(subjectDto,Subject.class);

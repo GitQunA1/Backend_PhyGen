@@ -58,8 +58,8 @@ public class QuestionController {
     }
 
     @PostMapping("/ai-generations/from-url")
-    public ResponseEntity<?> insertDataFromGeminiJsonFormat(@RequestParam String fileUrl) throws IOException {
-        SubjectDto subjectDto = questionService.insertDataFromGeminiJsonFormat(fileUrl);
+    public ResponseEntity<?> insertDataFromGeminiJsonFormat(@RequestParam String fileUrl,@RequestParam Long subjectId) throws IOException {
+        SubjectDto subjectDto = questionService.insertDataFromGeminiJsonFormat(fileUrl,subjectId);
         ApiResponse<SubjectDto> response = new ApiResponse<>(true,"Insert successfully",subjectDto,null);
         return ResponseEntity.ok(response);
     }
