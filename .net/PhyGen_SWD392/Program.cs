@@ -114,8 +114,21 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(
 
 builder.Services.AddScoped<RedisLogService>();
 
-var firebaseJson = builder.Configuration["Firebase:CredentialJson"];
-var credential = GoogleCredential.FromJson(firebaseJson);
+GoogleCredential credential;
+if (builder.Environment.IsDevelopment())
+{
+    var credentialPath = builder.Configuration["Firebase:CredentialPath"];
+    credential = GoogleCredential.FromFile(credentialPath);
+}
+else
+{
+    var firebaseJson = builder.Configuration["Firebase:CredentialJson"];
+    if (string.IsNullOrWhiteSpace(firebaseJson))
+    {
+        throw new Exception("Missing Firebase__CredentialJson in environment variables.");
+    }
+    credential = GoogleCredential.FromJson(firebaseJson);
+}
 FirebaseApp.Create(new AppOptions
 {
     Credential = credential

@@ -6,12 +6,26 @@ namespace PhyGen_SWD392.Services
 {
     public class FirebaseNotificationService
     {
-        public FirebaseNotificationService(IConfiguration configuration)
+        public FirebaseNotificationService(IConfiguration configuration, IWebHostEnvironment env)
         {
             if (FirebaseApp.DefaultInstance == null)
             {
-                var firebaseJson = configuration["Firebase:CredentialJson"];
-                var credential = GoogleCredential.FromJson(firebaseJson);
+                GoogleCredential credential;
+
+                if (env.IsDevelopment()) 
+                {
+                    var path = configuration["Firebase:CredentialPath"];
+                    credential = GoogleCredential.FromFile(path);
+                }
+                else 
+                {
+                    var firebaseJson = configuration["Firebase:CredentialJson"];
+                    if (string.IsNullOrWhiteSpace(firebaseJson))
+                    {
+                        throw new Exception("Firebase__CredentialJson is missing in environment variables.");
+                    }
+                    credential = GoogleCredential.FromJson(firebaseJson);
+                }
 
                 FirebaseApp.Create(new AppOptions
                 {
