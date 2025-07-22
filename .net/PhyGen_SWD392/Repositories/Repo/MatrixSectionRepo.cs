@@ -43,8 +43,7 @@ namespace PhyGen_SWD392.Repositories.Repo
             {
                 var keyword = queryParams.Search.ToLower();
                 query = query.Where(x =>
-                    (x.SectionName != null && x.SectionName.ToLower().Contains(keyword)) ||
-                    (x.Matrix != null && x.Matrix.Id.ToString().Contains(keyword))
+                    (x.SectionName != null && x.SectionName.ToLower().Contains(keyword))
                 );
             }
 
