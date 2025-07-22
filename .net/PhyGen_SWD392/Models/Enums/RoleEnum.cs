@@ -5,6 +5,8 @@ namespace PhyGen_SWD392.Models.Enums
     public enum RoleEnum
     {
         user = 1,
-        admin = 2
+        admin = 2,
+        manager = 3,
+
     }
 }

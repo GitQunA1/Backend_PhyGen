@@ -5,11 +5,12 @@ using PhyGen_SWD392.Helpers;
 using PhyGen_SWD392.Models.DTOs;
 using PhyGen_SWD392.Models.Entities;
 using PhyGen_SWD392.Models.Enums;
+using PhyGen_SWD392.Models.Requests;
 using PhyGen_SWD392.Services;
 
 namespace PhyGen_SWD392.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/account_admins")]
     [ApiController]
     [Authorize(Roles = "admin")]
     public class AccountAdminController : ControllerBase
@@ -41,12 +42,12 @@ namespace PhyGen_SWD392.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAccount()
+        public async Task<IActionResult> GetAllAccount([FromQuery] AccountQueryParameters queryParams)
         {
-            var accounts = await _accountService.GetAllAccountsAsync();
-            var response = ApiResponse<IEnumerable<Account>>.SuccessResponse(accounts, "List all accounts:");
-            return Ok(response);
+            var result = await _accountService.GetAllAccountsAsync(queryParams);
+            return Ok(ApiResponse<PagedResult<Account>>.SuccessResponse(result, "List all accounts:"));
         }
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)

@@ -6,7 +6,7 @@ using PhyGen_SWD392.Services;
 
 namespace PhyGen_SWD392.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/forget_password")]
     [ApiController]
     public class ForgetPasswordController : ControllerBase
     {

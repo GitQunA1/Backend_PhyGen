@@ -11,7 +11,7 @@ using System.Security.Claims;
 
 namespace PhyGen_SWD392.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/account_users")]
     [ApiController]
     [Authorize(Roles = "user,admin")]
 
