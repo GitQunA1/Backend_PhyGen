@@ -88,4 +88,29 @@ public class ExamSectionService {
         );
 
     }
+
+    public PagedResponse<ExamSectionResponse> getAllExamSection(
+            int page,
+            int size,
+            String sortBy,
+            String sortDir){
+        Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        Page<ExamSection> examSectionPage = examSectionRepo.findAll(pageRequest);
+        if(examSectionPage.isEmpty()){
+            throw new ExamException("Empty list exam section",HttpStatus.NOT_FOUND);
+        }
+        List<ExamSectionResponse> response = examSectionPage.stream()
+                .map(examSection -> modelMapper.map(examSection, ExamSectionResponse.class))
+                .toList();
+        return new PagedResponse<>(
+                response,
+                page,
+                size,
+                examSectionPage.getTotalElements(),
+                examSectionPage.getTotalPages(),
+                examSectionPage.isLast()
+        );
+
+    }
 }

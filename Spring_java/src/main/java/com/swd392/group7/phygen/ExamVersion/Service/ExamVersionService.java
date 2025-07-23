@@ -112,6 +112,31 @@ public class ExamVersionService {
         );
     }
 
+    public PagedResponse<ExamVersionResponse> getAllExamVersion(
+            int page,
+            int size,
+            String sortBy,
+            String sortDir
+    ){
+        Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
+        Page<ExamVersion> examVersionPage = examVersionRepo.findAll(pageRequest);
+        if(examVersionPage.isEmpty()){
+            throw new AnswerException("Empty list examVersion ",HttpStatus.NOT_FOUND);
+        }
+        List<ExamVersionResponse> response = examVersionPage
+                .stream()
+                .map(examVersion -> modelMapper.map(examVersion, ExamVersionResponse.class))
+                .toList();
+        return new PagedResponse<>(
+                response,
+                page,
+                size,
+                examVersionPage.getTotalElements(),
+                examVersionPage.getTotalPages(),
+                examVersionPage.isLast()
+        );
+    }
 
 }

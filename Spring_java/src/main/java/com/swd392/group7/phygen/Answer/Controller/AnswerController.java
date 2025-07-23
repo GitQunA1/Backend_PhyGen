@@ -54,5 +54,16 @@ public class AnswerController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping()
+    public ResponseEntity<?> getAllAnswer(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir){
+        PagedResponse<AnswerResponse> pagedResponse = answerService.getAllAnswer(page, size, sortBy, sortDir);
+        ApiResponse<PagedResponse<AnswerResponse>> response = new ApiResponse<>(true,"get list answer successfully",pagedResponse,null);
+        return ResponseEntity.ok(response);
+    }
+
 
 }

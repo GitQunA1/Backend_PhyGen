@@ -61,4 +61,16 @@ public class ExamQuestionController {
         ApiResponse<PagedResponse<ExamQuestionResponse>> response = new ApiResponse<>(true,"get Question from examSectionId"+examSectionId+"successfully",pagedResponse,null);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping()
+    public ResponseEntity<?> getAllExamQuestion(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir
+    ){
+        PagedResponse<ExamQuestionResponse> pagedResponse = examQuestionService.getAllExamQuestion(page, size, sortBy, sortDir);
+        ApiResponse<PagedResponse<ExamQuestionResponse>> response = new ApiResponse<>(true,"get list exam question successfully",pagedResponse,null);
+        return ResponseEntity.ok(response);
+    }
 }

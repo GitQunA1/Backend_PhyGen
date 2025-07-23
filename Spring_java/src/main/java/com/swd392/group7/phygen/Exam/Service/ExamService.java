@@ -205,6 +205,30 @@ public class ExamService {
         );
     }
 
+    public PagedResponse<ExamResponse> getAllExam(
+            int page,
+            int size,
+            String sortBy,
+            String sortDir) {
+        Account account = accountService.getCurrentAccount();
+        Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+        Page<Exam> examPage = examRepo.findAll(pageRequest);
+        if (examPage.isEmpty()) {
+            throw new ExamException("Empty list exam for accountId: " + account.getId(), HttpStatus.NOT_FOUND);
+        }
+        List<ExamResponse> responses = examPage.stream().map(exam -> modelMapper.map(exam, ExamResponse.class)).toList();
+        return new PagedResponse<>(
+                responses,
+                page,
+                size,
+                examPage.getTotalElements(),
+                examPage.getTotalPages(),
+                examPage.isLast()
+        );
+    }
+
     public ExamStructureResponse getExamStructure(ExamStructureRequest request) {
         Level level = Level.valueOf(request.getDifficultLevel().name());
 

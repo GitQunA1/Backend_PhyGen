@@ -106,4 +106,29 @@ public class ExamQuestionService {
                 examSectionPage.isLast());
     }
 
+    public PagedResponse<ExamQuestionResponse> getAllExamQuestion(
+              int page
+            , int size
+            , String sortBy
+            , String sortDir
+    ){
+        Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        Page<ExamQuestion> examSectionPage =  examQuestionRepo.findAll(pageRequest);
+        if(examSectionPage.isEmpty()){
+            throw new ExamSectionException("Cant found list examQuestion ",HttpStatus.NOT_FOUND);
+        }
+        List<ExamQuestionResponse> response = examSectionPage
+                .stream()
+                .map(examSection -> modelMapper.map(examSection, ExamQuestionResponse.class))
+                .toList();
+        return new PagedResponse<>(
+                response,
+                page,
+                size,
+                examSectionPage.getTotalElements(),
+                examSectionPage.getTotalPages(),
+                examSectionPage.isLast());
+    }
+
 }

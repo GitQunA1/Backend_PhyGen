@@ -58,4 +58,16 @@ public class ExamSectionController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping()
+    public ResponseEntity<?> getAllExamSection(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir
+    ){
+        PagedResponse<ExamSectionResponse> pagedResponse = examSectionService.getAllExamSection(page,size,sortBy,sortDir);
+        ApiResponse<PagedResponse<ExamSectionResponse>> response = new ApiResponse<>(true,"Get list exam section",pagedResponse,null);
+        return ResponseEntity.ok(response);
+    }
+
 }

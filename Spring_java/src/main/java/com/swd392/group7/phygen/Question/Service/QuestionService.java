@@ -76,13 +76,13 @@ public class QuestionService {
             , int page
             , int size
             , String sortBy
-            , String sortDir){
+            , String sortDir) {
 
         Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
-        Page<Question> questionPage = questionRepo.findAllByTopicId(topicId,pageRequest);
-        if(questionPage.isEmpty()) {
+        Page<Question> questionPage = questionRepo.findAllByTopicId(topicId, pageRequest);
+        if (questionPage.isEmpty()) {
             throw new QuestionException("Empty list question for topicID: " + topicId, HttpStatus.NOT_FOUND);
         }
         List<QuestionResponse> responses = questionPage
@@ -98,6 +98,34 @@ public class QuestionService {
                 questionPage.getTotalPages(),
                 questionPage.isLast()
         );
+    }
+
+        public PagedResponse<QuestionResponse> getAllQuestion(
+                int page
+        ,int size
+        ,String sortBy
+        ,String sortDir){
+
+            Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+            PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+            Page<Question> questionPage = questionRepo.findAll(pageRequest);
+            if(questionPage.isEmpty()) {
+                throw new QuestionException("Empty list question", HttpStatus.NOT_FOUND);
+            }
+            List<QuestionResponse> responses = questionPage
+                    .stream()
+                    .map(question -> modelMapper.map(question, QuestionResponse.class))
+                    .filter(questionResponse -> questionResponse.getStatus() == Status.active)
+                    .toList();
+            return new PagedResponse<>(
+                    responses,
+                    page,
+                    size,
+                    questionPage.getTotalElements(),
+                    questionPage.getTotalPages(),
+                    questionPage.isLast()
+            );
 
     }
 

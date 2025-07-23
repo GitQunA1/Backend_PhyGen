@@ -81,5 +81,32 @@ public class AnswerService {
         );
     }
 
+    public PagedResponse<AnswerResponse> getAllAnswer(
+              int page
+            , int size
+            , String sortBy
+            , String sortDir){
+        Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+        Page<Answer> answerPage = answerRepo.findAll(pageRequest);
+        if(answerPage.isEmpty()){
+            throw new AnswerException("Empty list answer",HttpStatus.NOT_FOUND);
+        }
+
+        List<AnswerResponse> response =answerPage.stream()
+                .map(answer -> modelMapper.map(answer, AnswerResponse.class))
+                .toList();
+
+        return new PagedResponse<>(
+                response,
+                page,
+                size,
+                answerPage.getTotalElements(),
+                answerPage.getTotalPages(),
+                answerPage.isLast()
+        );
+    }
+
 
 }

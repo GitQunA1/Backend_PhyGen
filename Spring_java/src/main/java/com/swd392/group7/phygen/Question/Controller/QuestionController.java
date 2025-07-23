@@ -57,6 +57,18 @@ public class QuestionController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping()
+    public ResponseEntity<?> getAllQuestion(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir
+    ){
+        PagedResponse<QuestionResponse> pagedResponse = questionService.getAllQuestion(page, size, sortBy, sortDir);
+        ApiResponse<PagedResponse<QuestionResponse>> response = new ApiResponse<>(true,"get Question from successfully",pagedResponse,null);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/ai-generations/from-url")
     public ResponseEntity<?> insertDataFromGeminiJsonFormat(@RequestParam String fileUrl,@RequestParam Long subjectId) throws IOException {
         SubjectDto subjectDto = questionService.insertDataFromGeminiJsonFormat(fileUrl,subjectId);

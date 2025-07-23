@@ -52,6 +52,18 @@ public class ExamController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping()
+    public ResponseEntity<?> getAllExam(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir
+    ){
+        PagedResponse<ExamResponse> pagedResponse = examService.getAllExam(page,size,sortBy,sortDir);
+        ApiResponse<PagedResponse<ExamResponse>> response = new ApiResponse<>(true,"get list exam successfully",pagedResponse,null );
+        return ResponseEntity.ok(response);
+    }
+
 
     public ResponseEntity<?> getExamStructure(@RequestParam ExamType examType,
                                               @RequestParam Long subjectId,

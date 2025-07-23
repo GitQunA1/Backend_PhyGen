@@ -81,4 +81,16 @@ public class ExamVersionController {
         ApiResponse<PagedResponse<ExamVersionResponse>> response = new ApiResponse<>(true,"Get ExamVersion form that examId: "+ examId,pagedResponse,null);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping()
+    public ResponseEntity<?> getAllExamVersion(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir
+    ){
+        PagedResponse<ExamVersionResponse> pagedResponse = examVersionService.getAllExamVersion(page,size,sortBy,sortDir);
+        ApiResponse<PagedResponse<ExamVersionResponse>> response = new ApiResponse<>(true,"Get list exam version",pagedResponse,null);
+        return ResponseEntity.ok(response);
+    }
 }
