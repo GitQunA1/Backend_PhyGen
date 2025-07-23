@@ -55,7 +55,6 @@ You are an AI exam generator that creates complete high school exam papers based
 
  Each MCQ must have options A, B, C, D
 
- End with centered word: "HẾT"
  </markdown_formatting_rules>
 
  <error_rules>
