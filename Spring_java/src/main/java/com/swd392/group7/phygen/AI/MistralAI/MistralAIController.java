@@ -19,7 +19,6 @@ public class MistralAIController {
     private final MistralAIService mistralAIService;
 
 
-    @PostMapping("/upload_url")
     public ResponseEntity<?> uploadDocUrl(@RequestParam("url") String url) {
         String result = mistralAIService.importDocUrl(url);
         ByteArrayResource resource = new ByteArrayResource(result.getBytes(StandardCharsets.UTF_8));
@@ -27,7 +26,6 @@ public class MistralAIController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/testCohere")
     public ResponseEntity<?> testEmbedding(@RequestBody String text){
         List<List<Double>> result = mistralAIService.checkCohereEmbedding(text);
         ApiResponse<?> response = new ApiResponse<>(true,"Embedding successfully",result,null);

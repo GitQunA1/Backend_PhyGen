@@ -15,7 +15,6 @@ public class QdrantController {
 
     private final QdrantService qdrantService;
 
-    @PostMapping("/collection")
     public ResponseEntity<?> createCollection(@RequestParam String collectionName){
         qdrantService.createCollection(collectionName);
         ApiResponse<?> response = new ApiResponse<>(true,"Create successfully",null,null);

@@ -28,14 +28,12 @@ public class GeminiController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/printSchemaInfo")
     public ResponseEntity<?> printSchemaInfo()throws SQLException{
         String answer = geminiService.schemaInfo();
         ApiResponse<?> response = new ApiResponse<>(true,"Schema info",answer,null);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/formatJson")
     public ResponseEntity<?> formatJson(@RequestParam String fileUrl, @RequestParam Long subjectId) throws JsonProcessingException {
         String formatJson = geminiService.formatJson(fileUrl,subjectId);
         ApiResponse<?> response = new ApiResponse<>(true,"Format thanh cong",formatJson,null);

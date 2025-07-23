@@ -25,7 +25,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -86,6 +88,7 @@ public class QuestionService {
         List<QuestionResponse> responses = questionPage
                 .stream()
                 .map(question -> modelMapper.map(question, QuestionResponse.class))
+                .filter(questionResponse -> questionResponse.getStatus() == Status.active)
                 .toList();
         return new PagedResponse<>(
                 responses,
