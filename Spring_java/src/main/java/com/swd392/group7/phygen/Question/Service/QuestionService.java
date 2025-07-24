@@ -13,7 +13,9 @@ import com.swd392.group7.phygen.Question.Enum.Status;
 import com.swd392.group7.phygen.Question.Exception.QuestionException;
 import com.swd392.group7.phygen.Question.Repository.QuestionRepo;
 import com.swd392.group7.phygen.Subject.Entity.Subject;
+import com.swd392.group7.phygen.Subject.Exception.SubjectException;
 import com.swd392.group7.phygen.Subject.Repository.SubjectRepo;
+import com.swd392.group7.phygen.Subject.Service.SubjectService;
 import com.swd392.group7.phygen.Topic.Entity.Topic;
 import com.swd392.group7.phygen.Topic.Service.TopicService;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +40,7 @@ public class QuestionService {
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
     private final GeminiService geminiService;
+    private final SubjectService subjectService;
 
     public Question findQuestionById(Long id){
         return questionRepo.findById(id).orElseThrow(()-> new QuestionException("Cant found Question", HttpStatus.NOT_FOUND));
@@ -133,10 +136,12 @@ public class QuestionService {
             String geminiJsonFormat = geminiService.formatJson(fileUrl,subjectId);
             SubjectDto subjectDto = objectMapper.readValue(geminiJsonFormat, SubjectDto.class);
             System.out.println("DTO sau khi parse JSON:\n" + subjectDto);
-            Subject subject = modelMapper.map(subjectDto,Subject.class);
-            if(subject.getTopics() != null){
+            Subject subject = subjectService.findSubjectById(subjectId);
+
                 for(Topic topic : subject.getTopics()){
-                    topic.setSubject(subject);
+                    if(topic.getSubject() != null) {
+                        topic.setSubject(subject);
+                    }
                     if(topic.getSubTopics()!=null){
                         for(Topic subtopic : topic.getSubTopics()){
                             subtopic.setParent(topic);
@@ -163,7 +168,7 @@ public class QuestionService {
                         }
                     }
                 }
-            }
+
             System.out.println("Entity sau khi ánh xạ và thiết lập quan hệ:\n" + subject);
             subjectRepo.save(subject);
             return modelMapper.map(subject, SubjectDto.class);
