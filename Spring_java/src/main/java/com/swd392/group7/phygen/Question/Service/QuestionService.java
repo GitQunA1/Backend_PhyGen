@@ -11,6 +11,7 @@ import com.swd392.group7.phygen.Common.PagedResponse;
 import com.swd392.group7.phygen.Question.Dto.QuestionResponse;
 import com.swd392.group7.phygen.Question.Dto.QuestionCreateRequest;
 import com.swd392.group7.phygen.Question.Dto.QuestionUpdateRequest;
+import com.swd392.group7.phygen.Question.Dto.StatusUpdateRequest;
 import com.swd392.group7.phygen.Question.Entity.Question;
 import com.swd392.group7.phygen.Question.Enum.Status;
 import com.swd392.group7.phygen.Question.Exception.QuestionException;
@@ -73,6 +74,20 @@ public class QuestionService {
         return modelMapper.map(oldQuestion, QuestionResponse.class);
     }
 
+    public List<QuestionResponse> statusUpdate(StatusUpdateRequest statusRq){
+        List<Question> questions = questionRepo.findAllById(statusRq.getId());
+        for (Question question : questions) {
+            question.setStatus(statusRq.getStatus());
+        }
+        questionRepo.saveAll(questions);
+        List<QuestionResponse> questionResponses = new ArrayList<>();
+        for (Question question : questions) {
+            QuestionResponse response = modelMapper.map(question, QuestionResponse.class);
+            questionResponses.add(response);
+        }
+        return questionResponses;
+    }
+
     public void deleted(Long id){
         Question question = findQuestionById(id);
         question.setStatus(Status.inactive);
@@ -109,22 +124,22 @@ public class QuestionService {
     }
 
         public PagedResponse<QuestionResponse> getAllQuestion(
-                int page
-        ,int size
-        ,String sortBy
-        ,String sortDir){
+                Status status,
+                int page,
+                int size,
+                String sortBy,
+                String sortDir){
 
             Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
             PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
-            Page<Question> questionPage = questionRepo.findAll(pageRequest);
+            Page<Question> questionPage = questionRepo.findAllByStatus(pageRequest,status);
             if(questionPage.isEmpty()) {
                 throw new QuestionException("Empty list question", HttpStatus.NOT_FOUND);
             }
             List<QuestionResponse> responses = questionPage
                     .stream()
                     .map(question -> modelMapper.map(question, QuestionResponse.class))
-                    .filter(questionResponse -> questionResponse.getStatus() == Status.active)
                     .toList();
             return new PagedResponse<>(
                     responses,
@@ -157,6 +172,7 @@ public class QuestionService {
                 for (QuestionDto questionDto : topicDto.getQuestions()) {
                     Question newQuestion = modelMapper.map(questionDto, Question.class);
                     newQuestion.setTopic(foundTopic);
+
                     if (questionDto.getAnswers() != null) {
                         if (newQuestion.getAnswers() == null) {
                             newQuestion.setAnswers(new ArrayList<>());

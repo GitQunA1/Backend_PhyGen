@@ -6,6 +6,8 @@ import com.swd392.group7.phygen.Common.PagedResponse;
 import com.swd392.group7.phygen.Question.Dto.QuestionCreateRequest;
 import com.swd392.group7.phygen.Question.Dto.QuestionResponse;
 import com.swd392.group7.phygen.Question.Dto.QuestionUpdateRequest;
+import com.swd392.group7.phygen.Question.Dto.StatusUpdateRequest;
+import com.swd392.group7.phygen.Question.Enum.Status;
 import com.swd392.group7.phygen.Question.Service.QuestionService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,6 +37,13 @@ public class QuestionController {
     public ResponseEntity<?> updated(@Valid @RequestBody QuestionUpdateRequest questionRq, @PathVariable Long id){
         QuestionResponse questionRp = questionService.update(questionRq,id);
         ApiResponse<QuestionResponse> response = new ApiResponse<>(true, "Question update successfully", questionRp,null);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/status")
+    public ResponseEntity<?> updated(@RequestBody StatusUpdateRequest statusUpdateRequest){
+        List<QuestionResponse> questionRp = questionService.statusUpdate(statusUpdateRequest);
+        ApiResponse<List<QuestionResponse>> response = new ApiResponse<>(true, "Question update successfully", questionRp,null);
         return ResponseEntity.ok(response);
     }
 
@@ -59,13 +69,14 @@ public class QuestionController {
 
     @GetMapping()
     public ResponseEntity<?> getAllQuestion(
+            @RequestParam(defaultValue = "active")Status status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir
     ){
-        PagedResponse<QuestionResponse> pagedResponse = questionService.getAllQuestion(page, size, sortBy, sortDir);
-        ApiResponse<PagedResponse<QuestionResponse>> response = new ApiResponse<>(true,"get Question from successfully",pagedResponse,null);
+        PagedResponse<QuestionResponse> pagedResponse = questionService.getAllQuestion(status,page, size, sortBy, sortDir);
+        ApiResponse<PagedResponse<QuestionResponse>> response = new ApiResponse<>(true,"get Question from status "+ status +"successfully",pagedResponse,null);
         return ResponseEntity.ok(response);
     }
 
