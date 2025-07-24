@@ -80,6 +80,8 @@ builder.Services.AddScoped<MatrixDetailService>();
 builder.Services.AddScoped<IQuestionRepo, QuestionRepo>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 builder.Services.AddScoped<DashboardService>();
+builder.Services.AddScoped<IEnumRepo, EnumRepo>();
+builder.Services.AddScoped<EnumService>();
 
 builder.Services.AddScoped<AIGenerationService>();
 
