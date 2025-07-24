@@ -16,5 +16,8 @@ import java.util.List;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SubjectDto {
+    String name;
+    @Enumerated(EnumType.STRING)
+    Grade grade;
     List<TopicDto> topics;
 }
