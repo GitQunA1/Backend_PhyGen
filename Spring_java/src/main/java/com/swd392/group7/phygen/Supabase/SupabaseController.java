@@ -21,9 +21,8 @@ public class SupabaseController {
     private final SupabaseStorageService supabaseStorageService;
 
     @PostMapping(value = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file)throws IOException {
+    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file,@RequestParam String key)throws IOException {
         String nameBucket = "swd392phygen.docs";
-        String key = file.getOriginalFilename();
         String result = supabaseStorageService.uploadFile(file,key,nameBucket);
         ApiResponse<?> response = new ApiResponse<>(true,"Upload file to supabase success",result,null);
         return ResponseEntity.ok(response);
@@ -39,8 +38,8 @@ public class SupabaseController {
 
     @GetMapping("/file-names")
     public ResponseEntity<?> listFileKeysInBucket(){
-        List<String> list = supabaseStorageService.listFileKeysInBucket();
-        ApiResponse<List<String>> response = new ApiResponse<>(true,"Get list file name successfully",list,null);
+        List<FileDto> list = supabaseStorageService.listFileKeysInBucket();
+        ApiResponse<List<FileDto>> response = new ApiResponse<>(true,"Get list file name successfully",list,null);
         return ResponseEntity.ok(response);
     }
 

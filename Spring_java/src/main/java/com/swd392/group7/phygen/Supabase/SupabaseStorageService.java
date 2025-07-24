@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,15 +59,23 @@ public class SupabaseStorageService {
         return signedUrl.toString();
     }
 
-    public List<String> listFileKeysInBucket(){
+    public List<FileDto> listFileKeysInBucket(){
         String bucketName = "swd392phygen.docs";
         ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
                 .bucket(bucketName)
                 .build();
         ListObjectsV2Response listObjectsV2Response = s3Client.listObjectsV2(listObjectsV2Request);
         return listObjectsV2Response.contents().stream()
-                .map(S3Object::key)
-                .filter(key -> !key.endsWith(".emptyFolderPlaceholder") && !key.endsWith("/"))
+                .map(s3Object -> {
+                    String key = s3Object.key();
+                    if (key.endsWith(".emptyFolderPlaceholder") || key.endsWith("/")) {
+                        return null;
+                    }
+
+                    String url = getSignedUrl(bucketName, key); // Tạo URL
+                    return new FileDto(key, url);
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
