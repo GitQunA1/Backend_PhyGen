@@ -132,8 +132,12 @@ public class QuestionService {
 
             Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
             PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortBy));
-
-            Page<Question> questionPage = questionRepo.findAllByStatus(pageRequest,status);
+            Page<Question> questionPage;
+            if(status==null){
+                questionPage = questionRepo.findAll(pageRequest);
+            }else{
+                questionPage = questionRepo.findAllByStatus(pageRequest,status);
+            }
             if(questionPage.isEmpty()) {
                 throw new QuestionException("Empty list question", HttpStatus.NOT_FOUND);
             }

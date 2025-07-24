@@ -69,7 +69,7 @@ public class QuestionController {
 
     @GetMapping()
     public ResponseEntity<?> getAllQuestion(
-            @RequestParam(defaultValue = "active")Status status,
+            @RequestParam(required = false)Status status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,

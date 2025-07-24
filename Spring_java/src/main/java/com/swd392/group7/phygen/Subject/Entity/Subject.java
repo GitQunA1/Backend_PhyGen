@@ -23,7 +23,6 @@ public class Subject {
     String name;
     String description;
 
-//    @Convert(converter = GradeConverter.class)
     @Enumerated(EnumType.STRING)
     Grade grade;
 
