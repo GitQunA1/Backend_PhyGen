@@ -30,17 +30,16 @@ namespace PhyGen_SWD392.Controllers
                     new List<string> { "User ID not found in token." }, "Unauthorized"));
             }
 
-            var aiResponses = await _aIGenerationService.GenerateExamFromMatrix(matrixId, userId);
-
-            if (aiResponses.Count == 1 && !string.IsNullOrEmpty(aiResponses[0].Error))
+            try
             {
-                return BadRequest(ApiResponse<object>.ErrorResponse(
-                    new List<string> { aiResponses[0].Error },
-                    "Failed to generate exam"
+                var examResponse = await _aIGenerationService.GenerateExamFromMatrix(matrixId, userId);
+                return Ok(examResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse<object>.ErrorResponse(new List<string> { ex.Message },"Failed to generate exam"
                 ));
             }
-
-            return Ok(ApiResponse<List<AIExamResponse>>.SuccessResponse(aiResponses, "Exam generated successfully"));
         }
     }
 }

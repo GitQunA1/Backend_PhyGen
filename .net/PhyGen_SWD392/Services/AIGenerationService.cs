@@ -27,17 +27,14 @@ namespace PhyGen_SWD392.Services
             _questionRepo = questionRepo;
         }
 
-        public async Task<List<AIExamResponse>> GenerateExamFromMatrix(int matrixId, int userId)
+        public async Task<ExamGenerationResponse> GenerateExamFromMatrix(int matrixId, int userId)
         {
             var buildResult = await BuildAIExamRequest(matrixId);
             if (!buildResult.IsSuccess)
             {
-                return new List<AIExamResponse>
+                return new ExamGenerationResponse
                 {
-                    new AIExamResponse
-                    {
-                        Error = buildResult.ErrorMessage
-                    }
+                    Error = buildResult.ErrorMessage,
                 };
             }
 
@@ -74,6 +71,14 @@ namespace PhyGen_SWD392.Services
             var grouped = tempItems.GroupBy(x => x.section);
             var aiExamResponses = new List<AIExamResponse>();
 
+            var examResponse = new ExamGenerationResponse
+            {
+                SubjectId = matrix.SubjectId ?? 0,
+                SubjectName = matrix.Subject?.Name,
+                ExamType = matrix.Examtype,
+                Sections = new List<ExamSectionResponse>()
+            };
+
             foreach (var group in grouped)
             {
                 var matrixSection = matrix.MatrixSections.FirstOrDefault(x => x.SectionName == group.Key);
@@ -91,11 +96,18 @@ namespace PhyGen_SWD392.Services
                 _context.ExamSections.Add(section);
                 await _context.SaveChangesAsync();
 
-                var questionInfos = new List<QuestionInfo>();
+                var sectionResponse = new ExamSectionResponse
+                {
+                    SectionName = group.Key,
+                    DisplayOrder = matrixSection.DisplayOrder,
+                    Questions = new List<ExamQuestionResponse>()
+                };
+
                 int qIndex = 1;
                 foreach (var item in selectedQuestions)
                 {
                     var question = await _questionRepo.GetByIdAsync(item.questionId);
+                    if (question == null) continue;
 
                     _context.ExamQuestions.Add(new ExamQuestion
                     {
@@ -113,24 +125,24 @@ namespace PhyGen_SWD392.Services
                         })
                         .ToList();
 
-                    questionInfos.Add(new QuestionInfo
+                    sectionResponse.Questions.Add(new ExamQuestionResponse
                     {
-                        QuestionName = question.Content,
+                        Content = question.Content,
                         OrderIndex = qIndex,
+                        DifficultyLevel = question.DifficultyLevel,
+                        Type = question.Type,
+                        TopicId = question.TopicId ?? 0,
+                        TopicName = question.Topic?.Name,
                         Answers = answers
                     });
 
                     qIndex++;
                 }
-                aiExamResponses.Add(new AIExamResponse
-                {
-                    SectionName = group.Key,
-                    Questions = questionInfos
-                });
+                examResponse.Sections.Add(sectionResponse);
             }
 
             await _context.SaveChangesAsync();
-            return aiExamResponses;
+            return examResponse;
         }
 
         private async Task<string> CallGeminiApi(AIExamRequest request)
