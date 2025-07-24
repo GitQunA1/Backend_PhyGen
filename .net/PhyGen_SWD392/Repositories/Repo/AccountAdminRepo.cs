@@ -124,43 +124,65 @@ namespace PhyGen_SWD392.Repositories.Repo
             return await _context.Accounts.FindAsync(id);
         }
 
-        public async Task<bool> UpdateAccountAsync(Account updatedAccount)
+        public async Task<bool> UpdateAccountInfoAsync(Account updatedAccount)
         {
             var account = await _context.Accounts.FindAsync(updatedAccount.Id);
             if (account == null) return false;
 
-            account.Username = updatedAccount.Username ?? account.Username;
-            account.Email = updatedAccount.Email ?? account.Email;
+            // Kiểm tra trùng Username với tài khoản khác
+            var usernameExists = await _context.Accounts
+                .AnyAsync(a => a.Username == updatedAccount.Username && a.Id != updatedAccount.Id);
+
+            if (usernameExists)
+                throw new InvalidOperationException("Username is already taken by another account.");
+
+            // Kiểm tra trùng Email với tài khoản khác
+            var emailExists = await _context.Accounts
+                .AnyAsync(a => a.Email == updatedAccount.Email && a.Id != updatedAccount.Id);
+
+            if (emailExists)
+                throw new InvalidOperationException("Email is already used by another account.");
+
+             var emailMatchesUsername = await _context.Accounts
+                .AnyAsync(a => a.Username == updatedAccount.Email && a.Id != updatedAccount.Id);
+
+            if (emailMatchesUsername)
+                throw new InvalidOperationException("Email cannot be the same as any existing Username.");
+
+             var usernameMatchesEmail = await _context.Accounts
+                .AnyAsync(a => a.Email == updatedAccount.Username && a.Id != updatedAccount.Id);
+
+            if (usernameMatchesEmail)
+                throw new InvalidOperationException("Username cannot be the same as any existing Email.");
+
+             account.Username = updatedAccount.Username;
+            account.Email = updatedAccount.Email;
             account.EmailVerified = updatedAccount.EmailVerified;
             account.Role = updatedAccount.Role;
             account.AccountType = updatedAccount.AccountType;
             account.Status = updatedAccount.Status;
 
-            if (!string.IsNullOrWhiteSpace(updatedAccount.Password))
-            {
-                try
-                {
-                    bool isSame = false;
-
-                    if (!string.IsNullOrWhiteSpace(account.Password))
-                    {
-                        isSame = BCrypt.Net.BCrypt.Verify(updatedAccount.Password, account.Password);
-                    }
-
-                    if (!isSame)
-                    {
-                        account.Password = BCrypt.Net.BCrypt.HashPassword(updatedAccount.Password);
-                    }
-                }
-                catch (BCrypt.Net.SaltParseException)
-                {
-                    account.Password = BCrypt.Net.BCrypt.HashPassword(updatedAccount.Password);
-                }
-            }
-
             await _context.SaveChangesAsync();
             return true;
         }
+
+
+        public async Task<bool> UpdateAccountPasswordAsync(int accountId, string newPassword)
+        {
+            if (string.IsNullOrWhiteSpace(newPassword)) return false;
+
+            var account = await _context.Accounts.FindAsync(accountId);
+            if (account == null) return false;
+
+            if (!BCrypt.Net.BCrypt.Verify(newPassword, account.Password))
+            {
+                account.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                await _context.SaveChangesAsync();
+            }
+
+            return true;
+        }
+
 
 
         public async Task<bool> DeleteAccountAsync(int id)

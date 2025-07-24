@@ -22,11 +22,15 @@ namespace PhyGen_SWD392.Repositories.Repo
         {
             var now = DateTime.UtcNow;
 
-            var totalUsers = await _context.Accounts.CountAsync();
+            var normalAccounts = _context.Accounts
+                .Where(u => u.Role.ToLower() != "manager" && u.Role.ToLower() != "admin");
 
-            var verifiedUsers = await _context.Accounts.CountAsync(u => u.EmailVerified == true);
+            var totalUsers = await normalAccounts.CountAsync();
 
-            var rawUsersByType = await _context.Accounts
+            var verifiedUsers = await normalAccounts
+                .CountAsync(u => u.EmailVerified == true);
+
+            var rawUsersByType = await normalAccounts
                 .GroupBy(u => u.AccountType)
                 .Select(g => new { AccountType = g.Key, Count = g.Count() })
                 .ToListAsync();
@@ -38,12 +42,21 @@ namespace PhyGen_SWD392.Repositories.Repo
                    x => x.Count
                );
 
+            var adminCount = await _context.Accounts
+                .CountAsync(u => u.Role.ToLower() == "admin");
+
+            var managerCount = await _context.Accounts
+                .CountAsync(u => u.Role.ToLower() == "manager");
+
             return new UserOverviewDto
             {
                 TotalUsers = totalUsers,
                 EmailVerifiedUsers = verifiedUsers,
-                UsersByAccountType = usersByType
+                UsersByAccountType = usersByType,
+                AdminCount = adminCount,
+                ManagerCount = managerCount
             };
         }
+
     }
 }

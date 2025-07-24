@@ -29,9 +29,14 @@ namespace PhyGen_SWD392.Services
             return await _accountRepo.GetAccountByIdAsync(id);
         }
 
-        public async Task<bool> UpdateAccountAsync(Account account)
+        public async Task<bool> UpdateAccountInfoAsync(Account account)
         {
-            return await _accountRepo.UpdateAccountAsync(account);
+            return await _accountRepo.UpdateAccountInfoAsync(account);
+        }
+
+        public async Task<bool> UpdateAccountPasswordAsync(int accountId, string newPassword)
+        {
+            return await _accountRepo.UpdateAccountPasswordAsync(accountId, newPassword);
         }
 
         public async Task<bool> DeleteAccountAsync(int id)

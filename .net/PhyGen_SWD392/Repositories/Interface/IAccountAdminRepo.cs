@@ -8,7 +8,8 @@ namespace PhyGen_SWD392.Repositories.Interface
     {
         Task<Account> CreateAccountAsync(Account account);
         Task<PagedResult<Account>> GetAllUserAccountsAsync(AccountQueryParameters queryParams);
-        Task<bool> UpdateAccountAsync(Account account);
+        Task<bool> UpdateAccountInfoAsync(Account account);
+        Task<bool> UpdateAccountPasswordAsync(int accountId, string newPassword);
         Task<bool> DeleteAccountAsync(int id);
         Task<Account?> GetAccountByIdAsync(int id);
     }
