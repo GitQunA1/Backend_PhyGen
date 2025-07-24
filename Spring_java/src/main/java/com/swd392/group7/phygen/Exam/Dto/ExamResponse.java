@@ -20,7 +20,7 @@ public class ExamResponse {
 
     ExamType examType;
 
-    LocalDateTime createAt;
+    LocalDateTime createdAt;
 
     Status status;
 
