@@ -2,13 +2,20 @@
 {
     public class AIExamResponse
     {
-        public string SectionName { get; set; }
-        public List<QuestionInfo> Questions { get; set; }
+        public string? Error { get; set; }
+        public string? SectionName { get; set; }
+        public List<QuestionInfo>? Questions { get; set; }
     }
     public class QuestionInfo
     {
         public string QuestionName { get; set; }
         public int OrderIndex { get; set; }
+        public List<AnswerInfo> Answers { get; set; }
+    }
+    public class AnswerInfo
+    {
+        public string Content { get; set; }
+        public bool? IsCorrect { get; set; }
     }
     public class TempAIExamItem
     {

@@ -13,7 +13,14 @@ namespace PhyGen_SWD392.Repositories.Repo
             _context = context;
         }
 
-        public async Task<List<Question>> GetQuestionsForMatrixAsync(List<MatrixDetail> details)
+        public override async Task<Question?> GetByIdAsync(int id)
+        {
+            return await _context.Questions
+                .Include(q => q.Answers.Where(a => a.IsDeleted != true))
+                .FirstOrDefaultAsync(q => q.Id == id);
+        }
+
+        public async Task<List<Question>> GetQuestionsForMatrixDetailAsync(List<MatrixDetail> details)
         {
             var topicIds = details.Select(d => d.TopicId).Distinct().ToList();
             var levels = details.Select(d => d.DifficultyLevel).Distinct().ToList();

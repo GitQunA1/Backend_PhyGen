@@ -29,8 +29,20 @@ namespace PhyGen_SWD392.Services
 
         public async Task<List<AIExamResponse>> GenerateExamFromMatrix(int matrixId, int userId)
         {
+            var buildResult = await BuildAIExamRequest(matrixId);
+            if (!buildResult.IsSuccess)
+            {
+                return new List<AIExamResponse>
+                {
+                    new AIExamResponse
+                    {
+                        Error = buildResult.ErrorMessage
+                    }
+                };
+            }
+
             var aiRequest = await BuildAIExamRequest(matrixId);
-            var aiResponse = await CallGeminiApi(aiRequest);
+            var aiResponse = await CallGeminiApi(buildResult.Data);
 
             Console.WriteLine("👉 AI Raw Output:");
             Console.WriteLine(aiResponse);
@@ -65,6 +77,10 @@ namespace PhyGen_SWD392.Services
             foreach (var group in grouped)
             {
                 var matrixSection = matrix.MatrixSections.FirstOrDefault(x => x.SectionName == group.Key);
+                if (matrixSection == null) continue;
+
+                var totalQuantityRequired = matrixSection.MatrixDetails.Sum(md => md.Quantity ?? 0);
+                var selectedQuestions = group.Take(totalQuantityRequired).ToList();
 
                 var section = new ExamSection
                 {
@@ -77,7 +93,7 @@ namespace PhyGen_SWD392.Services
 
                 var questionInfos = new List<QuestionInfo>();
                 int qIndex = 1;
-                foreach (var item in group)
+                foreach (var item in selectedQuestions)
                 {
                     var question = await _questionRepo.GetByIdAsync(item.questionId);
 
@@ -88,10 +104,20 @@ namespace PhyGen_SWD392.Services
                         OrderIndex = qIndex
                     });
 
+                    var answers = question.Answers
+                        .Where(a => a.IsDeleted != true)
+                        .Select(a => new AnswerInfo
+                        {
+                            Content = a.Content,
+                            IsCorrect = a.IsCorrect
+                        })
+                        .ToList();
+
                     questionInfos.Add(new QuestionInfo
                     {
                         QuestionName = question.Content,
-                        OrderIndex = qIndex
+                        OrderIndex = qIndex,
+                        Answers = answers
                     });
 
                     qIndex++;
@@ -120,9 +146,9 @@ Dữ liệu đầu vào (đã được serialize từ 'request'):
 " + JsonConvert.SerializeObject(request) + @"
 
 Quy tắc chọn câu hỏi:
-- Mỗi phần trong 'matrixDetails' có 'sectionName', 'topic', 'difficultyLevel' và 'quantity'.
+- Mỗi phần trong 'matrixDetails' có 'sectionName', 'topic', 'type' 'difficultyLevel' và 'quantity'.
 - Bạn phải chọn chính xác 'quantity' câu hỏi cho mỗi 'sectionName'.
-- Các câu hỏi được chọn phải khớp với 'topic' và 'difficultyLevel' của phần đó.
+- Các câu hỏi được chọn phải khớp với 'topic', 'type' và 'difficultyLevel' của phần đó.
 - Danh sách câu hỏi để chọn là 'questions'.
 
 ĐỊNH DẠNG ĐẦU RA YÊU CẦU:
@@ -178,23 +204,42 @@ NHẮC LẠI:
             return result.candidates[0]?.content?.parts?[0]?.text ?? throw new Exception("Không tìm thấy text từ Gemini.");
         }
 
-        private async Task<AIExamRequest> BuildAIExamRequest(int matrixId)
+        private async Task<AIExamRequestResult> BuildAIExamRequest(int matrixId)
         {
             var matrix = await _examMatrixRepo.GetByIdAsync(matrixId);
+            if (matrix == null || matrix.MatrixSections == null || !matrix.MatrixSections.Any())
+            {
+                return AIExamRequestResult.Failure("Matrix không có section nào, không thể tạo đề thi.");
+            }
+
             var matrixDetails = matrix.MatrixSections
                 .SelectMany(ms => ms.MatrixDetails)
                 .ToList();
 
-            var questions = await _questionRepo.GetQuestionsForMatrixAsync(matrixDetails);
+            var questions = await _questionRepo.GetQuestionsForMatrixDetailAsync(matrixDetails);
 
+            foreach (var detail in matrixDetails)
+            {
+                var matchingQuestions = questions.Where(q =>
+                    q.TopicId == detail.TopicId &&
+                    q.Type == detail.Type &&
+                    q.DifficultyLevel == detail.DifficultyLevel
+                ).ToList();
+                if (matchingQuestions.Count < detail.Quantity)
+                {
+                    return AIExamRequestResult.Failure($"Không đủ câu hỏi cho detail: topic={detail.TopicId}, type={detail.Type}, level={detail.DifficultyLevel}");
+                }
+            }
             var matrixDetailDtos = _mapper.Map<List<MatrixDetailDTO>>(matrixDetails);
             var questionDtos = _mapper.Map<List<QuestionDto>>(questions);
 
-            return new AIExamRequest
+            var aiRequest = new AIExamRequest
             {
                 MatrixDetails = matrixDetailDtos,
                 Questions = questionDtos
             };
+
+            return AIExamRequestResult.Success(aiRequest);
         }
     }
 }
