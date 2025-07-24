@@ -44,5 +44,13 @@ public class SupabaseController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/fileName")
+    public ResponseEntity<?> deletedFileInBucket(@RequestParam String fileName){
+        String bucketName = "swd392phygen.docs";
+        Boolean deleted = supabaseStorageService.deleted(bucketName,fileName);
+        ApiResponse<Boolean> response = new ApiResponse<>(true,"Delete "+fileName+" successfully",deleted,null);
+        return ResponseEntity.ok(response);
+    }
+
 
 }

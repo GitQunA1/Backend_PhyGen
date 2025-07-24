@@ -97,5 +97,22 @@ public class SupabaseStorageService {
         return listObjectsV2Response.contents();
     }
 
+    public boolean deleted(String bucketName, String fileName){
+        try{
+            DeleteObjectRequest deletedObject = DeleteObjectRequest
+                    .builder()
+                    .bucket(bucketName)
+                    .key(fileName)
+                    .build();
+            DeleteObjectResponse deleteObjectResponse = s3Client.deleteObject(deletedObject);
+            System.out.println("File '" + fileName + "' deleted successfully from bucket '" + bucketName + "'.");
+            return true;
+
+        }catch(S3Exception s3Exception){
+            System.err.println("Error deleting file '" + fileName + "' from bucket '" + bucketName + "': " + s3Exception.getMessage());
+            return false;
+        }
+    }
+
 
 }
