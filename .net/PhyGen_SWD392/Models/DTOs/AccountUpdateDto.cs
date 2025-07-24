@@ -4,12 +4,12 @@ namespace PhyGen_SWD392.Models.DTOs
 {
     public class AccountUpdateDto
     {
-        public string Username { get; set; } = null!;
-        public string Password { get; set; } = null!;
-        public string Email { get; set; } = null!;
-        public bool? EmailVerified { get; set; } = false;
-        public RoleEnum Role { get; set; }
-        public AccountTypeEnum AccountType { get; set; } 
-        public AccountStatusEnum AccountStatus { get; set; }
+        public string? Username { get; set; }
+        public string? Email { get; set; }
+        public bool? EmailVerified { get; set; }
+
+        public RoleEnum? Role { get; set; }
+        public AccountTypeEnum? AccountType { get; set; }
+        public AccountStatusEnum? AccountStatus { get; set; }
     }
 }

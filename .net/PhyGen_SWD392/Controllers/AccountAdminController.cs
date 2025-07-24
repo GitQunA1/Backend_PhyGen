@@ -63,51 +63,74 @@ namespace PhyGen_SWD392.Controllers
             return Ok(response);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] AccountUpdateDto dto)
+        [HttpPut("{id}/info")]
+        public async Task<IActionResult> UpdateInfoAccount(int id, [FromBody] AccountUpdateDto dto)
         {
             var existingAccount = await _accountService.GetAccountByIdAsync(id);
             if (existingAccount == null)
             {
-                var error = ApiResponse<string>.ErrorResponse(
+                return NotFound(ApiResponse<string>.ErrorResponse(
                     new() { "Account not found." },
                     "Update failed."
-                );
-                return NotFound(error);
+                ));
             }
 
-
             existingAccount.Username = !string.IsNullOrWhiteSpace(dto.Username) ? dto.Username : existingAccount.Username;
-            existingAccount.Password = !string.IsNullOrWhiteSpace(dto.Password) ? dto.Password : existingAccount.Password;
             existingAccount.Email = !string.IsNullOrWhiteSpace(dto.Email) ? dto.Email : existingAccount.Email;
             existingAccount.EmailVerified = dto.EmailVerified ?? existingAccount.EmailVerified;
 
-            if (Enum.IsDefined(typeof(RoleEnum), dto.Role))
-                existingAccount.Role = Enum.GetName(typeof(RoleEnum), dto.Role)!;
+            if (dto.Role.HasValue)
+                existingAccount.Role = dto.Role.ToString();
 
-            if (Enum.IsDefined(typeof(AccountTypeEnum), dto.AccountType))
-                existingAccount.AccountType = Enum.GetName(typeof(AccountTypeEnum), dto.AccountType)!;
+            if (dto.AccountType.HasValue)
+                existingAccount.AccountType = dto.AccountType.ToString();
 
-            if (Enum.IsDefined(typeof(AccountStatusEnum), dto.AccountStatus))
-                existingAccount.Status = Enum.GetName(typeof(AccountStatusEnum), dto.AccountStatus)!;
+            if (dto.AccountStatus.HasValue)
+                existingAccount.Status = dto.AccountStatus.ToString();
 
-            var result = await _accountService.UpdateAccountAsync(existingAccount);
+            var result = await _accountService.UpdateAccountInfoAsync(existingAccount);
 
             if (!result)
             {
-                var error = ApiResponse<string>.ErrorResponse(
-                    new() { "Failed to update account." },
+                return BadRequest(ApiResponse<string>.ErrorResponse(
+                    new() { "Failed to update account info." },
                     "Update failed."
-                );
-                return BadRequest(error);
+                ));
             }
 
-            var response = ApiResponse<string>.SuccessResponse(
-                "Account updated successfully.",
+            return Ok(ApiResponse<string>.SuccessResponse(
+                "Account info updated successfully.",
                 "Success"
-            );
-            return Ok(response);
+            ));
         }
+        [HttpPut("{id}/password")]
+        public async Task<IActionResult> UpdatePassword(int id, [FromBody] AccountPasswordUpdateDto dto)
+        {
+            var existingAccount = await _accountService.GetAccountByIdAsync(id);
+            if (existingAccount == null)
+            {
+                return NotFound(ApiResponse<string>.ErrorResponse(
+                    new() { "Account not found." },
+                    "Update failed."
+                ));
+            }
+
+            var result = await _accountService.UpdateAccountPasswordAsync(existingAccount.Id, dto.Password);
+
+            if (!result)
+            {
+                return BadRequest(ApiResponse<string>.ErrorResponse(
+                    new() { "Failed to update password." },
+                    "Update failed."
+                ));
+            }
+
+            return Ok(ApiResponse<string>.SuccessResponse(
+                "Password updated successfully.",
+                "Success"
+            ));
+        }
+
 
 
         [HttpDelete("{id}")]
