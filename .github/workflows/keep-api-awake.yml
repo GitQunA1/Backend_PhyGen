@@ -2,7 +2,7 @@ name: Keep API Awake
 
 on:
   schedule:
-    -cron: "*/20 * * * *"
+    - cron: "*/20 * * * *"
   workflow_dispatch:
 
 jobs:
@@ -12,4 +12,4 @@ jobs:
     steps:
       - name: Send HTTP Request to API
         run: |
-          curl -X GET "https://backend-phygen-4c2y.onrender.com/swagger-ui/index.html/api/ping"
+          curl -X GET "https://backend-phygen-4c2y.onrender.com/api/ping"
