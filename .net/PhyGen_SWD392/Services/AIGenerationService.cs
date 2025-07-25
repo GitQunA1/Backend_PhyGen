@@ -18,13 +18,15 @@ namespace PhyGen_SWD392.Services
         private readonly PhyGenDbContext _context;
         private readonly IExamMatrixRepo _examMatrixRepo;
         private readonly IQuestionRepo _questionRepo;
-        public AIGenerationService(HttpClient httpClient, IMapper mapper, PhyGenDbContext context, IExamMatrixRepo examMatrixRepo, IQuestionRepo questionRepo)
+        private readonly StorageService _storageService;
+        public AIGenerationService(HttpClient httpClient, IMapper mapper, PhyGenDbContext context, IExamMatrixRepo examMatrixRepo, IQuestionRepo questionRepo, StorageService storageService)
         {
             _httpClient = httpClient;
             _mapper = mapper;
             _context = context;
             _examMatrixRepo = examMatrixRepo;
             _questionRepo = questionRepo;
+            _storageService = storageService;
         }
 
         public async Task<ExamGenerationResponse> GenerateExamFromMatrix(int matrixId, int userId)
@@ -140,7 +142,21 @@ namespace PhyGen_SWD392.Services
                 examResponse.Sections.Add(sectionResponse);
             }
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                var examJson = JsonConvert.SerializeObject(examResponse);
+                var fileName = $"exam_{exam.Id}_{DateTime.UtcNow:yyyyMMddHHmmss}.json";
+            
+                var jsonUrl = await _storageService.UploadExamJson(examJson, fileName);
+                // Update exam với URL
+                exam.ExamJson = jsonUrl;
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to upload exam JSON: {ex.Message}");
+            }
+
             return examResponse;
         }
 

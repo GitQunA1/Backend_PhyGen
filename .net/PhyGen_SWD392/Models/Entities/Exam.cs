@@ -17,6 +17,8 @@ public partial class Exam
 
     public string? Status { get; set; }
 
+    public string? ExamJson { get; set; }
+
     public virtual Account? CreatedByNavigation { get; set; }
 
     public virtual ICollection<ExamSection> ExamSections { get; set; } = new List<ExamSection>();

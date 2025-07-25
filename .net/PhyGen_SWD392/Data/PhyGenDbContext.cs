@@ -140,6 +140,7 @@ public partial class PhyGenDbContext : DbContext
             entity.Property(e => e.Examtype).HasColumnName("examtype");
             entity.Property(e => e.IsDraft).HasColumnName("is_draft");
             entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.ExamJson).HasColumnName("exam_json");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.Exams)
                 .HasForeignKey(d => d.CreatedBy)
