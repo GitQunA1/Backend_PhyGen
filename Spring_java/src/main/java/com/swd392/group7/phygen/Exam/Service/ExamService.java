@@ -7,55 +7,15 @@ import com.swd392.group7.phygen.AI.GeminiAI.GeminiService;
 import com.swd392.group7.phygen.AI.Structure.Prompt.PromptBuilder;
 import com.swd392.group7.phygen.Account.Entity.Account;
 import com.swd392.group7.phygen.Account.Service.AccountService;
-import com.swd392.group7.phygen.Answer.Dto.AnswerStructureResponse;
-import com.swd392.group7.phygen.Answer.Entity.Answer;
-import com.swd392.group7.phygen.Answer.Exception.AnswerException;
-import com.swd392.group7.phygen.Answer.Repository.AnswerRepo;
 import com.swd392.group7.phygen.Common.ByteArrayMultipartFile;
 import com.swd392.group7.phygen.Common.PagedResponse;
 import com.swd392.group7.phygen.Exam.Dto.*;
 import com.swd392.group7.phygen.Exam.Entity.Exam;
-import com.swd392.group7.phygen.Exam.Enum.ExamType;
-import com.swd392.group7.phygen.Exam.Enum.Status;
 import com.swd392.group7.phygen.Exam.Exception.ExamException;
 import com.swd392.group7.phygen.Exam.Repository.ExamRepo;
-import com.swd392.group7.phygen.ExamMatrix.Dto.ExamMatrixStructureResponse;
-import com.swd392.group7.phygen.ExamMatrix.Entity.ExamMatrix;
-import com.swd392.group7.phygen.ExamMatrix.Enum.ExamMatrixStatus;
-import com.swd392.group7.phygen.ExamMatrix.Exception.ExamMatrixException;
-import com.swd392.group7.phygen.ExamMatrix.Repository.ExamMatrixRepo;
-import com.swd392.group7.phygen.ExamQuestion.Dto.ExamQuestionResponse;
-import com.swd392.group7.phygen.ExamQuestion.Entity.ExamQuestion;
-import com.swd392.group7.phygen.ExamQuestion.Exception.ExamQuestionException;
-import com.swd392.group7.phygen.ExamQuestion.Repository.ExamQuestionRepo;
-import com.swd392.group7.phygen.ExamSection.Dto.ExamSectionCreateRequest;
-import com.swd392.group7.phygen.ExamSection.Dto.ExamSectionFormatResponse;
-import com.swd392.group7.phygen.ExamSection.Entity.ExamSection;
-import com.swd392.group7.phygen.ExamSection.Exception.ExamSectionException;
-import com.swd392.group7.phygen.ExamSection.Repository.ExamSectionRepo;
-import com.swd392.group7.phygen.ExamSection.Service.ExamSectionService;
 import com.swd392.group7.phygen.ExamVersion.Dto.ExamVersionGenerateResponse;
-import com.swd392.group7.phygen.MatrixDetail.Dto.MatrixDetailStructureResponse;
-import com.swd392.group7.phygen.MatrixDetail.Enum.DifficultyLevel;
-import com.swd392.group7.phygen.MatrixDetail.Exception.MatrixDetailException;
-import com.swd392.group7.phygen.MatrixDetail.MatrixDetail;
-import com.swd392.group7.phygen.MatrixDetail.Repository.MatrixDetailRepo;
-import com.swd392.group7.phygen.MatrixSection.Dto.MatrixSectionStructureResponse;
-import com.swd392.group7.phygen.MatrixSection.Exception.MatrixSectionException;
-import com.swd392.group7.phygen.MatrixSection.MatrixSection;
-import com.swd392.group7.phygen.MatrixSection.Repository.MatrixSectionRepo;
-import com.swd392.group7.phygen.Question.Dto.QuestionStructureResponse;
-import com.swd392.group7.phygen.Question.Entity.Question;
-import com.swd392.group7.phygen.Question.Exception.QuestionException;
-import com.swd392.group7.phygen.Question.Repository.QuestionRepo;
-import com.swd392.group7.phygen.Subject.Dto.SubjectStructureResponse;
 import com.swd392.group7.phygen.Subject.Entity.Subject;
 import com.swd392.group7.phygen.Subject.Service.SubjectService;
-import com.swd392.group7.phygen.Topic.Dto.TopicStructureResponse;
-import com.swd392.group7.phygen.Topic.Entity.Topic;
-import com.swd392.group7.phygen.Topic.Enum.Level;
-import com.swd392.group7.phygen.Topic.Exception.TopicException;
-import com.swd392.group7.phygen.Topic.Repository.TopicRepo;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import lombok.RequiredArgsConstructor;
@@ -73,8 +33,6 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.io.ByteArrayOutputStream;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -84,18 +42,9 @@ public class ExamService {
     private final ExamRepo examRepo;
     private final ModelMapper modelMapper;
     private final SubjectService subjectService;
-    private final ExamMatrixRepo examMatrixRepo;
-    private final MatrixSectionRepo matrixSectionRepo;
-    private final MatrixDetailRepo matrixDetailRepo;
-    private final TopicRepo topicRepo;
-    private final QuestionRepo questionRepo;
-    private final AnswerRepo answerRepo;
-    private final ExamSectionRepo examSectionRepo;
-    private final ExamQuestionRepo examQuestionRepo;
     private final ObjectMapper objectMapper;
     private final PromptBuilder promptBuilder;
     private final GeminiService geminiService;
-    private final ExamSectionService examSectionService;
     private final TemplateEngine templateEngine;
     private final Parser markdownParser;
     private final HtmlRenderer htmlRenderer;
@@ -170,7 +119,7 @@ public class ExamService {
 
         Page<Exam> examPage = examRepo.findAllByAccountId(account.getId(), pageRequest);
         if (examPage.isEmpty()) {
-            throw new ExamException("Empty list exam for accountId: " + account.getId(), HttpStatus.NOT_FOUND);
+           return null;
         }
         List<ExamResponse> responses = examPage.stream().map(exam -> modelMapper.map(exam, ExamResponse.class)).toList();
         return new PagedResponse<>(
@@ -195,7 +144,7 @@ public class ExamService {
 
         Page<Exam> examPage = examRepo.findAllByAccountId(accountId, pageRequest);
         if (examPage.isEmpty()) {
-            throw new ExamException("Empty list exam for accountId: " + accountId, HttpStatus.NOT_FOUND);
+            return null;
         }
         List<ExamResponse> responses = examPage.stream().map(exam -> modelMapper.map(exam, ExamResponse.class)).toList();
         return new PagedResponse<>(

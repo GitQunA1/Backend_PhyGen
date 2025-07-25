@@ -96,7 +96,7 @@ public class ExamVersionService {
 
         Page<ExamVersion> examVersionPage = examVersionRepo.findAllByExamId(examId,pageRequest);
         if(examVersionPage.isEmpty()){
-            throw new AnswerException("Empty list examVersion for examId: "+examId,HttpStatus.NOT_FOUND);
+            return null;
         }
         List<ExamVersionResponse> respons = examVersionPage
                 .stream()

@@ -71,8 +71,7 @@ public class SupabaseStorageService {
                     if (key.endsWith(".emptyFolderPlaceholder") || key.endsWith("/")) {
                         return null;
                     }
-
-                    String url = getSignedUrl(bucketName, key); // Tạo URL
+                    String url = getSignedUrl(key, bucketName); // Tạo URL
                     return new FileDto(key, url);
                 })
                 .filter(Objects::nonNull)
