@@ -26,4 +26,16 @@
         public string TopicName { get; set; }
         public List<AnswerInfo> Answers { get; set; }
     }
+
+    public class AnswerInfo
+    {
+        public string Content { get; set; }
+        public bool? IsCorrect { get; set; }
+    }
+
+    public class TempAIExamItem
+    {
+        public string section { get; set; }
+        public int questionId { get; set; }
+    }
 }

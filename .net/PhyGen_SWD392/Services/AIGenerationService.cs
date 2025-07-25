@@ -69,7 +69,6 @@ namespace PhyGen_SWD392.Services
             await _context.SaveChangesAsync(); 
 
             var grouped = tempItems.GroupBy(x => x.section);
-            var aiExamResponses = new List<AIExamResponse>();
 
             var examResponse = new ExamGenerationResponse
             {
