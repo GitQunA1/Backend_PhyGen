@@ -30,7 +30,7 @@ public class Exam {
     Status status;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "examtype")
+    @Column(name = "examtype"   )
     ExamType examType;
 
 

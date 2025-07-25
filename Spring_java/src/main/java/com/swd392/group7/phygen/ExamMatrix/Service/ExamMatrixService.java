@@ -4,8 +4,6 @@ import com.swd392.group7.phygen.ExamMatrix.Dto.ExamMatrixEnumResponse;
 import com.swd392.group7.phygen.ExamMatrix.Entity.ExamMatrix;
 import com.swd392.group7.phygen.ExamMatrix.Exception.ExamMatrixException;
 import com.swd392.group7.phygen.ExamMatrix.Repository.ExamMatrixRepo;
-import com.swd392.group7.phygen.Subject.Entity.Subject;
-import com.swd392.group7.phygen.Subject.Service.SubjectService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
