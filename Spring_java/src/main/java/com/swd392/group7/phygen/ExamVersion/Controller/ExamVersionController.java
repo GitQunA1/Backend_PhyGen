@@ -92,9 +92,4 @@ public class ExamVersionController {
         ApiResponse<PagedResponse<ExamVersionResponse>> response = new ApiResponse<>(true,"Get list exam version",pagedResponse,null);
         return ResponseEntity.ok(response);
     }
-
-    @PostMapping
-    public ResponseEntity<?> create(){
-        return ResponseEntity.ok("ok");
-    }
 }
