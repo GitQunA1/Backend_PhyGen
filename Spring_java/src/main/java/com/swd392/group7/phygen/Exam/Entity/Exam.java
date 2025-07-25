@@ -36,6 +36,9 @@ public class Exam {
 
     LocalDateTime createdAt;
 
+    @Column(name = "exam_json")
+    String json;
+
     @ManyToOne
     @JoinColumn(name = "created_by")
     Account account;

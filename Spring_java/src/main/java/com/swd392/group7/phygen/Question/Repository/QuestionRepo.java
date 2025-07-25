@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,4 +18,11 @@ public interface QuestionRepo extends JpaRepository<Question, Long> {
     Optional<List<Question>> findAllByTopicId(Long topicId);
 
     Page<Question> findAllByStatus(PageRequest pageRequest, Status status);
+
+
+    @Query("SELECT q FROM Question q JOIN FETCH q.topic")
+    Page<Question> findAllWithTopic(Pageable pageable);
+
+    @Query("SELECT q FROM Question q JOIN FETCH q.topic WHERE q.status = :status")
+    Page<Question> findAllByStatusWithTopic(Status status, Pageable pageable);
 }

@@ -8,10 +8,7 @@ import com.swd392.group7.phygen.AI.Structure.Dto.SubjectDto;
 import com.swd392.group7.phygen.AI.Structure.Dto.TopicDto;
 import com.swd392.group7.phygen.Answer.Entity.Answer;
 import com.swd392.group7.phygen.Common.PagedResponse;
-import com.swd392.group7.phygen.Question.Dto.QuestionResponse;
-import com.swd392.group7.phygen.Question.Dto.QuestionCreateRequest;
-import com.swd392.group7.phygen.Question.Dto.QuestionUpdateRequest;
-import com.swd392.group7.phygen.Question.Dto.StatusUpdateRequest;
+import com.swd392.group7.phygen.Question.Dto.*;
 import com.swd392.group7.phygen.Question.Entity.Question;
 import com.swd392.group7.phygen.Question.Enum.Status;
 import com.swd392.group7.phygen.Question.Exception.QuestionException;
@@ -123,7 +120,7 @@ public class QuestionService {
         );
     }
 
-        public PagedResponse<QuestionResponse> getAllQuestion(
+        public PagedResponse<QuestionGetAllByStatusResponse> getAllQuestion(
                 Status status,
                 int page,
                 int size,
@@ -134,16 +131,16 @@ public class QuestionService {
             PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, sortBy));
             Page<Question> questionPage;
             if(status==null){
-                questionPage = questionRepo.findAll(pageRequest);
+                questionPage = questionRepo.findAllWithTopic(pageRequest);
             }else{
-                questionPage = questionRepo.findAllByStatus(pageRequest,status);
+                questionPage = questionRepo.findAllByStatusWithTopic(status,pageRequest);
             }
             if(questionPage.isEmpty()) {
                 throw new QuestionException("Empty list question", HttpStatus.NOT_FOUND);
             }
-            List<QuestionResponse> responses = questionPage
+            List<QuestionGetAllByStatusResponse> responses = questionPage
                     .stream()
-                    .map(question -> modelMapper.map(question, QuestionResponse.class))
+                    .map(question -> modelMapper.map(question, QuestionGetAllByStatusResponse.class))
                     .toList();
             return new PagedResponse<>(
                     responses,

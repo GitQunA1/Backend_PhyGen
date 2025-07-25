@@ -3,10 +3,7 @@ package com.swd392.group7.phygen.Question.Controller;
 import com.swd392.group7.phygen.AI.Structure.Dto.SubjectDto;
 import com.swd392.group7.phygen.Common.ApiResponse;
 import com.swd392.group7.phygen.Common.PagedResponse;
-import com.swd392.group7.phygen.Question.Dto.QuestionCreateRequest;
-import com.swd392.group7.phygen.Question.Dto.QuestionResponse;
-import com.swd392.group7.phygen.Question.Dto.QuestionUpdateRequest;
-import com.swd392.group7.phygen.Question.Dto.StatusUpdateRequest;
+import com.swd392.group7.phygen.Question.Dto.*;
 import com.swd392.group7.phygen.Question.Enum.Status;
 import com.swd392.group7.phygen.Question.Service.QuestionService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -63,7 +60,7 @@ public class QuestionController {
             @RequestParam(defaultValue = "desc") String sortDir
     ){
         PagedResponse<QuestionResponse> pagedResponse = questionService.getAllQuestionFromTopicId(topicId, page, size, sortBy, sortDir);
-        ApiResponse<PagedResponse<QuestionResponse>> response = new ApiResponse<>(true,"get Question from topicId"+topicId+"successfully",pagedResponse,null);
+        ApiResponse<PagedResponse<QuestionResponse>> response = new ApiResponse<>(true,"get Question from topicId "+topicId+" successfully",pagedResponse,null);
         return ResponseEntity.ok(response);
     }
 
@@ -75,8 +72,8 @@ public class QuestionController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir
     ){
-        PagedResponse<QuestionResponse> pagedResponse = questionService.getAllQuestion(status,page, size, sortBy, sortDir);
-        ApiResponse<PagedResponse<QuestionResponse>> response = new ApiResponse<>(true,"get Question from status "+ status +"successfully",pagedResponse,null);
+        PagedResponse<QuestionGetAllByStatusResponse> pagedResponse = questionService.getAllQuestion(status,page, size, sortBy, sortDir);
+        ApiResponse<PagedResponse<QuestionGetAllByStatusResponse>> response = new ApiResponse<>(true,"get Question from status "+ status +" successfully",pagedResponse,null);
         return ResponseEntity.ok(response);
     }
 
