@@ -3,6 +3,6 @@
     public enum MatrixDetailTypeEnum
     {
         multiple_choice = 1,
-        essay_question = 2
+        essay = 2
     }
 }
