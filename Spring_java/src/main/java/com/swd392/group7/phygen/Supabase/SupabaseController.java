@@ -51,5 +51,12 @@ public class SupabaseController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/url/isExpired")
+    public ResponseEntity<?> checkUrl(String url){
+        Boolean isExpired = supabaseStorageService.checkUrlExpired(url);
+        ApiResponse<Boolean> response = new ApiResponse<>(true,"get status url",isExpired,null);
+        return ResponseEntity.ok(response);
+    }
+
 
 }

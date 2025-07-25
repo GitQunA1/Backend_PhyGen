@@ -12,6 +12,8 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.List;
@@ -119,6 +121,53 @@ public class SupabaseStorageService {
         }catch(S3Exception s3Exception){
             System.err.println("Error deleting file '" + fileName + "' from bucket '" + bucketName + "': " + s3Exception.getMessage());
             return false;
+        }
+    }
+
+    public boolean checkUrlExpired(String signedUrl){
+        HttpURLConnection connection = null;
+        try {
+            URL url = new URL(signedUrl);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("HEAD");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+
+            int responseCode = connection.getResponseCode();
+            System.out.println("Kiểm tra URL: " + signedUrl + " -> Mã phản hồi: " + responseCode);
+            if (responseCode >= 200 && responseCode < 300) {
+                return false;
+            }
+            else return responseCode != 403;
+        } catch (IOException e) {
+            System.err.println("Lỗi khi kiểm tra URL " + signedUrl + ": " + e.getMessage());
+            return true;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+    }
+
+    public String[] extractBucketAndPath(String urlString) {
+        try {
+            String path = new URL(urlString).getPath();
+            int s3Index = path.indexOf("/s3/");
+
+            if (s3Index == -1) {
+                return new String[]{"", ""};
+            }
+
+            String relevantPath = path.substring(s3Index + "/s3/".length());
+            int firstSlashIndex = relevantPath.indexOf('/');
+
+            String bucketName = (firstSlashIndex == -1) ? relevantPath : relevantPath.substring(0, firstSlashIndex);
+            String folderPathAndFileName = (firstSlashIndex == -1) ? "" : relevantPath.substring(firstSlashIndex + 1);
+
+            return new String[]{bucketName, folderPathAndFileName};
+
+        } catch (MalformedURLException e) {
+            return new String[]{"", ""}; // URL không hợp lệ, trả về rỗng
         }
     }
 
