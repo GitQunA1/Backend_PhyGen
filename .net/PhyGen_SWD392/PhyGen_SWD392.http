@@ -1,0 +1,6 @@
+@PhyGen_SWD392_HostAddress = http://localhost:5102
+
+GET {{PhyGen_SWD392_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
