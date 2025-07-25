@@ -16,7 +16,5 @@ public class ExamCreateRequest {
 
     ExamType examType;
 
-    DifficultyLevel difficultyLevel;
-
     String examQuantity;
 }

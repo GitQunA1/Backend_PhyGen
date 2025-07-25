@@ -17,7 +17,10 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class QuestionStructureResponse {
     String content;
-    Type type;
+    int orderIndex;
     DifficultyLevel difficultyLevel;
-    List<AnswerStructureResponse> answerStructureResponses;
+    Type type;
+    Long topicId;
+    String topicName;
+    List<AnswerStructureResponse> answers;
 }

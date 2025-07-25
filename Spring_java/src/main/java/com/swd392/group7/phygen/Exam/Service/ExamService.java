@@ -104,68 +104,46 @@ public class ExamService {
         return examRepo.findById(id).orElseThrow(() -> new ExamException("Cant found that Exam", HttpStatus.NOT_FOUND));
     }
 
-    public ExamVersionGenerateResponse create(ExamCreateRequest examRq) throws JsonProcessingException {
-        Account account = accountService.getCurrentAccount();
-        Exam exam = new Exam();
-        exam.setAccount(account);
-        ExamType targetType = ExamType.valueOf(examRq.getExamType().name());
-        exam.setExamType(targetType);
-        exam.setCreatedAt(LocalDateTime.now());
-        exam.setStatus(Status.active);
-        exam.setDraft(true);
-        examRepo.save(exam);
-
-        ExamSectionCreateRequest examSectionCreateRequest = new ExamSectionCreateRequest();
-        List<String> hardcodedSectionNames = new ArrayList<>();
-        hardcodedSectionNames.add("Phần I:  Trắc nghiệm");
-        hardcodedSectionNames.add("Phần II: Tự luận");
-        examSectionCreateRequest.setSectionName(hardcodedSectionNames);
-        examSectionService.create(examSectionCreateRequest, exam.getId());
-
-        ExamFormatResponse examFormatResponse = getListExamFormat(exam.getId());
-        ExamStructureRequest examStructureRequest = new ExamStructureRequest();
-        examStructureRequest.setExamType(examRq.getExamType());
-        examStructureRequest.setSubjectId(examRq.getSubjectId());
-        examStructureRequest.setDifficultLevel(examRq.getDifficultyLevel());
-        ExamStructureResponse examStructureResponse = getExamStructure(examStructureRequest);
+    public ExamVersionGenerateResponse createMarkdownForm(ExamStructureRequest examFormatResponse,String quantity) throws JsonProcessingException {
+        Subject subject = subjectService.findSubjectById(examFormatResponse.getSubjectId());
+        String grade = subject.getGrade().toString();
 
         String examFormatJson = objectMapper.writeValueAsString(examFormatResponse);
-        String examStructureJson = objectMapper.writeValueAsString(examStructureResponse);
 
         String examTemplate = promptBuilder
                 .buildGenerateExamPrompt()
+                .replace("{{Grade}}",grade)
                 .replace("{{EXAM_FORMAT_RESPONSE_JSON}}", examFormatJson)
-                .replace("{{EXAM_STRUCTURE_RESPONSE_JSON}}", examStructureJson)
-                .replace("{{EXAM_ID_PLACEHOLDER}}", exam.getId().toString())
-                .replace("{{NUMBER_OF_EXAMS_TO_GENERATE}}", examRq.getExamQuantity());
+                .replace("{{EXAM_ID_PLACEHOLDER}}", examFormatResponse.getSubjectId().toString())
+                .replace("{{NUMBER_OF_EXAMS_TO_GENERATE}}", quantity);
 
         String examGeminiGenerate = geminiService.generateExam(examTemplate);
         return objectMapper.readValue(examGeminiGenerate, ExamVersionGenerateResponse.class);
     }
 
-    public ExamFormatResponse getListExamFormat(Long examId) {
-        Exam exam = findExamById(examId);
-        ExamResponse examResponse = modelMapper.map(exam, ExamResponse.class);
-
-        ExamFormatResponse examFormatResponse = new ExamFormatResponse();
-        examFormatResponse.setExamResponse(examResponse);
-        examFormatResponse.setExamSectionFormatResponses(new ArrayList<>());
-
-        List<ExamSection> examSections = examSectionRepo.findAllByExamId(exam.getId()).orElseThrow(() -> new ExamSectionException("Empty list exam section", HttpStatus.NOT_FOUND));
-
-        for (ExamSection examSection : examSections) {
-            ExamSectionFormatResponse examSectionFormatResponse = modelMapper.map(examSection, ExamSectionFormatResponse.class);
-            examSectionFormatResponse.setExamQuestionResponses(new ArrayList<>());
-            List<ExamQuestion> examQuestions = examQuestionRepo.findAllByExamSectionId(examSection.getId()).orElseThrow(() -> new ExamQuestionException("Empty list exam question", HttpStatus.NOT_FOUND));
-            for (ExamQuestion examQuestion : examQuestions) {
-                ExamQuestionResponse examQuestionResponse = modelMapper.map(examQuestion, ExamQuestionResponse.class);
-
-                examSectionFormatResponse.getExamQuestionResponses().add(examQuestionResponse);
-            }
-            examFormatResponse.getExamSectionFormatResponses().add(examSectionFormatResponse);
-        }
-        return examFormatResponse;
-    }
+//    public ExamFormatResponse getListExamFormat(Long examId) {
+//        Exam exam = findExamById(examId);
+//        ExamResponse examResponse = modelMapper.map(exam, ExamResponse.class);
+//
+//        ExamFormatResponse examFormatResponse = new ExamFormatResponse();
+//        examFormatResponse.setExamResponse(examResponse);
+//        examFormatResponse.setExamSectionFormatResponses(new ArrayList<>());
+//
+//        List<ExamSection> examSections = examSectionRepo.findAllByExamId(exam.getId()).orElseThrow(() -> new ExamSectionException("Empty list exam section", HttpStatus.NOT_FOUND));
+//
+//        for (ExamSection examSection : examSections) {
+//            ExamSectionFormatResponse examSectionFormatResponse = modelMapper.map(examSection, ExamSectionFormatResponse.class);
+//            examSectionFormatResponse.setExamQuestionResponses(new ArrayList<>());
+//            List<ExamQuestion> examQuestions = examQuestionRepo.findAllByExamSectionId(examSection.getId()).orElseThrow(() -> new ExamQuestionException("Empty list exam question", HttpStatus.NOT_FOUND));
+//            for (ExamQuestion examQuestion : examQuestions) {
+//                ExamQuestionResponse examQuestionResponse = modelMapper.map(examQuestion, ExamQuestionResponse.class);
+//
+//                examSectionFormatResponse.getExamQuestionResponses().add(examQuestionResponse);
+//            }
+//            examFormatResponse.getExamSectionFormatResponses().add(examSectionFormatResponse);
+//        }
+//        return examFormatResponse;
+//    }
 
     public ExamResponse update(ExamUpdateRequest examRq, Long id) {
         Exam oldExam = findExamById(id);
@@ -254,45 +232,45 @@ public class ExamService {
         );
     }
 
-    public ExamStructureResponse getExamStructure(ExamStructureRequest request) {
-        Level level = Level.valueOf(request.getDifficultLevel().name());
-
-        Subject subject = subjectService.findSubjectById(request.getSubjectId());
-        SubjectStructureResponse subjectStructureResponse = modelMapper.map(subject, SubjectStructureResponse.class);
-
-
-        ExamMatrix examMatrix = examMatrixRepo.findBySubjectIdAndExamTypeAndExamMatrixStatus(request.getSubjectId(), request.getExamType(), ExamMatrixStatus.active).orElseThrow(() -> new ExamMatrixException("Empty list exam matrix", HttpStatus.NOT_FOUND));
-
-        ExamMatrixStructureResponse examMatrixStructureResponse = modelMapper.map(examMatrix, ExamMatrixStructureResponse.class);
-        examMatrixStructureResponse.setMatrixSectionStructureResponses(new ArrayList<>());
-
-        List<MatrixSection> matrixSections = matrixSectionRepo.findAllByExamMatrixId(examMatrix.getId()).orElseThrow(() -> new MatrixSectionException("Empty list matrix section", HttpStatus.NOT_FOUND));
-
-        for (MatrixSection matrixSection : matrixSections) {
-            MatrixSectionStructureResponse matrixSectionStructureResponse = modelMapper.map(matrixSection, MatrixSectionStructureResponse.class);
-            matrixSectionStructureResponse.setMatrixDetailStructureResponseList(new ArrayList<>());
-
-            List<MatrixDetail> matrixDetails = matrixDetailRepo.findAllByMatrixSectionIdAndDifficultyLevel(matrixSection.getId(), request.getDifficultLevel()).orElseThrow(() -> new MatrixDetailException("Empty list matrix detail", HttpStatus.NOT_FOUND));
-
-            for (MatrixDetail matrixDetail : matrixDetails) {
-                MatrixDetailStructureResponse matrixDetailStructureResponse = modelMapper.map(matrixDetail, MatrixDetailStructureResponse.class);
-
-
-                Topic rootTopic = topicRepo.findTopicByIdAndLevel(matrixDetail.getTopic().getId(), level).orElseThrow(() -> new TopicException("Cant found topic with level " + request.getDifficultLevel().toString(), HttpStatus.NOT_FOUND));
-                TopicStructureResponse rootTopicStructureResponse = buildTopicTree(rootTopic, request.getDifficultLevel());
-
-                TopicStructureResponse topicStructureResponse = modelMapper.map(rootTopicStructureResponse, TopicStructureResponse.class);
-                topicStructureResponse.setQuestionStructureResponses(new ArrayList<>());
-
-
-                matrixDetailStructureResponse.setTopicStructureResponse(topicStructureResponse);
-                matrixSectionStructureResponse.getMatrixDetailStructureResponseList().add(matrixDetailStructureResponse);
-            }
-            examMatrixStructureResponse.getMatrixSectionStructureResponses().add(matrixSectionStructureResponse);
-        }
-        subjectStructureResponse.setExamMatrixStructureResponse(examMatrixStructureResponse);
-        return new ExamStructureResponse(subjectStructureResponse);
-    }
+//    public ExamStructureResponse getExamStructure(ExamStructureRequest request) {
+//        Level level = Level.valueOf(request.getDifficultLevel().name());
+//
+//        Subject subject = subjectService.findSubjectById(request.getSubjectId());
+//        SubjectStructureResponse subjectStructureResponse = modelMapper.map(subject, SubjectStructureResponse.class);
+//
+//
+//        ExamMatrix examMatrix = examMatrixRepo.findBySubjectIdAndExamTypeAndExamMatrixStatus(request.getSubjectId(), request.getExamType(), ExamMatrixStatus.active).orElseThrow(() -> new ExamMatrixException("Empty list exam matrix", HttpStatus.NOT_FOUND));
+//
+//        ExamMatrixStructureResponse examMatrixStructureResponse = modelMapper.map(examMatrix, ExamMatrixStructureResponse.class);
+//        examMatrixStructureResponse.setMatrixSectionStructureResponses(new ArrayList<>());
+//
+//        List<MatrixSection> matrixSections = matrixSectionRepo.findAllByExamMatrixId(examMatrix.getId()).orElseThrow(() -> new MatrixSectionException("Empty list matrix section", HttpStatus.NOT_FOUND));
+//
+//        for (MatrixSection matrixSection : matrixSections) {
+//            MatrixSectionStructureResponse matrixSectionStructureResponse = modelMapper.map(matrixSection, MatrixSectionStructureResponse.class);
+//            matrixSectionStructureResponse.setMatrixDetailStructureResponseList(new ArrayList<>());
+//
+//            List<MatrixDetail> matrixDetails = matrixDetailRepo.findAllByMatrixSectionIdAndDifficultyLevel(matrixSection.getId(), request.getDifficultLevel()).orElseThrow(() -> new MatrixDetailException("Empty list matrix detail", HttpStatus.NOT_FOUND));
+//
+//            for (MatrixDetail matrixDetail : matrixDetails) {
+//                MatrixDetailStructureResponse matrixDetailStructureResponse = modelMapper.map(matrixDetail, MatrixDetailStructureResponse.class);
+//
+//
+//                Topic rootTopic = topicRepo.findTopicByIdAndLevel(matrixDetail.getTopic().getId(), level).orElseThrow(() -> new TopicException("Cant found topic with level " + request.getDifficultLevel().toString(), HttpStatus.NOT_FOUND));
+//                TopicStructureResponse rootTopicStructureResponse = buildTopicTree(rootTopic, request.getDifficultLevel());
+//
+//                TopicStructureResponse topicStructureResponse = modelMapper.map(rootTopicStructureResponse, TopicStructureResponse.class);
+//                topicStructureResponse.setQuestionStructureResponses(new ArrayList<>());
+//
+//
+//                matrixDetailStructureResponse.setTopicStructureResponse(topicStructureResponse);
+//                matrixSectionStructureResponse.getMatrixDetailStructureResponseList().add(matrixDetailStructureResponse);
+//            }
+//            examMatrixStructureResponse.getMatrixSectionStructureResponses().add(matrixSectionStructureResponse);
+//        }
+//        subjectStructureResponse.setExamMatrixStructureResponse(examMatrixStructureResponse);
+//        return new ExamStructureResponse(subjectStructureResponse);
+//    }
 
     public MultipartFile convertMarkdownToPdf(String markdown,String key){
         String reformatMarkdown = markdown
@@ -346,43 +324,43 @@ public class ExamService {
         }
     }
 
-    private TopicStructureResponse buildTopicTree(Topic currentTopic, DifficultyLevel difficultLevel) {
-        TopicStructureResponse topicStructureResponse = modelMapper.map(currentTopic, TopicStructureResponse.class);
-        topicStructureResponse.setQuestionStructureResponses(new ArrayList<>());
-        topicStructureResponse.setTopicStructureResponses(new ArrayList<>());
-
-        // 1. Thêm các câu hỏi trực tiếp thuộc về chủ đề này (ở mức độ khó yêu cầu)
-        List<Question> questions = questionRepo.findAllByTopicId(currentTopic.getId())
-                .orElseThrow(() -> new QuestionException("Empty list question for topic " + currentTopic.getId(), HttpStatus.NOT_FOUND))
-                .stream()
-                .filter(question -> question.getDifficultyLevel().toString().equals(difficultLevel.toString()))
-                .toList();
-
-        for (Question question : questions) {
-            QuestionStructureResponse questionStructureResponse = modelMapper.map(question, QuestionStructureResponse.class);
-            questionStructureResponse.setAnswerStructureResponses(new ArrayList<>());
-
-            List<Answer> answers = answerRepo.findAllByQuestionId(question.getId())
-                    .orElseThrow(() -> new AnswerException("Empty list answer for question " + question.getId(), HttpStatus.NOT_FOUND));
-            List<AnswerStructureResponse> answerStructureResponses = answers.stream()
-                    .map(answer -> modelMapper.map(answer, AnswerStructureResponse.class))
-                    .toList();
-            questionStructureResponse.setAnswerStructureResponses(answerStructureResponses);
-            topicStructureResponse.getQuestionStructureResponses().add(questionStructureResponse);
-        }
-
-        // 2. Tìm và thêm các chủ đề con
-        // Giả định bạn có một phương thức trong topicRepo để tìm các chủ đề con dựa trên parentId
-        List<Topic> subTopics = topicRepo.findAllByParentId(currentTopic.getId()).orElseThrow(()-> new TopicException("No subtopic found",HttpStatus.NOT_FOUND)); // Trả về danh sách rỗng nếu không có
-
-        for (Topic subTopic : subTopics) {
-            // Đệ quy gọi lại hàm để xây dựng cây cho chủ đề con
-            TopicStructureResponse subTopicResponse = buildTopicTree(subTopic, difficultLevel);
-            topicStructureResponse.getTopicStructureResponses().add(subTopicResponse);
-        }
-
-        return topicStructureResponse;
-    }
+//    private TopicStructureResponse buildTopicTree(Topic currentTopic, DifficultyLevel difficultLevel) {
+//        TopicStructureResponse topicStructureResponse = modelMapper.map(currentTopic, TopicStructureResponse.class);
+//        topicStructureResponse.setQuestionStructureResponses(new ArrayList<>());
+//        topicStructureResponse.setTopicStructureResponses(new ArrayList<>());
+//
+//        // 1. Thêm các câu hỏi trực tiếp thuộc về chủ đề này (ở mức độ khó yêu cầu)
+//        List<Question> questions = questionRepo.findAllByTopicId(currentTopic.getId())
+//                .orElseThrow(() -> new QuestionException("Empty list question for topic " + currentTopic.getId(), HttpStatus.NOT_FOUND))
+//                .stream()
+//                .filter(question -> question.getDifficultyLevel().toString().equals(difficultLevel.toString()))
+//                .toList();
+//
+//        for (Question question : questions) {
+//            QuestionStructureResponse questionStructureResponse = modelMapper.map(question, QuestionStructureResponse.class);
+//            questionStructureResponse.setAnswerStructureResponses(new ArrayList<>());
+//
+//            List<Answer> answers = answerRepo.findAllByQuestionId(question.getId())
+//                    .orElseThrow(() -> new AnswerException("Empty list answer for question " + question.getId(), HttpStatus.NOT_FOUND));
+//            List<AnswerStructureResponse> answerStructureResponses = answers.stream()
+//                    .map(answer -> modelMapper.map(answer, AnswerStructureResponse.class))
+//                    .toList();
+//            questionStructureResponse.setAnswerStructureResponses(answerStructureResponses);
+//            topicStructureResponse.getQuestionStructureResponses().add(questionStructureResponse);
+//        }
+//
+//        // 2. Tìm và thêm các chủ đề con
+//        // Giả định bạn có một phương thức trong topicRepo để tìm các chủ đề con dựa trên parentId
+//        List<Topic> subTopics = topicRepo.findAllByParentId(currentTopic.getId()).orElseThrow(()-> new TopicException("No subtopic found",HttpStatus.NOT_FOUND)); // Trả về danh sách rỗng nếu không có
+//
+//        for (Topic subTopic : subTopics) {
+//            // Đệ quy gọi lại hàm để xây dựng cây cho chủ đề con
+//            TopicStructureResponse subTopicResponse = buildTopicTree(subTopic, difficultLevel);
+//            topicStructureResponse.getTopicStructureResponses().add(subTopicResponse);
+//        }
+//
+//        return topicStructureResponse;
+//    }
 
 
 

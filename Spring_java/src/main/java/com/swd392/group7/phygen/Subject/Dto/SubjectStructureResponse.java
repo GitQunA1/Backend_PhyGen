@@ -15,6 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SubjectStructureResponse {
+    Long id;
+
     String name;
 
     Grade grade;

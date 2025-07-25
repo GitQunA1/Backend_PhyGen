@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.*;
 public class ExamController {
     private final ExamService examService;
 
-    @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody ExamCreateRequest examRq)throws JsonProcessingException {
-        ExamVersionGenerateResponse examVersionGenerateResponse = examService.create(examRq);
+    @PostMapping("/markdown")
+    public ResponseEntity<?> create(@Valid @RequestBody ExamStructureRequest examRq, @RequestParam String quantity)throws JsonProcessingException {
+        ExamVersionGenerateResponse examVersionGenerateResponse = examService.createMarkdownForm(examRq,quantity);
         ApiResponse<ExamVersionGenerateResponse> response = new ApiResponse<>(true,"Generate exam successfully", examVersionGenerateResponse,null);
         return ResponseEntity.ok(response);
     }
@@ -61,16 +61,6 @@ public class ExamController {
     ){
         PagedResponse<ExamResponse> pagedResponse = examService.getAllExam(page,size,sortBy,sortDir);
         ApiResponse<PagedResponse<ExamResponse>> response = new ApiResponse<>(true,"get list exam successfully",pagedResponse,null );
-        return ResponseEntity.ok(response);
-    }
-
-
-    public ResponseEntity<?> getExamStructure(@RequestParam ExamType examType,
-                                              @RequestParam Long subjectId,
-                                              @RequestParam DifficultyLevel difficultLevel){
-        ExamStructureRequest examStructureRequest = new ExamStructureRequest(examType,subjectId,difficultLevel);
-        ExamStructureResponse examStructureResponse = examService.getExamStructure(examStructureRequest);
-        ApiResponse<ExamStructureResponse> response = new ApiResponse<>(true,"Get Exam Structure successfully",examStructureResponse,null);
         return ResponseEntity.ok(response);
     }
 

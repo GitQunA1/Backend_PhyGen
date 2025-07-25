@@ -28,7 +28,6 @@ public class ExamVersionController {
     private final ExamVersionService examVersionService;
     private final ObjectMapper objectMapper;
 
-    @PostMapping(path = "/by-exam/{examId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@RequestPart("file") MultipartFile multipartFile,
                                     @Parameter(schema = @Schema (implementation = ExamVersionCreateRequest.class))
                                     @RequestPart String examVersionJson,
@@ -92,5 +91,10 @@ public class ExamVersionController {
         PagedResponse<ExamVersionResponse> pagedResponse = examVersionService.getAllExamVersion(page,size,sortBy,sortDir);
         ApiResponse<PagedResponse<ExamVersionResponse>> response = new ApiResponse<>(true,"Get list exam version",pagedResponse,null);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping
+    public ResponseEntity<?> create(){
+        return ResponseEntity.ok("ok");
     }
 }
