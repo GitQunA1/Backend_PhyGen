@@ -42,9 +42,11 @@ public class Filter extends OncePerRequestFilter {
             "/swagger-resources/**",
             "/api/Gemini/**",
             "/api/OCR/**",
-            "/api/Qdrant/**",
+            "/api/ping",
+            "/api/exams/expired-url",
             "/api/exams/structure",
-            "/api/topics/**"
+            "/api/topics/**",
+            "/api/Supabase/url/isExpired"
     );
 
 

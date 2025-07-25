@@ -14,8 +14,11 @@ import com.swd392.group7.phygen.Exam.Entity.Exam;
 import com.swd392.group7.phygen.Exam.Exception.ExamException;
 import com.swd392.group7.phygen.Exam.Repository.ExamRepo;
 import com.swd392.group7.phygen.ExamVersion.Dto.ExamVersionGenerateResponse;
+import com.swd392.group7.phygen.ExamVersion.Entity.ExamVersion;
+import com.swd392.group7.phygen.ExamVersion.Repository.ExamVersionRepo;
 import com.swd392.group7.phygen.Subject.Entity.Subject;
 import com.swd392.group7.phygen.Subject.Service.SubjectService;
+import com.swd392.group7.phygen.Supabase.SupabaseStorageService;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import lombok.RequiredArgsConstructor;
@@ -28,11 +31,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -40,6 +45,7 @@ import java.util.List;
 public class ExamService {
     private final AccountService accountService;
     private final ExamRepo examRepo;
+    private final ExamVersionRepo examVersionRepo;
     private final ModelMapper modelMapper;
     private final SubjectService subjectService;
     private final ObjectMapper objectMapper;
@@ -48,6 +54,7 @@ public class ExamService {
     private final TemplateEngine templateEngine;
     private final Parser markdownParser;
     private final HtmlRenderer htmlRenderer;
+    private final SupabaseStorageService supabaseStorageService;
 
     public Exam findExamById(Long id) {
         return examRepo.findById(id).orElseThrow(() -> new ExamException("Cant found that Exam", HttpStatus.NOT_FOUND));
@@ -311,6 +318,24 @@ public class ExamService {
 //        return topicStructureResponse;
 //    }
 
+    @Transactional
+    public void updateExpiredUrl(){
+        List<ExamVersion> examVersions = examVersionRepo.findAll();
+        List<ExamVersion> updatedExamVersions = new ArrayList<>();
+        for(ExamVersion examVersion:examVersions){
+            if(supabaseStorageService.checkUrlExpired(examVersion.getPdfUrl())){
+               String[] parts = supabaseStorageService.extractBucketAndPath(examVersion.getPdfUrl());
+                String bucketName = parts[0];
+                String folderFilePath = parts[1];
+                String newUrl = supabaseStorageService.getSignedUrl(folderFilePath,bucketName);
+                examVersion.setPdfUrl(newUrl);
+                updatedExamVersions.add(examVersion);
+            }else{
+                continue;
+            }
+            examVersionRepo.saveAll(updatedExamVersions);
+        }
+    }
 
 
 }

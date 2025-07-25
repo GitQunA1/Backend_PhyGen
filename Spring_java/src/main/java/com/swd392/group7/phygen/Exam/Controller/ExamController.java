@@ -77,4 +77,11 @@ public class ExamController {
         return ResponseEntity.ok(response);
     }
 
+
+    public ResponseEntity<?> updateExpiredUrl(){
+        examService.updateExpiredUrl();
+        ApiResponse<?> response = new ApiResponse<>(true,"update url successful",null,null);
+        return ResponseEntity.ok(response);
+    }
+
 }
