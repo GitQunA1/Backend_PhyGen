@@ -1,0 +1,25 @@
+# Thư mục build
+target/
+.build/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Git & metadata
+.git/
+.gitignore
+
+# File hệ thống & tạm thời
+.DS_Store
+*.log
+*.bak
+*.tmp
+*.swp
+
+# Dockerfile chính nó (tránh vòng lặp nếu muốn)
+Dockerfile
+
+# File môi trường nhạy cảm
+.env
