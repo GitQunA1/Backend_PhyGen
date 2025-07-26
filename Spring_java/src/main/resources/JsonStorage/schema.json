@@ -1,0 +1,149 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ExamDataSchema",
+  "description": "Schema for parsing and formatting high school exam data in Vietnam.",
+  "type": "object",
+  "properties": {
+    "subject": {
+      "type": "object",
+      "description": "Thông tin về môn học và khối lớp của đề thi.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Tên môn học (ví dụ: 'Vật Lý', 'Toán', 'Tiếng Anh')"
+        },
+        "grade": {
+          "type": "string",
+          "description": "Khối lớp (ví dụ: 'grade10', 'grade11', 'grade12')",
+          "enum": ["grade10", "grade11", "grade12"]
+        }
+      },
+      "required": ["name", "grade"]
+    },
+    "topics": {
+      "type": "array",
+      "description": "Danh sách các chủ đề chính trong đề thi.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Tên chủ đề chính (ví dụ: 'Cơ học', 'Điện học', 'Đại số')"
+          },
+          "level": {
+            "type": "string",
+            "description": "Mức độ kiến thức của chủ đề",
+            "enum": ["easy", "medium", "hard"]
+          },
+          "subTopics": {
+            "type": "array",
+            "description": "Danh sách các chủ đề con (chỉ một cấp độ, không lồng sâu hơn).",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Tên chủ đề con"
+                },
+                "level": {
+                  "type": "string",
+                  "description": "Mức độ kiến thức của chủ đề con",
+                  "enum": ["easy", "medium", "hard"]
+                },
+                "questions": {
+                  "type": "array",
+                  "description": "Danh sách các câu hỏi trong chủ đề con này.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "content": {
+                        "type": "string",
+                        "description": "Nội dung đầy đủ của câu hỏi"
+                      },
+                      "type": {
+                        "type": "string",
+                        "description": "Loại câu hỏi ('multiple_choice' hoặc 'essay')",
+                        "enum": ["multiple_choice", "essay"]
+                      },
+                      "difficultyLevel": {
+                        "type": "string",
+                        "description": "Mức độ khó của câu hỏi ('easy', 'medium', 'hard')",
+                        "enum": ["easy", "medium", "hard"]
+                      },
+                      "answers": {
+                        "type": "array",
+                        "description": "Danh sách các đáp án cho câu hỏi (chỉ có cho loại 'multiple_choice').",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "content": {
+                              "type": "string",
+                              "description": "Nội dung đáp án"
+                            },
+                            "isCorrect": {
+                              "type": "boolean",
+                              "description": "Đáp án đúng hay sai"
+                            }
+                          },
+                          "required": ["content", "is_correct"]
+                        }
+                      }
+                    },
+                    "required": ["content", "type", "difficultyLevel", "answers"]
+                  }
+                }
+              },
+              "required": ["name", "level", "questions"]
+            }
+          },
+          "questions": {
+            "type": "array",
+            "description": "Danh sách các câu hỏi trong chủ đề này.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "description": "Nội dung đầy đủ của câu hỏi"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "Loại câu hỏi ('multiple_choice' hoặc 'essay')",
+                  "enum": ["multiple_choice", "essay"]
+                },
+                "difficultyLevel": {
+                  "type": "string",
+                  "description": "Mức độ khó của câu hỏi ('easy', 'medium', 'hard')",
+                  "enum": ["easy", "medium", "hard"]
+                },
+                "answers": {
+                  "type": "array",
+                  "description": "Danh sách các đáp án cho câu hỏi (chỉ có cho loại 'multiple_choice').",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "content": {
+                        "type": "string",
+                        "description": "Nội dung đáp án"
+                      },
+                      "isCorrect": {
+                        "type": "boolean",
+                        "description": "Đáp án đúng hay sai"
+                      }
+                    },
+                    "required": ["content",
+                      "isCorrect"
+                    ]
+                  }
+                }
+              },
+              "required": ["content", "type", "difficultyLevel", "answers"]
+            }
+          }
+        },
+        "required": ["name", "level", "subTopics", "questions"]
+      }
+    }
+  },
+  "required": ["subject", "topics"]
+}

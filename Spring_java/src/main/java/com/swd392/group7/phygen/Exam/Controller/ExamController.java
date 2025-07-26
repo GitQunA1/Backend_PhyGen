@@ -1,0 +1,87 @@
+package com.swd392.group7.phygen.Exam.Controller;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.swd392.group7.phygen.Common.ApiResponse;
+import com.swd392.group7.phygen.Common.PagedResponse;
+import com.swd392.group7.phygen.Exam.Dto.*;
+import com.swd392.group7.phygen.Exam.Service.ExamService;
+import com.swd392.group7.phygen.ExamMatrix.Enum.ExamType;
+import com.swd392.group7.phygen.ExamVersion.Dto.ExamVersionGenerateResponse;
+import com.swd392.group7.phygen.MatrixDetail.Enum.DifficultyLevel;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/exams")
+@CrossOrigin("*")
+@SecurityRequirement(name = "api")
+public class ExamController {
+    private final ExamService examService;
+
+    @PostMapping("/markdown")
+    public ResponseEntity<?> create(@Valid @RequestBody ExamStructureRequest examRq, @RequestParam String quantity)throws JsonProcessingException {
+        ExamVersionGenerateResponse examVersionGenerateResponse = examService.createMarkdownForm(examRq,quantity);
+        ApiResponse<ExamVersionGenerateResponse> response = new ApiResponse<>(true,"Generate exam successfully", examVersionGenerateResponse,null);
+        return ResponseEntity.ok(response);
+    }
+    @PutMapping("{id}")
+    public ResponseEntity<?> update(@Valid @RequestBody ExamUpdateRequest examRq, @PathVariable Long id){
+        ExamResponse examRp = examService.update(examRq,id);
+        ApiResponse<ExamResponse> response = new ApiResponse<>(true,"Update Exam successfully",examRp,null);
+        return ResponseEntity.ok(response);
+    }
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> deleted(@PathVariable Long id){
+        examService.deleted(id);
+        ApiResponse<ExamResponse> response = new ApiResponse<>(true, "Deleted Exam successfully",null,null);
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/my")
+    public ResponseEntity<?> getAllExamFromAccountId(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir
+    ){
+        PagedResponse<ExamResponse> pagedResponse = examService.getAllExamFromAccountId(page,size,sortBy,sortDir);
+        ApiResponse<PagedResponse<ExamResponse>> response = new ApiResponse<>(true,"get Exam from account successfully",pagedResponse,null );
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping()
+    public ResponseEntity<?> getAllExam(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir
+    ){
+        PagedResponse<ExamResponse> pagedResponse = examService.getAllExam(page,size,sortBy,sortDir);
+        ApiResponse<PagedResponse<ExamResponse>> response = new ApiResponse<>(true,"get list exam successfully",pagedResponse,null );
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/by-account/{accountId}")
+    public ResponseEntity<?> getAllExamFromAccountId(
+            @PathVariable Long accountId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir
+    ){
+        PagedResponse<ExamResponse> pagedResponse = examService.getAllExamFromAccountID(accountId,page,size,sortBy,sortDir);
+        ApiResponse<PagedResponse<ExamResponse>> response = new ApiResponse<>(true,"get list exam successfully",pagedResponse,null );
+        return ResponseEntity.ok(response);
+    }
+
+
+    public ResponseEntity<?> updateExpiredUrl(){
+        examService.updateExpiredUrl();
+        ApiResponse<?> response = new ApiResponse<>(true,"update url successful",null,null);
+        return ResponseEntity.ok(response);
+    }
+
+}

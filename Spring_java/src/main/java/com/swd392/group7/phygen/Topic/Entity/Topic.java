@@ -1,0 +1,46 @@
+package com.swd392.group7.phygen.Topic.Entity;
+
+import com.swd392.group7.phygen.MatrixDetail.MatrixDetail;
+import com.swd392.group7.phygen.Question.Entity.Question;
+import com.swd392.group7.phygen.Subject.Entity.Subject;
+import com.swd392.group7.phygen.Topic.Enum.Level;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+import java.util.List;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class Topic {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+
+    String name;
+
+    @Enumerated(EnumType.STRING)
+    Level level;
+
+    @OneToMany(mappedBy = "topic",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<Question> questions;
+
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    private Topic parent;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Topic> subTopics;
+
+    @ManyToOne
+    @JoinColumn(name = "subject_id")
+    Subject subject;
+
+    @OneToMany(mappedBy = "topic",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<MatrixDetail> matrixDetails;
+
+}

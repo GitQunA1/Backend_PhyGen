@@ -49,7 +49,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173", "https://phygen-ai.vercel.app", "https://phygen-ai-dusky.vercel.app/")
+            policy.WithOrigins("http://localhost:5173", "https://phygen-ai.vercel.app", "https://phygen-ai-management.vercel.app")
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials();
