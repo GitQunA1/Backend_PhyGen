@@ -83,6 +83,8 @@ builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<IEnumRepo, EnumRepo>();
 builder.Services.AddScoped<EnumService>();
 builder.Services.AddScoped<StorageService>();
+builder.Services.AddScoped<IExamVersionRepo, ExamVersionRepo>();
+builder.Services.AddScoped<ExamVersionService>();
 
 builder.Services.AddScoped<AIGenerationService>();
 

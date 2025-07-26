@@ -55,8 +55,7 @@
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.TypeEnum.ToString()));
 
             CreateMap<Question, QuestionDto>();
-
-
+            CreateMap<ExamVersion, ExamVersionDto>();
         }
     }
 }

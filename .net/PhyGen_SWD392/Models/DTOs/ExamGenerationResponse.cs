@@ -2,6 +2,7 @@
 {
     public class ExamGenerationResponse
     {
+        public int ExamId { get; set; }
         public int SubjectId { get; set; }
         public string SubjectName { get; set; }
         public string ExamType { get; set; }
