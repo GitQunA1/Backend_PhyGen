@@ -74,6 +74,7 @@ namespace PhyGen_SWD392.Services
 
             var examResponse = new ExamGenerationResponse
             {
+                ExamId = exam.Id,
                 SubjectId = matrix.SubjectId ?? 0,
                 SubjectName = matrix.Subject?.Name,
                 ExamType = matrix.Examtype,
