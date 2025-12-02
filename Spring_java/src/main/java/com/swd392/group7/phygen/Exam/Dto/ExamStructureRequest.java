@@ -15,6 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ExamStructureRequest {
+    Long examId;
+
     Long subjectId;
 
     String subjectName;

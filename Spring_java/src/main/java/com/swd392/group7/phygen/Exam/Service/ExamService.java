@@ -70,7 +70,7 @@ public class ExamService {
                 .buildGenerateExamPrompt()
                 .replace("{{Grade}}",grade)
                 .replace("{{EXAM_FORMAT_RESPONSE_JSON}}", examFormatJson)
-                .replace("{{EXAM_ID_PLACEHOLDER}}", examFormatResponse.getSubjectId().toString())
+                .replace("{{EXAM_ID_PLACEHOLDER}}", examFormatResponse.getExamId().toString())
                 .replace("{{NUMBER_OF_EXAMS_TO_GENERATE}}", quantity);
 
         String examGeminiGenerate = geminiService.generateExam(examTemplate);
