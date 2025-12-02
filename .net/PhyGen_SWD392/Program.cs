@@ -113,9 +113,13 @@ builder.Services.AddSingleton(cloudinary =>
     return new CloudinaryDotNet.Cloudinary(account);
 });
 
-builder.Services.AddSingleton<IConnectionMultiplexer>(
-    ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis"))
-);
+var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp => {
+    var configuration = ConfigurationOptions.Parse(redisConnectionString, true);
+
+    configuration.AbortOnConnectFail = false;
+    return ConnectionMultiplexer.Connect(configuration);
+});
 
 builder.Services.AddScoped<RedisLogService>();
 
